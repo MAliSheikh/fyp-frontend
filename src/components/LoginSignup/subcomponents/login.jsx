@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import {
     Box,
@@ -15,7 +16,19 @@ const Login = () => {
     const [password, setPassword] = useState('');
 
     const handleLogin = () => {
-        console.log('Login:', { email, password });
+      
+                const url = 'http://localhost:8000/users/login';
+                axios.post(url, { email, password })
+                    .then(response => {
+                        console.log('Login successful:', response.data);
+                        const { token } = response.data;
+
+                        localStorage.setItem('token', token);
+                    })
+                    .catch(error => {
+                        console.error('Login error:', error);
+                    
+                    });
     };
 
     return (
@@ -42,7 +55,7 @@ const Login = () => {
                 variant="contained"
                 color="primary"
                 fullWidth
-                onClick={handleLogin}
+                type="submit"
             >
                 Login
             </Button>
