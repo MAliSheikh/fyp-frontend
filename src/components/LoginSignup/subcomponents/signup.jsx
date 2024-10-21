@@ -7,7 +7,6 @@ import {
     FormControlLabel,
     Typography,
 } from '@mui/material';
-import axiosInstance from "../../axiosInstance";
 import authService from './token'
 
 const SignUp = () => {
@@ -104,7 +103,6 @@ const SignUp = () => {
                 variant="contained"
                 color="primary"
                 fullWidth
-                // onClick={handleSignup}
                 type="submit"
             >
                 Signup
