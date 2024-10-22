@@ -1,3 +1,4 @@
+import axios from 'axios'; 
 import React, { useState } from 'react';
 import {
     Box,
@@ -16,10 +17,36 @@ const SignUp = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [gender, setGender] = useState('male');
+    const [error, setError] = useState(null); // Initialize error state
 
 
-    const handleSignup = () => {
-        console.log('Signup:', { username, email, password, confirmPassword, gender });
+    const handleSignup = (event) => {
+        event.preventDefault();
+        
+        // Check if passwords match
+        if (password !== confirmPassword) {
+            setError('Passwords do not match.');
+            return;
+        }
+
+        const url = 'http://localhost:8000/users/register';
+        const data = {
+            name: username,
+            email,
+            password,
+            gender,
+        };
+
+        axios.post(url, data)
+            .then(response => {
+                console.log('Signup successful:', response.data);
+                alert('Signup successful! You can now login.');
+                // Optionally, redirect to login page or show a success message
+            })
+            .catch(error => {
+                console.error('Signup error:', error.response ? error.response.data : error.message);
+                alert('Signup failed. Please try again.');
+            });
     };
 
     return (
@@ -75,7 +102,7 @@ const SignUp = () => {
                 variant="contained"
                 color="primary"
                 fullWidth
-                onClick={handleSignup}
+                type="submit"
             >
                 Signup
             </Button>
