@@ -1,4 +1,5 @@
 import axiosInstance from "../../axiosInstance";
+import axios from "axios";
 
 const login = (email, password) => {
   return axiosInstance
@@ -39,11 +40,10 @@ const getToken = () => {
 };
 
 const register = (email, password, username, role) => {
-  return axiosInstance
-    .post("/users/register", {
+  return axios.post("http://localhost:8000/users/register", {
       email: email,
       password: password,
-      username: username,
+      name: username,
       role: role,
     })
     .then((response) => {
