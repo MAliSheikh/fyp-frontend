@@ -17,7 +17,7 @@ const Login = () => {
 
     const handleLogin = () => {
       
-                const url = 'http://localhost:8000/users/login';
+                const url = 'http://localhost:8000/docs#';
                 axios.post(url, { email, password })
                     .then(response => {
                         console.log('Login successful:', response.data);
