@@ -3,15 +3,16 @@ import {
     Box,
     Button,
     TextField,
+    Typography
 } from '@mui/material';
-// import { login } from './token'
 import authService from './token'
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
-    console.log('Login:', { email, password });
+    const [error, setError] = useState('');
+    const navigate = useNavigate()
     // const handleLogin = () => {
     //             const data = {email, password}
     //             const url = 'http://localhost:8000/users/token';
@@ -24,18 +25,31 @@ const Login = () => {
     //                 })
     //                 .catch(error => {
     //                     console.error('Login error:', error);
-                    
+
     //                 });
     // };
 
     const handleLogin = async (event) => {
         event.preventDefault();
-        const loginSuccess = await authService.login(email, password);
-        if (loginSuccess) {
-            // Redirect the user to the desired page (e.g., /docs)
-            // window.location.href = 'http://localhost:8000/docs';
-            // console.log('response:', loginSuccess); 
-            console.log('response: success'); 
+        setError('');
+
+        if (!email || !password) {
+            setError('Email and password are required');
+            return;
+        }
+
+          try {
+            const response = await authService.login(email, password);
+            if (response.access_token) {
+                console.log('response: success');
+                navigate('/products');
+            }
+        } catch (error) {
+            if (error.response && error.response.status === 401) {
+                setError('Incorrect username or password.');
+            } else {
+                setError('Login failed. Please try again later.');
+            }
         }
     };
     console.log('Login:', { email, password });
@@ -60,6 +74,7 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
             />
+            {error && <Typography color="error">{error}</Typography>}
             <Button
                 variant="contained"
                 color="primary"
