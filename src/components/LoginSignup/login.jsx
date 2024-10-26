@@ -8,7 +8,7 @@ import {
     useMediaQuery,
     Link
 } from '@mui/material';
-import authService from './subcomponents/token'
+import authService from './components/token'
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {

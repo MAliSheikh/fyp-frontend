@@ -1,5 +1,5 @@
 import axios from "axios";
-import authService from "../components/LoginSignup/subcomponents/token";
+import authService from "./LoginSignup/components/token";
 import { base_URL } from "../utils";
 
 // const baseURL = process.env.BASE_URL;

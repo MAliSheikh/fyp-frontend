@@ -11,7 +11,7 @@ import {
     useMediaQuery
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import authService from './subcomponents/token'
+import authService from './components/token'
 
 const SignUp = () => {
     const [username, setUsername] = useState('');
