@@ -8,7 +8,7 @@ import {
 import authService from './token'
 import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const LoginSS = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -53,7 +53,7 @@ const Login = () => {
         }
     };
     console.log('Login:', { email, password });
-
+    
     return (
         <Box component="form" onSubmit={handleLogin}>
             <TextField
@@ -87,4 +87,4 @@ const Login = () => {
     )
 }
 
-export default Login
+export default LoginSS

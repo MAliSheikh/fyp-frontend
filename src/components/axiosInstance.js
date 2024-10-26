@@ -1,9 +1,11 @@
 import axios from "axios";
 import authService from "../components/LoginSignup/subcomponents/token";
+import { base_URL } from "../utils";
 
+// const baseURL = process.env.BASE_URL;
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: base_URL,
   headers: {
     "Content-Type": "application/x-www-form-urlencoded",
   },

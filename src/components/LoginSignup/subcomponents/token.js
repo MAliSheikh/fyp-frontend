@@ -1,22 +1,46 @@
 import axiosInstance from "../../axiosInstance";
 import axios from "axios";
+import { base_URL } from "../../../utils";
 
-const login = (email, password) => {
-  return axiosInstance
-    .post("/users/token", {
+// Base_URL = process.env.BASE_URL;
+const login = async (email, password) => {
+  try {
+    // const response = await axios.post(`${base_URL}/users/token`, {
+    //   username: email,
+    //   password: password,
+    // }, {
+    //   headers: {
+    //     "Content-Type": "application/x-www-form-urlencoded",
+
+    //   }
+    // });
+
+    const response = await axiosInstance.post("/users/token", {
       username: email,
       password: password,
-    })
-    .then((response) => {
-      if (response.data.access_token) {
-        localStorage.setItem("access_token", JSON.stringify(response.data.access_token));
-      }
-      return response.data;
     });
-};
 
+    if (response.data.access_token) {
+      localStorage.setItem("access_token", response.data.access_token);
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("Login error:", error);
+    throw error;
+  };
+}
 const refreshToken = async (email, password) => {
   try {
+    // const response = await axios.post(`${base_URL}/users/token`, {
+    //   username: email,
+    //   password: password,
+    // }, {
+    //   headers: {
+    //     "Content-Type": "application/x-www-form-urlencoded",
+
+    //   }
+    // });
     const response = await axiosInstance.post("/users/token", {
       username: email,
       password: password,
@@ -40,12 +64,12 @@ const getToken = () => {
 };
 
 const register = (email, password, username, role) => {
-  return axios.post("http://localhost:8000/users/register", {
-      email: email,
-      password: password,
-      name: username,
-      role: role,
-    })
+  return axios.post(`${base_URL}/users/register`, {
+    email: email,
+    password: password,
+    name: username,
+    role: role,
+  })
     .then((response) => {
       return { success: true, data: response.data };
     })
