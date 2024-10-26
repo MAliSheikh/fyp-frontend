@@ -1,11 +1,10 @@
 import axiosInstance from "../../axiosInstance";
-import axios from "axios";
 import { base_URL } from "../../../utils";
+import axios from "axios";
 
-// Base_URL = process.env.BASE_URL;
 const login = async (email, password) => {
   try {
-    // const response = await axios.post(`${base_URL}/users/token`, {
+     // const response = await axios.post(`${base_URL}/users/token`, {
     //   username: email,
     //   password: password,
     // }, {
@@ -15,6 +14,14 @@ const login = async (email, password) => {
     //   }
     // });
 
+    // Check if the user is already logged in
+    // const existingToken = localStorage.getItem("access_token");
+    // if (existingToken) {
+    //   console.log("User is already logged in");
+    //   return { message: "You are already logged in" };
+    // }
+
+    console.log('email', email, 'password', password);
     const response = await axiosInstance.post("/users/token", {
       username: email,
       password: password,
@@ -28,11 +35,12 @@ const login = async (email, password) => {
   } catch (error) {
     console.error("Login error:", error);
     throw error;
-  };
-}
+  }
+};
+
 const refreshToken = async (email, password) => {
   try {
-    // const response = await axios.post(`${base_URL}/users/token`, {
+     // const response = await axios.post(`${base_URL}/users/token`, {
     //   username: email,
     //   password: password,
     // }, {
@@ -46,7 +54,7 @@ const refreshToken = async (email, password) => {
       password: password,
     });
     if (response.data.access_token) {
-      localStorage.setItem("access_token", JSON.stringify(response.data.access_token));
+      localStorage.setItem("access_token", response.data.access_token);
       return response.data.access_token;
     }
   } catch (error) {
@@ -65,11 +73,11 @@ const getToken = () => {
 
 const register = (email, password, username, role) => {
   return axios.post(`${base_URL}/users/register`, {
-    email: email,
-    password: password,
-    name: username,
-    role: role,
-  })
+      email: email,
+      password: password,
+      name: username,
+      role: role,
+    })
     .then((response) => {
       return { success: true, data: response.data };
     })

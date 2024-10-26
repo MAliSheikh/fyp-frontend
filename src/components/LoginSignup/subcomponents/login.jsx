@@ -38,7 +38,7 @@ const LoginSS = () => {
             return;
         }
 
-          try {
+        try {
             const response = await authService.login(email, password);
             if (response.access_token) {
                 console.log('response: success');
@@ -53,7 +53,7 @@ const LoginSS = () => {
         }
     };
     console.log('Login:', { email, password });
-    
+
     return (
         <Box component="form" onSubmit={handleLogin}>
             <TextField
@@ -74,7 +74,17 @@ const LoginSS = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
             />
-            {error && <Typography color="error">{error}</Typography>}
+            {error && (
+                <Typography
+                    color="error"
+                    sx={{
+                        fontSize: isMobile ? '0.875rem' : '1rem',
+                        textAlign: 'center'
+                    }}
+                >
+                    {error}
+                </Typography>
+            )}
             <Button
                 variant="contained"
                 color="primary"
