@@ -1,5 +1,8 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+import Navbar from './components/Header&footer/header';
+import Footer from './components/Header&footer/footer';
+//simport Layout  from './components/Header&footer/Layout';
 
 const Products = () => {
     return (
