@@ -1,7 +1,7 @@
 // Layout.js
 import React from 'react';
-import Navbar from './header';
-import Footer from './footer';
+import Navbar from './components/Header&footer/header';
+import Footer from './components/Header&footer/footer';
 import { Box } from '@mui/material';
 
 function Layout({ children }) {
