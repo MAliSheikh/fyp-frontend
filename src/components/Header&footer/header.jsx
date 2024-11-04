@@ -37,7 +37,8 @@ const SearchWrapper = styled('div')(({ theme }) => ({
   backgroundColor: '#fff',
   width: '100%',
   maxWidth: '600px',
-  margin: '0 16px',
+  margin: '0 15px',
+  marginRight: 'auto',
 }));
 
 const SearchIconWrapper = styled('div')({
@@ -92,11 +93,11 @@ const Header = () => {
               src={logo}
               alt = "Bazaar Nest logo"
               sx={{
-                height: 100,
-                width: 100,
+                height: 70,
+                width: 70,
                 borderRadius: '50%',
-                padding: 0,
-                marginRight: 50,
+                padding: 2,
+                marginRight: 32,
                 objectFit: 'cover',
               }}
             />
@@ -144,7 +145,7 @@ const Header = () => {
                 display: 'flex',
                 justifyContent: 'right',
                 py: 1,
-                gap: 7
+                gap: 5
               }}>
                 {navItems.map((item) => (
                   <NavButton key={item}>{item}</NavButton>
