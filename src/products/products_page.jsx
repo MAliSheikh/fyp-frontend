@@ -1,7 +1,11 @@
 import React from 'react';
 import Slider from 'react-slick';
-import { Container, Box, Typography, Card, CardMedia, CardContent, CardActions, Button, Grid, Rating } from '@mui/material';
+import { Container, Box, Typography, Card, CardMedia, CardContent, Grid, Rating } from '@mui/material';
 import banner1 from 'D:/frontend/fyp-frontend/src/components/Logos/banner2.jpg'
+import banner2 from 'D:/frontend/fyp-frontend/src/components/Logos/banner3.jpg'
+import banner3 from 'D:/frontend/fyp-frontend/src/components/Logos/banner4.png'
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 // Mock product data
 const products = [
@@ -23,35 +27,42 @@ const products = [
   { name: 'Dior Perfume', price: '6500', rating: 4.8, img: 'https://via.placeholder.com/150' }
 ];
 
+
 // Slider component for the banner
 const BannerSlider = () => {
   const Bannersettings = {
     dots: true,
     infinite: true,
     speed: 500,
-    // slidesToShow: 1,
-    // slidesToScroll: 1,
+    slidesToShow: 1,
+    slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
     arrows: false,
   };
 
+  const bannerImages = [banner1, banner2, banner3];
+
   return (
     <Slider {...Bannersettings}>
-      <Box>
-        <img
-          src={banner1}
-          alt="Banner"
-          style={{
-            width: '100%',
-            height: 'auto',
-            objectFit: 'cover',
-          }}
-        />
-      </Box>
+      {bannerImages.map((image, index) => (
+        <Box key={index}>
+          <img
+            src={image}
+            alt={`Banner ${index + 1}`}
+            style={{
+              width: '100%',
+              height: '400px',  // Set a fixed height or adjust as needed
+              objectFit: 'cover',
+
+            }}
+          />
+        </Box>
+      ))}
     </Slider>
   );
 };
+
 
 
 // Product card component

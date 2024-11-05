@@ -17,12 +17,13 @@ function App() {
           path="/"
           element={
             <Layout>
-              <Seller />
+              <Products />
             </Layout>
           }
         />
         
         {/* Other routes like Login and Signup without Layout */}
+        <Route path="/seller_upload" element={<Seller />} />
         <Route path="/products" element={<Products />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
