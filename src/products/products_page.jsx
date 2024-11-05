@@ -13,6 +13,14 @@ const products = [
   { name: 'Chanel N5 Perfume', price: '7000', rating: 4.9, img: 'https://via.placeholder.com/150' },
   { name: 'Apple Air Pods', price: '5000', rating: 4.2, img: 'https://via.placeholder.com/150' },
   { name: 'Dior Perfume', price: '6500', rating: 4.8, img: 'https://via.placeholder.com/150' },
+  { name: 'Fashion Digital Watch', price: '5000', rating: 4, img: 'https://via.placeholder.com/150' },
+  { name: 'Nike Shoes', price: '3000', rating: 4, img: 'https://via.placeholder.com/150' },
+  { name: 'Square Dial Watch', price: '3000', rating: 4.3, img: 'https://via.placeholder.com/150' },
+  { name: 'Stylish Glasses', price: '6000', rating: 3.5, img: 'https://via.placeholder.com/150' },
+  { name: 'Samsung A20', price: '15000', rating: 4.7, img: 'https://via.placeholder.com/150' },
+  { name: 'Chanel N5 Perfume', price: '7000', rating: 4.9, img: 'https://via.placeholder.com/150' },
+  { name: 'Apple Air Pods', price: '5000', rating: 4.2, img: 'https://via.placeholder.com/150' },
+  { name: 'Dior Perfume', price: '6500', rating: 4.8, img: 'https://via.placeholder.com/150' }
 ];
 
 // Slider component for the banner
@@ -21,8 +29,8 @@ const BannerSlider = () => {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
+    // slidesToShow: 1,
+    // slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
     arrows: false,

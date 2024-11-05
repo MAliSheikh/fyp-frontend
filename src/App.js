@@ -6,6 +6,7 @@ import Products from './products/products_page';
 import SignUp from './components/LoginSignup/signup';
 import Login from './components/LoginSignup/login';
 import Layout from './layout';
+import Seller from './seller/seller_upload';
 
 function App() {
   return (
@@ -16,12 +17,13 @@ function App() {
           path="/"
           element={
             <Layout>
-              <Products />
+              <Seller />
             </Layout>
           }
         />
         
         {/* Other routes like Login and Signup without Layout */}
+        <Route path="/products" element={<Products />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
       </Routes>
