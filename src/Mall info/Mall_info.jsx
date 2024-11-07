@@ -1,19 +1,21 @@
-
 import React, { useState } from 'react';
-import { Box, TextField, Button, Typography, Paper } from '@mui/material';
-import { Label } from '@mui/icons-material';
+import { Box, TextField, Button, Typography, Paper} from '@mui/material';
+import { label } from '@mui/icons-material';
 
 const ProductUploadPage = () => {
-  const [productName, setProductName] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [stock, setStock] = useState('');
-  const [category, setCategory] = useState('');
+  const [mallName, setmallName] = useState('');
+  const [shopName, setShopName] = useState('');
+  const [shopType, setshopType] = useState('');
+  const [floorNo, setfloorNo] = useState('');
+  const [shopNo, setshopNo] = useState('');
+  const [description, setdescription] = useState('');
   const [image, setImage] = useState(null);
 
   const handleFileChange = (event) => {
     setImage(event.target.files[0]);
   };
+
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -25,11 +27,12 @@ const ProductUploadPage = () => {
       {/* Sidebar */}
       <Box sx={{ width: { xs: '100%', md: '25%' }, display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Button variant="contained" fullWidth
-          sx={{
-            height: 50, // Customize height
-            backgroundColor: '#119994', // Customize filled color
-            '&:hover': { backgroundColor: '#0d7b76' }, // Darker shade on hover
-          }}
+            sx={{
+                height: 50, 
+                backgroundColor: '#ffffff', 
+                color: 'grey', 
+                '&:hover': { backgroundColor: '#0d7b76', color: '#ffffff' }, 
+            }}
         >Upload Product</Button>
 
         <Button variant="contained" fullWidth
@@ -58,12 +61,11 @@ const ProductUploadPage = () => {
           }}
           >_____REGISTER STORE_____</Typography>
           
-        <Button variant="contained" fullWidth
+          <Button variant="contained" fullWidth
           sx={{
-            height: 50, 
-            backgroundColor: '#ffffff', 
-            color: 'grey', 
-            '&:hover': { backgroundColor: '#0d7b76', color: '#ffffff' },
+            height: 50, // Customize height
+            backgroundColor: '#119994', // Customize filled color
+            '&:hover': { backgroundColor: '#0d7b76' }, // Darker shade on hover
           }}
           >Mall</Button>
         <Button variant="contained" fullWidth
@@ -85,11 +87,12 @@ const ProductUploadPage = () => {
           >Sign Out</Button>
       </Box>
 
-      {/* Main Content */}
-      <Box sx={{ width: { xs: '100%', md: '100%' } }}>
+      
+            {/* Main Content */}
+            <Box sx={{ width: { xs: '100%', md: '100%' } }}>
         <Paper sx={{ p: 3 }}>
           <Typography variant="h5" gutterBottom>
-            Upload New Product
+            Add Mall Information
           </Typography>
           <Box
             component="form"
@@ -99,11 +102,13 @@ const ProductUploadPage = () => {
             <Box
               sx={{
                 border: '2px dashed gray',
-                display: 'flex',
+                marginLeft: '650px',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: 150,
+                height: 200,
+                width: '390px',
                 cursor: 'pointer',
+                display: 'flex'
               }}
             >
               <input
@@ -116,6 +121,7 @@ const ProductUploadPage = () => {
               <label htmlFor="upload-button">
                 <Button component="span" variant="contained"
                   sx={{
+                    alignItems: 'center',
                     backgroundColor: '#119994', // Customize filled color
                     '&:hover': { backgroundColor: '#0d7b76' }, // Darker shade on hover
                   }}>
@@ -125,43 +131,68 @@ const ProductUploadPage = () => {
             </Box>
 
             <TextField
-              label="Product Name"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
+              label="Mall Name"
+              value={mallName}
+              onChange={(e) => setmallName(e.target.value)}
+              required
+              sx={{
+                width: '600px'
+              }}
+            />
+            <TextField
+              label="Shop Name"
+              value={shopName}
+              onChange={(e) => setShopName(e.target.value)}
               fullWidth
               required
+              sx={{
+                width: '600px',
+                display: 'flex'
+              }}
+            />
+            <TextField
+              label="Shop Type"
+              value={shopType}
+              onChange={(e) => setshopType(e.target.value)}
+              required
+              sx={{
+                width: '300px',
+                display: 'flex'
+              }}
+            />
+            <TextField
+              label="Floor No"
+              value={floorNo}
+              onChange={(e) => setfloorNo(e.target.value)}
+              type="number"
+              required
+              sx={{
+                width: '200px',
+                display: 'flex'
+              }}
+            />
+            <TextField
+              label="Shop No"
+              value={shopNo}
+              onChange={(e) => setshopNo(e.target.value)}
+              type='number'
+              required
+              sx={{
+                width: '200px',
+                display: 'flex'
+              }}
             />
             <TextField
               label="Description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => setdescription(e.target.value)}
               multiline
-              rows={4}
-              fullWidth
+              rows={7}
               required
-            />
-            <TextField
-              label="Price"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              type="number"
-              fullWidth
-              required
-            />
-            <TextField
-              label="Available Stock"
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-              type="number"
-              fullWidth
-              required
-            />
-            <TextField
-              label="Category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              fullWidth
-              required
+              sx={{
+                width: '600px',
+                display: 'flex'
+              }}
             />
 
             <Button
@@ -170,6 +201,7 @@ const ProductUploadPage = () => {
               sx={{
                 backgroundColor: '#119994',
                 color: '#ffffff',
+                marginTop: '10px',
                 '&:hover': {
                   backgroundColor: '#0d7b76',
                 },
@@ -178,7 +210,7 @@ const ProductUploadPage = () => {
               Submit
             </Button>
           </Box>
-        </Paper>
+          </Paper>
       </Box>
     </Box>
   );

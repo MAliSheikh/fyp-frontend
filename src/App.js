@@ -7,6 +7,7 @@ import SignUp from './components/LoginSignup/signup';
 import Login from './components/LoginSignup/login';
 import Layout from './layout';
 import Seller from './seller/seller_upload';
+import Mall_info from './Mall info/Mall_info';
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
           path="/"
           element={
             <Layout>
-              <Products />
+              <Mall_info />
             </Layout>
           }
         />
