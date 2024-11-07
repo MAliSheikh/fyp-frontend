@@ -7,7 +7,8 @@ import SignUp from './components/LoginSignup/signup';
 import Login from './components/LoginSignup/login';
 import Layout from './layout';
 import Seller from './seller/seller_upload';
-import Mall_info from './Mall info/Mall_info';
+import Mall_info from './Mall/Mall_info';
+import Store_info from './Independent store/store_info';
 
 function App() {
   return (
@@ -18,12 +19,13 @@ function App() {
           path="/"
           element={
             <Layout>
-              <Mall_info />
+              <Store_info />
             </Layout>
           }
         />
         
         {/* Other routes like Login and Signup without Layout */}
+        <Route path="/Mall_info" element={<Mall_info />} />
         <Route path="/seller_upload" element={<Seller />} />
         <Route path="/products" element={<Products />} />
         <Route path="/login" element={<Login />} />
