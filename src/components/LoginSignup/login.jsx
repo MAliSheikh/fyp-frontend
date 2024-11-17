@@ -34,9 +34,22 @@ const Login = () => {
             const response = await authService.login(email, password);
             console.log('response:', response);
             if (response.access_token) {
-                console.log('response: success');
-                navigate('/products');
+                const userRole = authService.getUserRole();
+                console.log(userRole)
+                if (userRole === 'customer') {
+                    navigate('/products');
+                } else if (userRole === 'seller') {
+                    navigate('/store_info');
+                } else if (userRole === 'admin') {
+                    navigate('/admin');
+                } else {
+                    navigate('/unauthorized');
+                }
             }
+            // if (response.access_token) {
+            //     console.log('response: success');
+            //     navigate('/products');
+            // }
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 setError('Incorrect username or password.');
