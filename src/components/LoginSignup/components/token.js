@@ -1,27 +1,11 @@
 import axiosInstance from "../../axiosInstance";
 import { base_URL } from "../../../utils";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const login = async (email, password) => {
   try {
-     // const response = await axios.post(`${base_URL}/users/token`, {
-    //   username: email,
-    //   password: password,
-    // }, {
-    //   headers: {
-    //     "Content-Type": "application/x-www-form-urlencoded",
-
-    //   }
-    // });
-
-    // Check if the user is already logged in
-    // const existingToken = localStorage.getItem("access_token");
-    // if (existingToken) {
-    //   console.log("User is already logged in");
-    //   return { message: "You are already logged in" };
-    // }
-
-    console.log('email', email, 'password', password);
+    // console.log('email', email, 'password', password);
     const response = await axiosInstance.post("/users/token", {
       username: email,
       password: password,
@@ -40,15 +24,6 @@ const login = async (email, password) => {
 
 const refreshToken = async (email, password) => {
   try {
-     // const response = await axios.post(`${base_URL}/users/token`, {
-    //   username: email,
-    //   password: password,
-    // }, {
-    //   headers: {
-    //     "Content-Type": "application/x-www-form-urlencoded",
-
-    //   }
-    // });
     const response = await axiosInstance.post("/users/token", {
       username: email,
       password: password,
@@ -71,8 +46,35 @@ const getToken = () => {
   return JSON.parse(localStorage.getItem("access_token"));
 };
 
+const getToken1 = () => {
+  const token = localStorage.getItem("access_token");
+  if (!token) return null;
+  try {
+    console.log('jwtDecode(token)', jwtDecode(token));
+    return jwtDecode(token);
+  } catch (e) {
+    console.error("Invalid token:", e);
+    return null;
+  }
+};
+
+const getUserRole = () => {
+  const token = getToken1();
+  if (!token) return null;
+
+  try {
+    // const decodedToken = jwtDecode(token);
+    console.log("decodedToken", token.role);
+    return token.role;
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return null;
+  }
+};
+
 const register = (email, password, username, role) => {
-  return axios.post(`${base_URL}/users/register`, {
+  return axios
+    .post(`${base_URL}/users/register`, {
       email: email,
       password: password,
       name: username,
@@ -82,16 +84,21 @@ const register = (email, password, username, role) => {
       return { success: true, data: response.data };
     })
     .catch((error) => {
-      return { success: false, error: error.response ? error.response.data.detail : error.message };
+      return {
+        success: false,
+        error: error.response ? error.response.data.detail : error.message,
+      };
     });
 };
 
 const authService = {
   login,
   refreshToken,
+  getToken1,
   logout,
   getToken,
   register,
+  getUserRole,
 };
 
 export default authService;

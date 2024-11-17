@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import logo from '../Logos/logo.png';
+import React, { useState, useEffect } from "react";
+import logo from "../Logos/logo.png";
+import authService from "../LoginSignup/components/token";
 // import logo from 'D:/frontend/fyp-frontend/src/components/Logos/logo.png';
 import {
   AppBar,
@@ -17,67 +18,83 @@ import {
   useTheme,
   useMediaQuery,
   Badge,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Menu as MenuIcon,
   Search as SearchIcon,
   ShoppingCart as CartIcon,
   Person as PersonIcon,
-} from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
+} from "@mui/icons-material";
+import { styled } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 
 // Custom styled components
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundColor: '#009688',
-  boxShadow: 'none',
+  backgroundColor: "#009688",
+  boxShadow: "none",
 }));
 
-const SearchWrapper = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: '4px',
-  backgroundColor: '#fff',
-  width: '100%',
-  maxWidth: '600px',
-  margin: '0 15px',
-  marginRight: 'auto',
+const SearchWrapper = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: "4px",
+  backgroundColor: "#fff",
+  width: "100%",
+  maxWidth: "600px",
+  margin: "0 15px",
+  marginRight: "auto",
 }));
 
-const SearchIconWrapper = styled('div')({
-  position: 'absolute',
-  right: '20px',
-  top: '58%',
-  transform: 'translateY(-50%)',
-  color: '#119994',
-  padding: '2px',
+const SearchIconWrapper = styled("div")({
+  position: "absolute",
+  right: "20px",
+  top: "58%",
+  transform: "translateY(-50%)",
+  color: "#119994",
+  padding: "2px",
 });
 
 const StyledInputBase = styled(InputBase)({
-  width: '100%',
-  '& .MuiInputBase-input': {
-    padding: '8px 16px',
-    width: '100%',
+  width: "100%",
+  "& .MuiInputBase-input": {
+    padding: "8px 16px",
+    width: "100%",
   },
 });
 
 const NavButton = styled(Button)({
-  color: '#fff',
-  textTransform: 'none',
-  padding: '6px 15px'
+  color: "#fff",
+  textTransform: "none",
+  padding: "6px 15px",
 });
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
-  const navItems = ['Men', 'Women', 'Kids', 'Beauty', 'Others'];
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const navigate = useNavigate();
+
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+  useEffect(() => {
+    const token = authService.getToken1();
+    if (token){
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    authService.logout();
+    setIsLoggedIn(false);
+    navigate("/");
+  };
+  const navItems = ["Men", "Women", "Kids", "Beauty", "Others"];
 
   return (
     <Box>
       {/* Top Bar */}
       <StyledAppBar position="static">
         <Container maxWidth="xl">
-          <Toolbar sx={{ padding: '8px 0' }}>
+          <Toolbar sx={{ padding: "8px 0" }}>
             {isMobile && (
               <IconButton
                 color="inherit"
@@ -92,14 +109,14 @@ const Header = () => {
             <Box
               component="img"
               src={logo}
-              alt = "Bazaar Nest logo"
+              alt="Bazaar Nest logo"
               sx={{
                 height: 70,
                 width: 70,
-                borderRadius: '50%',
+                borderRadius: "50%",
                 padding: 2,
                 marginRight: 32,
-                objectFit: 'cover',
+                objectFit: "cover",
               }}
             />
 
@@ -107,7 +124,7 @@ const Header = () => {
             <SearchWrapper>
               <StyledInputBase
                 placeholder="Search"
-                inputProps={{ 'aria-label': 'search' }}
+                inputProps={{ "aria-label": "search" }}
               />
               <SearchIconWrapper>
                 <SearchIcon />
@@ -115,14 +132,26 @@ const Header = () => {
             </SearchWrapper>
 
             {/* Right Side Menu */}
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              gap: { xs: 1, md: 2 }
-            }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: { xs: 1, md: 2 },
+              }}
+            >
               {!isMobile && (
+                // <>
+                //   <NavButton  onClick={() => navigate("/login")}>Login</NavButton>
+                //   <NavButton>Order & Returns</NavButton>
+                // </>
                 <>
-                  <NavButton>Login</NavButton>
+                  {isLoggedIn ? (
+                    <NavButton onClick={handleLogout}>Logout</NavButton>
+                  ) : (
+                    <NavButton onClick={() => navigate("/login")}>
+                      Login
+                    </NavButton>
+                  )}
                   <NavButton>Order & Returns</NavButton>
                 </>
               )}
@@ -140,14 +169,16 @@ const Header = () => {
 
         {/* Bottom Navigation */}
         {!isMobile && (
-          <Box sx={{ bgcolor: 'rgba(0, 0, 0, 0.1)' }}>
+          <Box sx={{ bgcolor: "rgba(0, 0, 0, 0.1)" }}>
             <Container maxWidth="xl">
-              <Box sx={{ 
-                display: 'flex',
-                justifyContent: 'right',
-                py: 1,
-                gap: 5
-              }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "right",
+                  py: 1,
+                  gap: 5,
+                }}
+              >
                 {navItems.map((item) => (
                   <NavButton key={item}>{item}</NavButton>
                 ))}
@@ -163,15 +194,15 @@ const Header = () => {
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
         sx={{
-          '& .MuiDrawer-paper': {
+          "& .MuiDrawer-paper": {
             width: 280,
-            bgcolor: '#009688',
-            color: '#fff',
+            bgcolor: "#009688",
+            color: "#fff",
           },
         }}
       >
         <Box sx={{ p: 2 }}>
-          <Typography variant="h6" sx={{ mb: 2, color: '#fff' }}>
+          <Typography variant="h6" sx={{ mb: 2, color: "#fff" }}>
             Menu
           </Typography>
           <List>
@@ -180,9 +211,18 @@ const Header = () => {
                 <ListItemText primary={item} />
               </ListItem>
             ))}
-            <ListItem button>
+            {isLoggedIn ? (
+              <ListItem button onClick={handleLogout}>
+                <ListItemText primary="Logout" />
+              </ListItem>
+            ) : (
+              <ListItem button onClick={() => navigate("/login")}>
+                <ListItemText primary="Login" />
+              </ListItem>
+            )}
+            {/* <ListItem button onClick={() => navigate("/login")}>
               <ListItemText primary="Login" />
-            </ListItem>
+            </ListItem> */}
             <ListItem button>
               <ListItemText primary="Order & Returns" />
             </ListItem>
