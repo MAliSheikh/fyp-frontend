@@ -1,31 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect, } from 'react';
 import Slider from 'react-slick';
-import { Container, Box, Typography, Card, CardMedia, CardContent, Grid, Rating } from '@mui/material';
-import banner1 from 'D:/frontend/fyp-frontend/src/components/Logos/banner2.jpg'
-import banner2 from 'D:/frontend/fyp-frontend/src/components/Logos/banner3.jpg'
-import banner3 from 'D:/frontend/fyp-frontend/src/components/Logos/banner4.png'
+import { useNavigate } from 'react-router-dom';
+import { Button, Container, Box, Typography, Card, CardMedia, CardContent, Rating } from '@mui/material';
+// import banner1 from 'D:/frontend/fyp-frontend/src/components/Logos/banner2.jpg'
+// import banner2 from 'D:/frontend/fyp-frontend/src/components/Logos/banner3.jpg'
+// import banner3 from 'D:/frontend/fyp-frontendu/src/components/Logos/banner4.png'
+import Grid from '@mui/material/Grid2';
+import banner1 from '../components/Logos/banner2.jpg'
+import banner2 from '../components/Logos/banner3.jpg'
+import banner3 from '../components/Logos/banner4.png'
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import { fetchProducts } from './product';
 
-// Mock product data
-const products = [
-  { name: 'Fashion Digital Watch', price: '5000', rating: 4, img: 'https://via.placeholder.com/150' },
-  { name: 'Nike Shoes', price: '3000', rating: 4, img: 'https://via.placeholder.com/150' },
-  { name: 'Square Dial Watch', price: '3000', rating: 4.3, img: 'https://via.placeholder.com/150' },
-  { name: 'Stylish Glasses', price: '6000', rating: 3.5, img: 'https://via.placeholder.com/150' },
-  { name: 'Samsung A20', price: '15000', rating: 4.7, img: 'https://via.placeholder.com/150' },
-  { name: 'Chanel N5 Perfume', price: '7000', rating: 4.9, img: 'https://via.placeholder.com/150' },
-  { name: 'Apple Air Pods', price: '5000', rating: 4.2, img: 'https://via.placeholder.com/150' },
-  { name: 'Dior Perfume', price: '6500', rating: 4.8, img: 'https://via.placeholder.com/150' },
-  { name: 'Fashion Digital Watch', price: '5000', rating: 4, img: 'https://via.placeholder.com/150' },
-  { name: 'Nike Shoes', price: '3000', rating: 4, img: 'https://via.placeholder.com/150' },
-  { name: 'Square Dial Watch', price: '3000', rating: 4.3, img: 'https://via.placeholder.com/150' },
-  { name: 'Stylish Glasses', price: '6000', rating: 3.5, img: 'https://via.placeholder.com/150' },
-  { name: 'Samsung A20', price: '15000', rating: 4.7, img: 'https://via.placeholder.com/150' },
-  { name: 'Chanel N5 Perfume', price: '7000', rating: 4.9, img: 'https://via.placeholder.com/150' },
-  { name: 'Apple Air Pods', price: '5000', rating: 4.2, img: 'https://via.placeholder.com/150' },
-  { name: 'Dior Perfume', price: '6500', rating: 4.8, img: 'https://via.placeholder.com/150' }
-];
+// // Mock product data
+// const products = [
+//   { name: 'Fashion Digital Watch', price: '5000', rating: 4, img: 'https://via.placeholder.com/150' },
+//   { name: 'Nike Shoes', price: '3000', rating: 4, img: 'https://via.placeholder.com/150' },
+//   { name: 'Square Dial Watch', price: '3000', rating: 4.3, img: 'https://via.placeholder.com/150' },
+//   { name: 'Stylish Glasses', price: '6000', rating: 3.5, img: 'https://via.placeholder.com/150' },
+//   { name: 'Samsung A20', price: '15000', rating: 4.7, img: 'https://via.placeholder.com/150' },
+//   { name: 'Chanel N5 Perfume', price: '7000', rating: 4.9, img: 'https://via.placeholder.com/150' },
+//   { name: 'Apple Air Pods', price: '5000', rating: 4.2, img: 'https://via.placeholder.com/150' },
+//   { name: 'Dior Perfume', price: '6500', rating: 4.8, img: 'https://via.placeholder.com/150' },
+//   { name: 'Fashion Digital Watch', price: '5000', rating: 4, img: 'https://via.placeholder.com/150' },
+//   { name: 'Nike Shoes', price: '3000', rating: 4, img: 'https://via.placeholder.com/150' },
+//   { name: 'Square Dial Watch', price: '3000', rating: 4.3, img: 'https://via.placeholder.com/150' },
+//   { name: 'Stylish Glasses', price: '6000', rating: 3.5, img: 'https://via.placeholder.com/150' },
+//   { name: 'Samsung A20', price: '15000', rating: 4.7, img: 'https://via.placeholder.com/150' },
+//   { name: 'Chanel N5 Perfume', price: '7000', rating: 4.9, img: 'https://via.placeholder.com/150' },
+//   { name: 'Apple Air Pods', price: '5000', rating: 4.2, img: 'https://via.placeholder.com/150' },
+//   { name: 'Dior Perfume', price: '6500', rating: 4.8, img: 'https://via.placeholder.com/150' }
+// ];
 
 
 // Slider component for the banner
@@ -66,30 +72,65 @@ const BannerSlider = () => {
 
 
 // Product card component
-const ProductCard = ({ product }) => (
-  <Card sx={{ maxWidth: 'auto', margin: 'auto' }}>
-    <CardMedia
-      component="img"
-      height="auto"
-      image={product.img}
-      alt={product.name}
-    />
-    <CardContent>
-      <Typography variant="h6">{product.name}</Typography>
-      <Typography variant="body2" color="text.secondary">
-        Rs. {product.price}
-      </Typography>
-      <Rating name="product-rating" value={product.rating} precision={0.5} readOnly />
-    </CardContent>
-    {/* <CardActions>
+const ProductCard = ({ product }) => {
+  const navigate = useNavigate();
+
+  const handleViewProduct = () => {
+    navigate(`/products/${product.product_id}`);
+  };
+  return (
+    <Card borderTop="50px" sx={{ maxWidth: 'auto', margin: 'auto', height: 350, }}>
+      <CardMedia
+        borderTop="50px"
+        component="img"
+        height="200"
+        image={product.images[0]}
+        alt={product.name}
+      />
+      <CardContent sx={{ flexGrow: 1 }}>
+        {/* <Typography variant="h6">{product.name}</Typography> */}
+        <Typography variant="h6" sx={{ height: 30, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+          {product.name}
+        </Typography>
+
+        <Typography variant="body2" color="text.secondary">
+          Rs. {product.price}
+        </Typography>
+
+        <Rating name="product-rating" value={4} precision={0.5} readOnly />
+        {/* <Rating name="product-rating" value={product.rating} precision={0.5} readOnly /> */}
+        
+        <Button variant="contained" color="primary" onClick={handleViewProduct}>
+          See Details
+        </Button>
+      </CardContent>
+
+      {/* <CardActions>
       <Button size="small" color="primary">
         Buy Now
       </Button>
     </CardActions> */}
-  </Card>
-);
+    </Card>
+  )
+};
 
 const Products = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const getProducts = async () => {
+      try {
+        const data = await fetchProducts();
+        setProducts(data);
+
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    getProducts();
+  }, []);
+
   return (
     <Container maxWidth="lg">
       {/* Banner Slider */}
@@ -105,7 +146,7 @@ const Products = () => {
       {/* Product Grid */}
       <Grid container spacing={3}>
         {products.map((product, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+          <Grid item size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
             <ProductCard product={product} />
           </Grid>
         ))}

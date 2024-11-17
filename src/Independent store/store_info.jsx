@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, TextField, Button, Typography, Paper} from '@mui/material';
-import { label } from '@mui/icons-material';
+// import { label } from '@mui/icons-material';
 
 const ProductUploadPage = () => {
   const [shopName, setshopName] = useState('');

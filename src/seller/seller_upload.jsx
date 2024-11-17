@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { Box, TextField, Button, Typography, Paper } from '@mui/material';
-import { Label } from '@mui/icons-material';
+// import { Label } from '@mui/icons-material';
 
 const ProductUploadPage = () => {
   const [productName, setProductName] = useState('');

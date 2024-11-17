@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import logo from 'D:/frontend/fyp-frontend/src/components/Logos/logo.png';
+import logo from '../Logos/logo.png';
+// import logo from 'D:/frontend/fyp-frontend/src/components/Logos/logo.png';
 import {
   AppBar,
   Box,
