@@ -10,6 +10,8 @@ import AddIcon from "@mui/icons-material/Add";
 import { useParams } from "react-router-dom";
 import { fetchProductByIdDetails } from "./product";
 import CircularProgress from "@mui/material/CircularProgress";
+import Modal from "@mui/material/Modal";
+import CloseIcon from "@mui/icons-material/Close";
 
 function ProductDetailsPage() {
   const { id } = useParams();
@@ -17,6 +19,8 @@ function ProductDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [open, setOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState("");
 
   useEffect(() => {
     const getProductDetails = async () => {
@@ -43,6 +47,16 @@ function ProductDetailsPage() {
     }
   };
 
+  const handleOpen = (image) => {
+    setSelectedImage(image);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedImage(null);
+  };
+
   if (loading) {
     return <CircularProgress />;
   }
@@ -67,14 +81,14 @@ function ProductDetailsPage() {
       <Grid container>
         {/* Left Column - Images */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Box sx={{ ml: { md: 1 },mt:1 }}>
+          <Box sx={{ ml: { md: 1 }, mt: 1 }}>
             {/* Main Image */}
             <img
-              src="https://i.imgur.com/example.jpg"
+              src={`data:image/jpeg;base64,${product.images[0]}`}
               alt={product.name}
               style={{
                 width: "100%",
-                height: "100%",
+                height: "50%",
                 // height: "auto",
                 display: "block",
                 // maxHeight: "600px",
@@ -116,7 +130,9 @@ function ProductDetailsPage() {
               <Grid size={12}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Typography fontWeight="500">Brand: </Typography>
-                  <Typography color="#000">{product.subcategory} {product.category} </Typography>
+                  <Typography color="#000">
+                    {product.subcategory} {product.category}{" "}
+                  </Typography>
                 </Box>
               </Grid>
               <Grid size={12}>
@@ -205,32 +221,74 @@ function ProductDetailsPage() {
 
         {/* Thumbnail Images */}
         <Box sx={{ mt: 4, ml: { md: 1 } }}>
-          <Typography sx={{ mb: 1 }} variant="h6">More Images</Typography>
+          <Typography sx={{ mb: 1 }} variant="h6">
+            More Images
+          </Typography>
           <Grid container spacing={1}>
-            {[1, 2, 3].map((_, index) => (
+            {product.images.slice(1).map((image, index) => (
               <Grid xs={6} sm={4} md={3} key={index}>
+                {/* <Modal open={open} onClose={handleClose}> */}
                 <Box
                   sx={{
                     position: "relative",
                     overflow: "hidden",
+                    cursor: "pointer",
                   }}
+                  onClick={() => handleOpen(image)}
                 >
                   <img
-                    src="https://i.imgur.com/example.jpg"
+                    src={`data:image/jpeg;base64,${image}`}
                     alt={`View ${index + 1}`}
-                    width="100%"
+                    // width="100%"
                     style={{
-                      objectFit: "contain",
+                      width: "100%",
+                      height: "100px",
+                      objectFit: "cover",
                     }}
                   />
                 </Box>
+                {/* </Modal> */}
               </Grid>
             ))}
           </Grid>
+          <Modal open={open} onClose={handleClose}>
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "70%",
+                height: "7  0%",
+                bgcolor: "background.paper",
+                boxShadow: 24,
+                p: 4,
+              }}
+            >
+              <IconButton
+                sx={{ position: "absolute", top: 8, right: 8 }}
+                onClick={handleClose}
+              >
+                <CloseIcon />
+              </IconButton>
+
+              {selectedImage && (
+                <img
+                  src={`data:image/jpeg;base64,${selectedImage}`}
+                  alt="Selected"
+                  style={{
+                    width: "100%",
+                    height: "440px",
+                    objectFit: "contain",
+                  }}
+                />
+              )}
+            </Box>
+          </Modal>
         </Box>
         {/* Description Section */}
         <Grid size={12}>
-          <Box sx={{ ml: { md: 1 },mt:3,mb:10 }}>
+          <Box sx={{ ml: { md: 1 }, mt: 3, mb: 10 }}>
             <Typography variant="h6" gutterBottom>
               Description
             </Typography>

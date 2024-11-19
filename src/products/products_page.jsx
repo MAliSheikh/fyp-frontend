@@ -84,7 +84,7 @@ const ProductCard = ({ product }) => {
         borderTop="50px"
         component="img"
         height="200"
-        image={product.images[0]}
+        image={`data:image/jpeg;base64,${product.images[0]}`} // Assuming the base64 string is for a JPEG image
         alt={product.name}
       />
       <CardContent sx={{ flexGrow: 1 }}>
@@ -146,7 +146,7 @@ const Products = () => {
       {/* Product Grid */}
       <Grid container spacing={3}>
         {products.map((product, index) => (
-          <Grid item size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
+          <Grid item size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product.product}>
             <ProductCard product={product} />
           </Grid>
         ))}
