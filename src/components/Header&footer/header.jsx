@@ -18,6 +18,7 @@ import {
   useTheme,
   useMediaQuery,
   Badge,
+  Link,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -77,7 +78,7 @@ const Header = () => {
 
   useEffect(() => {
     const token = authService.getToken1();
-    if (token){
+    if (token) {
       setIsLoggedIn(true);
     }
   }, []);
@@ -106,19 +107,21 @@ const Header = () => {
             )}
 
             {/* Logo */}
-            <Box
-              component="img"
-              src={logo}
-              alt="Bazaar Nest logo"
-              sx={{
-                height: 70,
-                width: 70,
-                borderRadius: "50%",
-                padding: 2,
-                marginRight: 32,
-                objectFit: "cover",
-              }}
-            />
+              <Box
+                component="img"
+                onClick={()=>{navigate("/")} }
+                src={logo}
+                alt="Bazaar Nest logo"
+                sx={{
+                  height: 70,
+                  width: 70,
+                  borderRadius: "50%",
+                  padding: 2,
+                  marginRight: 32,
+                  objectFit: "cover",
+                  cursor: "pointer",
+                }}
+              />
 
             {/* Search Bar */}
             <SearchWrapper>
