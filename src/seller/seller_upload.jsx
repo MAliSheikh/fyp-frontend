@@ -1,28 +1,46 @@
-import React, { useState } from 'react';
-import { Box, TextField, Button, Typography, Paper } from '@mui/material';
+import React from "react";
+import { Box, Paper } from "@mui/material";
 // import { Label } from '@mui/icons-material';
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import StoreInfo from "./store_info";
+import MallInfo from "./mall_info";
 
 const ProductUploadPage = () => {
-  const [productName, setProductName] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [stock, setStock] = useState('');
-  const [category, setCategory] = useState('');
-  const [image, setImage] = useState(null);
+  // const [productName, setProductName] = useState("");
+  // const [description, setDescription] = useState("");
+  // const [price, setPrice] = useState("");
+  // const [stock, setStock] = useState("");
+  // const [category, setCategory] = useState("");
+  // const [image, setImage] = useState(null);
+  const [storeType, setStoreType] = React.useState("");
 
-  const handleFileChange = (event) => {
-    setImage(event.target.files[0]);
+  const handleChange = (event) => {
+    setStoreType(event.target.value);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Add form submission logic here
-  };
+  // const handleFileChange = (event) => {
+  //   setImage(event.target.files[0]);
+  // };
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   // Add form submission logic here
+  // };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, p: 2, gap: 3 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: { xs: "column", md: "row" },
+        p: 2,
+        gap: 3,
+      }}
+    >
       {/* Sidebar */}
-      <Box sx={{ width: { xs: '100%', md: '25%' }, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {/* <Box sx={{ width: { xs: '100%', md: '25%' }, display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Button variant="contained" fullWidth
           sx={{
             height: 50, // Customize height
@@ -82,43 +100,65 @@ const ProductUploadPage = () => {
             '&:hover': { backgroundColor: 'red', color: '#ffffff' }, 
           }}
           >Sign Out</Button>
-      </Box>
+      </Box> */}
 
       {/* Main Content */}
-      <Box sx={{ width: { xs: '100%', md: '100%' } }}>
+      <Box sx={{ width: { xs: "100%", md: "100%" } }}>
         <Paper sx={{ p: 3 }}>
-          <Typography variant="h5" gutterBottom>
+          <Box sx={{ minWidth: 120 }}>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">
+                Selelction any option
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={storeType}
+                label="storeType"
+                onChange={handleChange}
+              >
+                <MenuItem value={"Mall"}>Mall</MenuItem>
+                <MenuItem value={"Store"}>Store</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+          {storeType === "Store" && <StoreInfo />}
+          {storeType === "Mall" && <MallInfo />}
+          {/* <Typography variant="h5" gutterBottom>
             Upload New Product
           </Typography>
           <Box
             component="form"
             onSubmit={handleSubmit}
-            sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
           >
             <Box
               sx={{
-                border: '2px dashed gray',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                border: "2px dashed gray",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 height: 150,
-                cursor: 'pointer',
+                cursor: "pointer",
               }}
             >
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
                 id="upload-button"
               />
               <label htmlFor="upload-button">
-                <Button component="span" variant="contained"
+                <Button
+                  component="span"
+                  variant="contained"
                   sx={{
-                    backgroundColor: '#119994', // Customize filled color
-                    '&:hover': { backgroundColor: '#0d7b76' }, // Darker shade on hover
-                  }}>
-                  {image ? image.name : 'Upload Image'}
+                    backgroundColor: "#119994", // Customize filled color
+                    "&:hover": { backgroundColor: "#0d7b76" }, // Darker shade on hover
+                  }}
+                >
+                  {image ? image.name : "Upload Image"}
                 </Button>
               </label>
             </Box>
@@ -167,16 +207,16 @@ const ProductUploadPage = () => {
               type="submit"
               variant="contained"
               sx={{
-                backgroundColor: '#119994',
-                color: '#ffffff',
-                '&:hover': {
-                  backgroundColor: '#0d7b76',
+                backgroundColor: "#119994",
+                color: "#ffffff",
+                "&:hover": {
+                  backgroundColor: "#0d7b76",
                 },
               }}
             >
               Submit
             </Button>
-          </Box>
+          </Box> */}
         </Paper>
       </Box>
     </Box>
