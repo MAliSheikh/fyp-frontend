@@ -13,6 +13,9 @@ const login = async (email, password) => {
 
     if (response.data.access_token) {
       localStorage.setItem("access_token", response.data.access_token);
+      const decodedToken = jwtDecode(response.data.access_token);
+      localStorage.setItem("userId", decodedToken?.id);
+      localStorage.setItem("userRole", decodedToken.role);
     }
 
     return response.data;
@@ -40,6 +43,8 @@ const refreshToken = async (email, password) => {
 
 const logout = () => {
   localStorage.removeItem("access_token");
+  localStorage.removeItem("userId");
+  localStorage.removeItem("userRole");
 };
 
 const getToken = () => {
@@ -51,6 +56,7 @@ const getToken1 = () => {
   if (!token) return null;
   try {
     console.log('jwtDecode(token)', jwtDecode(token));
+    // localStorage.setItem("userId", token.id);
     return jwtDecode(token);
   } catch (e) {
     console.error("Invalid token:", e);
@@ -90,7 +96,18 @@ const register = (email, password, username, role) => {
       };
     });
 };
-
+const fetchStoreOwnerId = async (userId) => {
+  try {
+    const response = await axiosInstance.get(`/store_owners/store_owner/${userId}`);
+    if (response.data) {
+      localStorage.setItem("store_owner_id", response.data.store_owner_id);
+    }
+    return response.data.store_owner_id;
+  } catch (error) {
+    console.error("Error fetching store owner ID:", error);
+    throw error;
+  }
+};
 const authService = {
   login,
   refreshToken,
@@ -99,6 +116,7 @@ const authService = {
   getToken,
   register,
   getUserRole,
+  fetchStoreOwnerId
 };
 
 export default authService;

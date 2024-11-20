@@ -81,14 +81,14 @@ function ProductDetailsPage() {
       <Grid container>
         {/* Left Column - Images */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Box sx={{ ml: { md: 1 }, mt: 1 }}>
+          <Box sx={{ml: {xs:1, md: 1 } , mt: 1 }}>
             {/* Main Image */}
             <img
               src={`data:image/jpeg;base64,${product.images[0]}`}
               alt={product.name}
               style={{
                 width: "100%",
-                height: "50%",
+                height: "350px",
                 // height: "auto",
                 display: "block",
                 // maxHeight: "600px",
@@ -220,7 +220,7 @@ function ProductDetailsPage() {
         </Grid>
 
         {/* Thumbnail Images */}
-        <Box sx={{ mt: 4, ml: { md: 1 } }}>
+        <Box sx={{ mt: 4, ml: {xs:1, md: 5 } }}>
           <Typography sx={{ mb: 1 }} variant="h6">
             More Images
           </Typography>
@@ -288,7 +288,7 @@ function ProductDetailsPage() {
         </Box>
         {/* Description Section */}
         <Grid size={12}>
-          <Box sx={{ ml: { md: 1 }, mt: 3, mb: 10 }}>
+          <Box sx={{  ml: {xs:1, md: 5 } , mt: 3, mb: 10 }}>
             <Typography variant="h6" gutterBottom>
               Description
             </Typography>

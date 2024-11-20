@@ -5,9 +5,9 @@ import Products from "./products/products_page";
 import SignUp from "./components/LoginSignup/signup";
 import Login from "./components/LoginSignup/login";
 import Layout from "./layout";
-import Seller from "./seller/seller_upload";
+import Seller from "./seller/store_create";
 // import Mall_info from "./Mall/Mall_info";
-import Store_info from "./Independent store/store_info";
+import StoreCreatePage from "./seller/store_create";
 import ProductDetailsPage from "./products/productInfo";
 import PrivateRoute from "./components/privateRoute";
 import Unauthorized from "./components/unauthorized";
@@ -40,7 +40,7 @@ function App() {
           element={
             <PrivateRoute roles={["seller"]}>
               <Layout>
-                <Store_info />
+                <StoreCreatePage />
               </Layout>
             </PrivateRoute>
           }

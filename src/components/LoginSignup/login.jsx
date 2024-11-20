@@ -35,11 +35,14 @@ const Login = () => {
             console.log('response:', response);
             if (response.access_token) {
                 const userRole = authService.getUserRole();
+                const userId = localStorage.getItem("userId"); 
                 console.log(userRole)
-                if (userRole === 'customer') {
-                    navigate('/products');
-                } else if (userRole === 'seller') {
+                console.log(userId)
+                if (userRole === 'seller') {
+                    await authService.fetchStoreOwnerId(userId);
                     navigate('/store_info');
+                } else if (userRole === 'customer') {
+                    navigate('/products');
                 } else if (userRole === 'admin') {
                     navigate('/admin');
                 } else {

@@ -1,22 +1,50 @@
-import axiosInstance from "../../axiosInstance";
+import axios from "axios";
+import { base_URL } from "../utils";
 
-const create_store = async (shopName, shopType, description, image) => {
+// export const create_store = async (store_owner_id, shopName, shopType, description, image) => {
+//   // console.log('email', email, 'password', password);
+//   try {
+//     const response = await axiosInstance.post("/store_owners/stores", {
+//         store_owner_id: store_owner_id,
+//         name: shopName,
+//         description: description,
+//         shop_type: shopType,
+//         image: image,
+//     });
+
+//     if (response.data.store_id) {
+//       localStorage.setItem("store_id", response.data.store_id);
+//     }
+
+//     return response.data;
+//   } catch (error) {
+//     console.error("Login error:", error);
+//     throw error;
+//   }
+// };
+
+export const createStore = async (store_owner_id, shopName, shopType, description, image) => {
   try {
-    // console.log('email', email, 'password', password);
-    const response = await axiosInstance.post("/store_owners/stores", {
+    const token = localStorage.getItem('access_token'); // Retrieve the token from localStorage
+    const response = await axios.post(
+      `${base_URL}/store_owners/stores`,
+      {
+        store_owner_id: store_owner_id,
         name: shopName,
         description: description,
         shop_type: shopType,
-        image: image
-    });
-
-    if (response.data.access_token) {
-      localStorage.setItem("access_token", response.data.access_token);
-    }
-
+        image: image,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
     return response.data;
   } catch (error) {
-    console.error("Login error:", error);
+    console.error('Error creating store:', error);
     throw error;
   }
 };

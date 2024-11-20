@@ -22,6 +22,8 @@ const SignUp = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    console.log('Role:', username);
+
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 

@@ -8,27 +8,14 @@ import Select from "@mui/material/Select";
 import StoreInfo from "./store_info";
 import MallInfo from "./mall_info";
 
-const ProductUploadPage = () => {
-  // const [productName, setProductName] = useState("");
-  // const [description, setDescription] = useState("");
-  // const [price, setPrice] = useState("");
-  // const [stock, setStock] = useState("");
-  // const [category, setCategory] = useState("");
-  // const [image, setImage] = useState(null);
+const StoreCreatePage = () => {
   const [storeType, setStoreType] = React.useState("");
 
   const handleChange = (event) => {
     setStoreType(event.target.value);
   };
 
-  // const handleFileChange = (event) => {
-  //   setImage(event.target.files[0]);
-  // };
-
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   // Add form submission logic here
-  // };
+ 
 
   return (
     <Box
@@ -223,4 +210,4 @@ const ProductUploadPage = () => {
   );
 };
 
-export default ProductUploadPage;
+export default StoreCreatePage;
