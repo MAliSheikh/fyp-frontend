@@ -6,7 +6,7 @@ import SignUp from "./components/LoginSignup/signup";
 import Login from "./components/LoginSignup/login";
 import Layout from "./layout";
 import Seller from "./seller/seller_upload";
-import Mall_info from "./Mall/Mall_info";
+// import Mall_info from "./Mall/Mall_info";
 import Store_info from "./Independent store/store_info";
 import ProductDetailsPage from "./products/productInfo";
 import PrivateRoute from "./components/privateRoute";
@@ -45,7 +45,7 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route
+        {/* <Route
           path="/mall_info"
           element={
             <PrivateRoute roles={["seller"]}>
@@ -54,7 +54,7 @@ function App() {
               </Layout>
             </PrivateRoute>
           }
-        />
+        /> */}
         <Route
           path="/seller_upload"
           element={
