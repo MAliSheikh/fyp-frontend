@@ -15,8 +15,6 @@ const StoreCreatePage = () => {
     setStoreType(event.target.value);
   };
 
- 
-
   return (
     <Box
       sx={{
@@ -110,7 +108,12 @@ const StoreCreatePage = () => {
             </FormControl>
           </Box>
           {storeType === "Store" && <StoreInfo />}
-          {storeType === "Mall" && <MallInfo />}
+          {storeType === "Mall" && (
+            <>
+              <MallInfo />
+              {/* <StoreInfo /> */}
+            </>
+          )}
           {/* <Typography variant="h5" gutterBottom>
             Upload New Product
           </Typography>

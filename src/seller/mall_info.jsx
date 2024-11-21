@@ -1,256 +1,268 @@
 import React, { useState } from "react";
-import { Box, TextField, Button, Typography, Paper } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
+import Grid from "@mui/material/Grid2"; // Import Grid2
+import { SideBar } from "./sidebar";
+import { createStoreAndMall } from "./seller";
+import { MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 
 const MallInfo = () => {
-  const [mallName, setmallName] = useState("");
+  const [mallName, setMallName] = useState("");
+  const [floorNo, setFloorNo] = useState("");
+  const [shopNo, setShopNo] = useState("");
+  const [descriptionMall, setDescriptionMall] = useState("");
   const [shopName, setShopName] = useState("");
-  const [shopType, setshopType] = useState("");
-  const [floorNo, setfloorNo] = useState("");
-  const [shopNo, setshopNo] = useState("");
-  const [description, setdescription] = useState("");
+  const [shopType, setShopType] = useState("");
+  const [descriptionStore, setDescriptionStore] = useState("");
   const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  console.log("Store Info", shopName);
 
   const handleFileChange = (event) => {
     setImage(event.target.files[0]);
   };
+  const handleChange = (event) => {
+    setMallName(event.target.value);
+  };
 
-  const handleSubmit = (e) => {
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add form submission logic here
+    console.log("Form submitted");
+
+    // Validation
+    if (
+      !mallName ||
+      !floorNo ||
+      !shopNo ||
+      !descriptionMall ||
+      !shopName ||
+      !shopType ||
+      !descriptionStore ||
+      !image
+    ) {
+      console.error("All fields are required");
+      return;
+    }
+
+    const store_owner_id = localStorage.getItem("store_owner_id");
+    if (!store_owner_id) {
+      console.error("Store owner ID not found in localStorage");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const base64Image = await convertToBase64(image);
+      console.log("Base64 image:", base64Image);
+
+      const data = {
+        store: {
+          store_owner_id: store_owner_id,
+          name: shopName,
+          description: descriptionStore,
+          shop_type: shopType,
+          image: base64Image,
+        },
+        mall: {
+          name: mallName,
+          floor_number: floorNo,
+          shop_number: shopNo,
+          description: descriptionMall,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      };
+
+      const response = await createStoreAndMall(data);
+      console.log("Store and mall created successfully:", response);
+    } catch (error) {
+      console.error("Error creating store and mall:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: { xs: "column", md: "row" },
-        p: 2,
-        gap: 3,
-      }}
-    >
-      {/* Sidebar */}
-      <Box
-        sx={{
-          width: { xs: "100%", md: "25%" },
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-        }}
-      >
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey",
-            "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
-          }}
-        >
-          Upload Product
-        </Button>
+    <Box component="form" onSubmit={handleSubmit} sx={{ p: 2 }}>
+      <Grid container spacing={2}>
+        {/* Sidebar - width: 4 columns */}
+        <Grid xs={12} sm={4} md={2}>
+          <SideBar />
+        </Grid>
 
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey", // Change text color
-            "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" }, // Change text color on hover
-          }}
-        >
-          Manage Products
-        </Button>
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey",
-            "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
-          }}
-        >
-          Sales
-        </Button>
-
-        <Typography
-          sx={{
-            height: 50,
-            color: "grey",
-            marginLeft: "30px",
-            marginTop: "5px",
-          }}
-        >
-          _____REGISTER STORE_____
-        </Typography>
-
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50, // Customize height
-            backgroundColor: "#119994", // Customize filled color
-            "&:hover": { backgroundColor: "#0d7b76" }, // Darker shade on hover
-          }}
-        >
-          Mall
-        </Button>
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey",
-            "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
-          }}
-        >
-          Independent Store
-        </Button>
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            marginTop: "auto",
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey",
-            "&:hover": { backgroundColor: "red", color: "#ffffff" },
-          }}
-        >
-          Sign Out
-        </Button>
-      </Box>
-
-      {/* Main Content */}
-      <Box sx={{ width: { xs: "100%", md: "100%" } }}>
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h5" gutterBottom>
-            Add Mall Information
-          </Typography>
+        {/* Mall Content - width: 8 columns */}
+        <Grid xs={12} sm={8} md={10}>
           <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+            sx={{
+              width: { lg: "350%", md: "200%", xs: "100%" },
+              margin: "0 auto",
+            }}
           >
+            {/* Mall Information Section */}
+            <Typography variant="h5" gutterBottom sx={{ mt: { xs: 2, sm: 0 } }}>
+              Add Mall Information
+            </Typography>
             <Box
-              sx={{
-                border: "2px dashed gray",
-                marginLeft: "650px",
-                alignItems: "center",
-                justifyContent: "center",
-                height: 200,
-                width: "390px",
-                cursor: "pointer",
-                display: "flex",
-              }}
+              sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 4 }}
             >
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                style={{ display: "none" }}
-                id="upload-button"
-              />
-              <label htmlFor="upload-button">
-                <Button
-                  component="span"
-                  variant="contained"
-                  sx={{
-                    alignItems: "center",
-                    backgroundColor: "#119994", // Customize filled color
-                    "&:hover": { backgroundColor: "#0d7b76" }, // Darker shade on hover
-                  }}
+              <FormControl fullWidth>
+                <InputLabel id="mall-select-label">Select Mall</InputLabel>
+
+                <Select
+                  labelId="mall-select-label"
+                  id="mall-select"
+                  value={mallName}
+                  onChange={handleChange}
+                  label="Select Mall"
                 >
-                  {image ? image.name : "Upload Image"}
-                </Button>
-              </label>
+                  <MenuItem value="Dolmen Mall">Dolmen Mall (Karachi)</MenuItem>
+                  <MenuItem value="Emporium Mall">
+                    Emporium Mall (Lahore)
+                  </MenuItem>
+                  <MenuItem value="Lucky One Mall">
+                    Lucky One Mall (Karachi)
+                  </MenuItem>
+                  <MenuItem value="Centaurus Mall">
+                    Centaurus Mall (Islamabad)
+                  </MenuItem>
+                  <MenuItem value="Giga Mall">Giga Mall (Islamabad)</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                label="Floor No"
+                value={floorNo}
+                onChange={(e) => setFloorNo(e.target.value)}
+                type="number"
+                required
+                fullWidth
+              />
+              <TextField
+                label="Shop No"
+                value={shopNo}
+                onChange={(e) => setShopNo(e.target.value)}
+                type="number"
+                required
+                fullWidth
+              />
+              <TextField
+                label="Description"
+                value={descriptionMall}
+                onChange={(e) => setDescriptionMall(e.target.value)}
+                multiline
+                rows={4}
+                required
+                fullWidth
+              />
             </Box>
 
-            <TextField
-              label="Mall Name"
-              value={mallName}
-              onChange={(e) => setmallName(e.target.value)}
-              required
-              sx={{
-                width: "600px",
-              }}
-            />
-            <TextField
-              label="Shop Name"
-              value={shopName}
-              onChange={(e) => setShopName(e.target.value)}
-              fullWidth
-              required
-              sx={{
-                width: "600px",
-                display: "flex",
-              }}
-            />
-            <TextField
-              label="Shop Type"
-              value={shopType}
-              onChange={(e) => setshopType(e.target.value)}
-              required
-              sx={{
-                width: "300px",
-                display: "flex",
-              }}
-            />
-            <TextField
-              label="Floor No"
-              value={floorNo}
-              onChange={(e) => setfloorNo(e.target.value)}
-              type="number"
-              required
-              sx={{
-                width: "200px",
-                display: "flex",
-              }}
-            />
-            <TextField
-              label="Shop No"
-              value={shopNo}
-              onChange={(e) => setshopNo(e.target.value)}
-              type="number"
-              required
-              sx={{
-                width: "200px",
-                display: "flex",
-              }}
-            />
-            <TextField
-              label="Description"
-              value={description}
-              onChange={(e) => setdescription(e.target.value)}
-              multiline
-              rows={7}
-              required
-              sx={{
-                width: "600px",
-                display: "flex",
-              }}
-            />
+            {/* Store Information Section */}
+            <Typography variant="h5" gutterBottom>
+              Add Store Information
+            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <TextField
+                label="Shop Name"
+                value={shopName}
+                onChange={(e) => setShopName(e.target.value)}
+                required
+                fullWidth
+              />
+              <TextField
+                label="Shop Type"
+                value={shopType}
+                onChange={(e) => setShopType(e.target.value)}
+                required
+                fullWidth
+              />
+              <TextField
+                label="Description"
+                value={descriptionStore}
+                onChange={(e) => setDescriptionStore(e.target.value)}
+                multiline
+                rows={4}
+                required
+                fullWidth
+              />
+              <Box
+                sx={{
+                  border: "2px dashed gray",
+                  borderRadius: 1,
+                  p: 2,
+                  height: { xs: 150, sm: 200 },
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                }}
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  style={{ display: "none" }}
+                  id="upload-button"
+                />
+                <label htmlFor="upload-button">
+                  <Button
+                    component="span"
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "#119994",
+                      "&:hover": { backgroundColor: "#0d7b76" },
+                    }}
+                  >
+                    {image ? image.name : "Upload Image"}
+                  </Button>
+                </label>
+                {/* {image && (
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt="Uploaded"
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "100%",
+                      objectFit: "contain",
+                      position: "absolute",
+                    }}
+                  />
+                )} */}
+              </Box>
+            </Box>
 
+            {/* Submit Button */}
             <Button
               type="submit"
               variant="contained"
+              fullWidth
               sx={{
+                mt: 3,
+                mb: 2,
                 backgroundColor: "#119994",
-                color: "#ffffff",
-                marginTop: "10px",
-                "&:hover": {
-                  backgroundColor: "#0d7b76",
-                },
+                "&:hover": { backgroundColor: "#0d7b76" },
               }}
+              disabled={loading}
             >
-              Submit
+              {loading ? <CircularProgress size={24} /> : "Submit"}
             </Button>
           </Box>
-        </Paper>
-      </Box>
+        </Grid>
+      </Grid>
     </Box>
   );
 };

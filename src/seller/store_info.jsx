@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Box, TextField, Button, Typography, Paper, CircularProgress } from "@mui/material";
 import { createStore } from './seller';
+import { SideBar } from "./sidebar";
 
 const StoreInfo = () => {
   const [shopName, setShopName] = useState("");
@@ -63,7 +64,7 @@ const StoreInfo = () => {
       }}
     >
       {/* Sidebar */}
-      <Box
+      {/* <Box
         sx={{
           width: { xs: "100%", md: "25%" },
           display: "flex",
@@ -156,7 +157,8 @@ const StoreInfo = () => {
         >
           Sign Out
         </Button>
-      </Box>
+      </Box> */}
+      <SideBar />
 
       {/* Main Content */}
       <Box sx={{ width: "100%" }}>
