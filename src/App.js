@@ -11,6 +11,7 @@ import StoreCreatePage from "./seller/store_create";
 import ProductDetailsPage from "./products/productInfo";
 import PrivateRoute from "./components/privateRoute";
 import Unauthorized from "./components/unauthorized";
+import UploadProduct from "./seller//upload_product";
 
 function App() {
   return (  
@@ -41,6 +42,16 @@ function App() {
             <PrivateRoute roles={["seller"]}>
               <Layout>
                 <StoreCreatePage />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/seller/upload-product"
+          element={
+            <PrivateRoute roles={["seller"]}>
+              <Layout>
+                <UploadProduct />
               </Layout>
             </PrivateRoute>
           }

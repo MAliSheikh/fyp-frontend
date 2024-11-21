@@ -1,8 +1,11 @@
 // sidebar.js
 import React from "react";
 import { Box, Button, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export const SideBar = () => {
+  const navigate = useNavigate();
+
   return (
     <Box
       sx={{
@@ -16,9 +19,10 @@ export const SideBar = () => {
     >
       <Button
         variant="contained"
+        onClick={() => navigate("/seller/upload-product")}
         sx={{
           height: 45,
-          mb: 1,
+          mb: 2,
           width: "100%",
           maxWidth: "100%",
           backgroundColor: "#ffffff",
@@ -33,7 +37,7 @@ export const SideBar = () => {
         variant="contained"
         sx={{
           height: 45,
-          mb: 1,
+          mb: 2,
           width: "100%",
           maxWidth: "100%",
           backgroundColor: "#ffffff",
@@ -48,7 +52,7 @@ export const SideBar = () => {
         variant="contained"
         sx={{
           height: 45,
-          mb: 1,
+          mb: 2,
           width: "100%",
           maxWidth: "100%",
           backgroundColor: "#ffffff",
@@ -73,7 +77,7 @@ export const SideBar = () => {
         variant="contained"
         sx={{
           height: 45,
-          mb: 1,
+          mb: 2,
           width: "100%",
           maxWidth: "100%",
           backgroundColor: "#119994",
@@ -87,7 +91,7 @@ export const SideBar = () => {
         variant="contained"
         sx={{
           height: 45,
-          mb: 1,
+          mb: 2,
           width: "100%",
           maxWidth: "100%",
           backgroundColor: "#ffffff",
@@ -102,7 +106,7 @@ export const SideBar = () => {
         variant="contained"
         sx={{
           height: 45,
-          mb: 1,
+          mb: 2,
           width: "100%",
           maxWidth: "100%",
           backgroundColor: "#ffffff",
