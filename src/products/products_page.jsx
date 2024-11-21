@@ -84,7 +84,8 @@ const ProductCard = ({ product }) => {
         borderTop="50px"
         component="img"
         height="200"
-        image={`data:image/jpeg;base64,${product.images[0]}`} // Assuming the base64 string is for a JPEG image
+        image={product.images[0]} // Assuming the base64 string is for a JPEG image
+        // image={`data:image/jpeg;base64,${product.images[0]}`} // Assuming the base64 string is for a JPEG image
         alt={product.name}
       />
       <CardContent sx={{ flexGrow: 1 }}>

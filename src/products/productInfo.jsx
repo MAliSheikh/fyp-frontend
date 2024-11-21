@@ -84,7 +84,8 @@ function ProductDetailsPage() {
           <Box sx={{ml: {xs:1, md: 1 } , mt: 1 }}>
             {/* Main Image */}
             <img
-              src={`data:image/jpeg;base64,${product.images[0]}`}
+              src={product.images[0]}
+              // src={`data:image/jpeg;base64,${product.images[0]}`}
               alt={product.name}
               style={{
                 width: "100%",
