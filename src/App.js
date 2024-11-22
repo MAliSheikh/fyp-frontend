@@ -12,6 +12,8 @@ import ProductDetailsPage from "./products/productInfo";
 import PrivateRoute from "./components/privateRoute";
 import Unauthorized from "./components/unauthorized";
 import UploadProduct from "./seller//upload_product";
+import BuyNowPage from "./Buy_now/Buy_now";
+import AddToCartPage from "./Add_to_cart/add_to_cart";
 
 function App() {
   return (  
@@ -34,6 +36,13 @@ function App() {
           path="/products/:id"
           element={<Layout>{<ProductDetailsPage />}</Layout>}
         />
+        <Route
+        path="/buy-now" element={<Layout>{<BuyNowPage />}</Layout>}
+        />
+        <Route
+        path="/add-to-cart" element={<Layout>{<AddToCartPage />}</Layout>}
+        />
+
 
         {/* Seller */}
         <Route

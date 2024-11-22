@@ -91,9 +91,9 @@ const StoreCreatePage = () => {
       <Box sx={{ width: { xs: "100%", md: "100%" } }}>
         <Paper sx={{ p: 3 }}>
           <Box sx={{ minWidth: 120 }}>
-            <FormControl fullWidth>
+            <FormControl sx={{ width: 225, marginLeft: 3 }}>
               <InputLabel id="demo-simple-select-label">
-                Selelction any option
+                Select option
               </InputLabel>
               <Select
                 labelId="demo-simple-select-label"
