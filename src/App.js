@@ -15,6 +15,7 @@ import UploadProduct from "./seller//upload_product";
 import BuyNowPage from "./Buy_now/Buy_now";
 import AddToCartPage from "./Add_to_cart/add_to_cart";
 
+
 function App() {
   return (  
     <Router>

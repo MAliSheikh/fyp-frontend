@@ -7,7 +7,9 @@ import IconButton from "@mui/material/IconButton";
 import Checkbox from "@mui/material/Checkbox";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import DeleteIcon from "@mui/icons-material/Delete"; // Import Delete Icon
 import CircularProgress from "@mui/material/CircularProgress";
+import tryImage from "../components/Logos/try.jpg";
 
 const AddToCartPage = () => {
   const [cartItems, setCartItems] = useState([]); // Cart items fetched from the API
@@ -32,7 +34,7 @@ const AddToCartPage = () => {
                   id: product.id,
                   name: product.name,
                   price: product.price,
-                  image: product.image,
+                  image:tryImage, //product.image,
                 },
               ]),
             1000
@@ -58,7 +60,7 @@ const AddToCartPage = () => {
     );
   };
 
-  // Handle quantity change
+  //Handle quantity change
   const handleQuantityChange = (item, delta) => {
     setCartItems((prev) =>
       prev.map((cartItem) =>
@@ -69,7 +71,17 @@ const AddToCartPage = () => {
     );
   };
 
-  // Calculate subtotal
+
+
+   
+
+  // Handle delete item
+  const handleDeleteItem = (itemId) => {
+    setCartItems((prev) => prev.filter((cartItem) => cartItem.id !== itemId));
+    setSelectedItems((prev) => prev.filter((selected) => selected.id !== itemId));
+  };
+
+  //Calculate subtotal
   const calculateSubtotal = () =>
     selectedItems.reduce(
       (total, item) => total + item.price * (item.quantity || 1),
@@ -155,6 +167,14 @@ const AddToCartPage = () => {
               </IconButton>
             </Box>
           </Box>
+
+          {/* Delete button */}
+          <IconButton
+            onClick={() => handleDeleteItem(item.id)}
+            color="error"
+          >
+            <DeleteIcon />
+          </IconButton>
         </Box>
       ))}
 
