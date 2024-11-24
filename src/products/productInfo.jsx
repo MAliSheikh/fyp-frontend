@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid2";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { fetchProductByIdDetails } from "./product";
 import CircularProgress from "@mui/material/CircularProgress";
 import Modal from "@mui/material/Modal";
@@ -15,6 +15,8 @@ import CloseIcon from "@mui/icons-material/Close";
 
 function ProductDetailsPage() {
   const { id } = useParams();
+  const navigate = useNavigate(); // Correct placement of useNavigate
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,6 +38,14 @@ function ProductDetailsPage() {
 
     getProductDetails();
   }, [id]);
+
+  const handleBuyNow = () => {
+    navigate(`/buy-now`, { state: { product, quantity } });
+  };
+
+  const handleaddtoCart = () => {
+    navigate(`/add-to-cart`, { state: { product, quantity } });
+  };
 
   const handleIncrement = () => {
     setQuantity((prev) => prev + 1);
@@ -189,6 +199,7 @@ function ProductDetailsPage() {
                 <Button
                   fullWidth
                   variant="outlined"
+                  onClick={handleaddtoCart}
                   sx={{
                     height: 45,
                     textTransform: "none",
@@ -204,6 +215,7 @@ function ProductDetailsPage() {
                 <Button
                   fullWidth
                   variant="contained"
+                  onClick={handleBuyNow}
                   sx={{
                     height: 45,
                     textTransform: "none",

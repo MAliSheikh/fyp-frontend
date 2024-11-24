@@ -15,6 +15,7 @@ export const SideBar = () => {
         position: { sm: "sticky" },
         top: { sm: 16 },
         width: "100%", // Takes full width of its grid container
+        mt: 5,
       }}
     >
       <Button
@@ -70,7 +71,7 @@ export const SideBar = () => {
           textAlign: "center",
         }}
       >
-        _____REGISTER STORE_____
+        REGISTER STORE
       </Typography>
 
       <Button

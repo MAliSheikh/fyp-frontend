@@ -5,6 +5,7 @@ import {
   Button,
   Typography,
   CircularProgress,
+  Paper,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2"; // Import Grid2
 import { SideBar } from "./sidebar";
@@ -100,12 +101,22 @@ const MallInfo = () => {
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ p: 2 }}>
-      <Grid container spacing={2}>
+      <Grid container spacing={8}>
         {/* Sidebar - width: 4 columns */}
-        <Grid xs={12} sm={4} md={2}>
+        {/* <Grid xs={12} sm={4} md={2}> */}
+        <Box
+        sx={{
+        display: "flex",
+        flexDirection: { xs: "column", md: "row" },
+        p: 2,
+        gap: 3,
+      }}
+      >
           <SideBar />
-        </Grid>
+        </Box>
+        {/* </Grid> */}
 
+        
         {/* Mall Content - width: 8 columns */}
         <Grid xs={12} sm={8} md={10}>
           <Box
@@ -114,6 +125,7 @@ const MallInfo = () => {
               margin: "0 auto",
             }}
           >
+            <Paper sx={{ p: 3 }}>
             {/* Mall Information Section */}
             <Typography variant="h5" gutterBottom sx={{ mt: { xs: 2, sm: 0 } }}>
               Add Mall Information
@@ -260,9 +272,14 @@ const MallInfo = () => {
             >
               {loading ? <CircularProgress size={24} /> : "Submit"}
             </Button>
+          </Paper>
           </Box>
+
+
         </Grid>
+        
       </Grid>
+      
     </Box>
   );
 };

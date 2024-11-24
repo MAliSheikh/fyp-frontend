@@ -7,6 +7,7 @@ import Grid from "@mui/material/Grid2";
 import { createProduct } from "./seller";
 import CloseIcon from "@mui/icons-material/Close";
 
+
 const convertToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     const fileReader = new FileReader();
@@ -139,7 +140,7 @@ const UploadProduct = () => {
         backgroundColor: "#fff",
       }}
     >
-      <Grid container spacing={3}>
+      <Grid container spacing={8}>
         <Grid item xs={12} sm={4} md={4}>
           <SideBar />
         </Grid>
@@ -165,10 +166,10 @@ const UploadProduct = () => {
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
-                    width: "100%",
+                    width: 600,
                   }}
                 >
-                  <Typography sx={{ color: "#666", mb: 2 }}>
+                  <Typography sx={{paddingTop:5, color: "#666", mb: 2 }}>
                     Upload Product Images
                   </Typography>
                   <Box
@@ -177,7 +178,8 @@ const UploadProduct = () => {
                       flexWrap: "wrap",
                       gap: 1,
                       mb: 2,
-                      width: "100%",
+                      height: 40,
+                      width: 100,
                       justifyContent: "center"
                     }}
                   >
@@ -226,10 +228,12 @@ const UploadProduct = () => {
                     variant="contained"
                     component="label"
                     sx={{
+                      marginBottom: 3,
+                      marginTop: -4,
                       backgroundColor: "#00897b",
                       "&:hover": { backgroundColor: "#00796b" },
                       textTransform: "none",
-                      width: { xs: "100%", md: "300px" },
+                      width: { xs: "200%", md: "300px" },
                     }}
                   >
                     Add Image
@@ -247,7 +251,7 @@ const UploadProduct = () => {
                   variant="outlined"
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
-                  sx={{ backgroundColor: "#fff", mt: 3 }}
+                  sx={{width: 633, backgroundColor: "#fff", mt: 3 }}
                 />
               </Grid>
 
@@ -255,9 +259,9 @@ const UploadProduct = () => {
               <Grid item xs={12} md={6}>
                 <Box
                   sx={{
-                    gap: 2,
+                    gap: 1,
                     width: { xs: "100%", md: "400px" },
-                    ml:5
+                    ml:0
                   }}
                 >
                   <TextField
@@ -265,7 +269,7 @@ const UploadProduct = () => {
                     label="Add Description"
                     variant="outlined"
                     multiline
-                    rows={10}
+                    rows={10.7}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     sx={{ backgroundColor: "#fff" }}
@@ -274,7 +278,7 @@ const UploadProduct = () => {
               </Grid>
             </Grid>
           </Box>
-          <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+          <Box sx={{ width:632, display: "flex", gap: 2, mt: 2 }}>
             <TextField
               label="Price"
               variant="outlined"
