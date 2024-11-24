@@ -23,6 +23,11 @@ function ProductDetailsPage() {
   const [quantity, setQuantity] = useState(1);
   const [open, setOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
+  const [selectedSize, setSelectedSize] = useState(null);
+
+  const handleSizeSelect = (size) => {
+    setSelectedSize(size);
+  };
 
   useEffect(() => {
     const getProductDetails = async () => {
@@ -91,7 +96,7 @@ function ProductDetailsPage() {
       <Grid container>
         {/* Left Column - Images */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Box sx={{ml: {xs:1, md: 1 } , mt: 1 }}>
+          <Box sx={{ ml: { xs: 1, md: 1 }, mt: 1 }}>
             {/* Main Image */}
             <img
               src={product.images[0]}
@@ -110,7 +115,7 @@ function ProductDetailsPage() {
         </Grid>
 
         {/* Right Column - Product Details */}
-        <Grid size={{ xs: 16, md: 6 }}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Box
             sx={{
               ml: { md: 5 },
@@ -138,14 +143,60 @@ function ProductDetailsPage() {
             />
 
             <Grid container spacing={2}>
-              <Grid size={12}>
+              <Grid item xs={12}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Typography fontWeight="500">Brand: </Typography>
                   <Typography color="#000">
-                    {product.subcategory} {product.category}{" "}
+                    {product.subcategory} {product.category}
                   </Typography>
                 </Box>
+                {/* Conditional rendering for sizes */}
+                <Box sx={{ mt: 2 }}>
+                  {product.category === "Clothing" && (
+                    <Box>
+                      <Typography fontWeight="500">Sizes:</Typography>
+                      <Box sx={{ display: "flex", gap: 1, mb:2 }}>
+                        {["Small", "Medium", "Large"].map((size) => (
+                          <Button
+                          sx={{
+                            bgcolor: selectedSize === size ? "#26A69A" : "#ffffff",
+                            color: selectedSize === size ? "#ffffff" : "#000000",
+                            border: selectedSize === size ? "none" : "1px solid #26A69A",
+                            "&:hover": {
+                              bgcolor: selectedSize === size ? "#219688" : "#f0f0f0",
+                            },
+                          }}
+                          key={size}
+                          variant="contained"
+                          onClick={() => handleSizeSelect(size)}
+                        >
+                          {size}
+                        </Button>
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+                  {product.category === "Footwear" && (
+                    <Box>
+                      <Typography fontWeight="500">Sizes:</Typography>
+                      <Box sx={{ display: "flex", gap: 1 }}>
+                        {[6, 7, 8, 9, 10].map((size) => (
+                          <Button
+                            key={size}
+                            variant={selectedSize === size ? "contained" : "outlined"}
+                            onClick={() => handleSizeSelect(size)}
+                          >
+                            {size}
+                          </Button>
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+                </Box>
               </Grid>
+            </Grid>
+
+            <Grid container spacing={2}>
               <Grid size={12}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Typography fontWeight="500">Available: </Typography>
@@ -233,7 +284,7 @@ function ProductDetailsPage() {
         </Grid>
 
         {/* Thumbnail Images */}
-        <Box sx={{ mt: 4, ml: {xs:1, md: 5 } }}>
+        <Box sx={{ mt: 4, ml: { xs: 1, md: 5 } }}>
           <Typography sx={{ mb: 1 }} variant="h6">
             More Images
           </Typography>
@@ -250,7 +301,7 @@ function ProductDetailsPage() {
                   onClick={() => handleOpen(image)}
                 >
                   <img
-                    src={`data:image/jpeg;base64,${image}`}
+                    src={image}
                     alt={`View ${index + 1}`}
                     // width="100%"
                     style={{
@@ -287,7 +338,7 @@ function ProductDetailsPage() {
 
               {selectedImage && (
                 <img
-                  src={`data:image/jpeg;base64,${selectedImage}`}
+                  src={selectedImage}
                   alt="Selected"
                   style={{
                     width: "100%",
@@ -301,7 +352,7 @@ function ProductDetailsPage() {
         </Box>
         {/* Description Section */}
         <Grid size={12}>
-          <Box sx={{  ml: {xs:1, md: 5 } , mt: 3, mb: 10 }}>
+          <Box sx={{ ml: { xs: 1, md: 5 }, mt: 3, mb: 10 }}>
             <Typography variant="h6" gutterBottom>
               Description
             </Typography>

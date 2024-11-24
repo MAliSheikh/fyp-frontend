@@ -9,7 +9,7 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import DeleteIcon from "@mui/icons-material/Delete"; // Import Delete Icon
 import CircularProgress from "@mui/material/CircularProgress";
-import tryImage from "../components/Logos/try.jpg";
+// import tryImage from "../components/Logos/try.jpg";
 
 const AddToCartPage = () => {
   const [cartItems, setCartItems] = useState([]); // Cart items fetched from the API
@@ -34,7 +34,7 @@ const AddToCartPage = () => {
                   id: product.id,
                   name: product.name,
                   price: product.price,
-                  image:tryImage, //product.image,
+                  image:product.images[0] //product.image,
                 },
               ]),
             1000
@@ -135,16 +135,17 @@ const AddToCartPage = () => {
             src={item.image}
             alt={item.name}
             style={{
-              width: "80px",
-              height: "80px",
+              width: "100px",
+              height: "100px",
               objectFit: "cover",
               borderRadius: "8px",
               marginRight: "16px",
+              marginLeft: "10px",
             }}
           />
 
           {/* Product details */}
-          <Box sx={{ flexGrow: 1 }}>
+          <Box sx={{ flexGrow: 1 , marginLeft:3}}>
             <Typography variant="subtitle1" fontWeight="500">
               {item.name}
             </Typography>

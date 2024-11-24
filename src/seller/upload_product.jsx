@@ -53,7 +53,7 @@ const UploadProduct = () => {
   };
 
   const handleRemoveImage = (indexToRemove) => {
-    setProductImages(prevImages => 
+    setProductImages(prevImages =>
       prevImages.filter((_, index) => index !== indexToRemove)
     );
   };
@@ -62,23 +62,23 @@ const UploadProduct = () => {
     categories.find((cat) => cat.name === selectedCategory)?.subcategories ||
     [];
 
-    const resetForm = () => {
-      setProductImages([]);
-      setProductName("");
-      setDescription("");
-      setPrice("");
-      setStock("");
-      setSelectedCategory("");
-      setSelectedSubcategory("");
-    };
-  
-    // Add snackbar close handler
-    const handleSnackbarClose = () => {
-      setSnackbar(prev => ({ ...prev, open: false }));
-    };
+  const resetForm = () => {
+    setProductImages([]);
+    setProductName("");
+    setDescription("");
+    setPrice("");
+    setStock("");
+    setSelectedCategory("");
+    setSelectedSubcategory("");
+  };
+
+  // Add snackbar close handler
+  const handleSnackbarClose = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
+
     // Validate required fields
     if (productImages.length === 0 || !productName || !description || !price || !stock || !selectedCategory) {
       setSnackbar({
@@ -95,7 +95,7 @@ const UploadProduct = () => {
       const base64Images = await Promise.all(
         productImages.map(image => convertToBase64(image))
       );
-      
+
       const productData = {
         name: productName,
         description: description,
@@ -105,10 +105,10 @@ const UploadProduct = () => {
         category: selectedCategory,
         subcategory: selectedSubcategory || ""
       };
-      
+
       const response = await createProduct(productData);
       console.log('Product created successfully:', response);
-      
+
       setSnackbar({
         open: true,
         message: 'Product created successfully!',
@@ -116,10 +116,10 @@ const UploadProduct = () => {
       });
 
       resetForm();
-      
+
     } catch (error) {
       console.error('Failed to create product:', error);
-      
+
       setSnackbar({
         open: true,
         message: error.response?.data?.message || 'Failed to create product. Please try again.',
@@ -162,28 +162,29 @@ const UploadProduct = () => {
                     borderRadius: "4px",
                     p: 2,
                     minHeight: "150px",
-                    display: "flex", 
+                    display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
                     width: 600,
                   }}
                 >
-                  <Typography sx={{paddingTop:5, color: "#666", mb: 2 }}>
+                  <Typography sx={{ paddingTop: 5, color: "#666", mb: 2 }}>
                     Upload Product Images
                   </Typography>
                   <Box
                     sx={{
                       display: "flex",
-                      flexWrap: "wrap",
+                      flexWrap: "nowrap", // Prevent wrapping to the next line
                       gap: 1,
                       mb: 2,
                       height: 40,
-                      width: 100,
-                      justifyContent: "center"
+                      width: "100%",
+                      overflowX: "auto", // Enable horizontal scrolling
+                      justifyContent: "center",
                     }}
                   >
-                    {productImages.length > 0 && 
+                    {productImages.length > 0 &&
                       productImages.map((image, index) => (
                         <Box
                           key={index}
@@ -193,16 +194,17 @@ const UploadProduct = () => {
                             border: "1px solid #e0e0e0",
                             borderRadius: "4px",
                             overflow: "hidden",
-                            position: "relative"
+                            position: "relative",
+                            flexShrink: 0, // Prevent shrinking
                           }}
                         >
-                          <img 
+                          <img
                             src={URL.createObjectURL(image)}
                             alt={`Preview ${index}`}
                             style={{
                               width: "100%",
                               height: "100%",
-                              objectFit: "cover"
+                              objectFit: "cover",
                             }}
                           />
                           <IconButton
@@ -213,16 +215,15 @@ const UploadProduct = () => {
                               right: 0,
                               backgroundColor: "rgba(255,255,255,0.7)",
                               "&:hover": {
-                                backgroundColor: "rgba(255,255,255,0.9)"
-                              }
+                                backgroundColor: "rgba(255,255,255,0.9)",
+                              },
                             }}
                             onClick={() => handleRemoveImage(index)}
                           >
                             <CloseIcon fontSize="small" />
                           </IconButton>
                         </Box>
-                      ))
-                    }
+                      ))}
                   </Box>
                   <Button
                     variant="contained"
@@ -237,7 +238,7 @@ const UploadProduct = () => {
                     }}
                   >
                     Add Image
-                    <input 
+                    <input
                       type="file"
                       hidden
                       accept="image/*"
@@ -251,7 +252,7 @@ const UploadProduct = () => {
                   variant="outlined"
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
-                  sx={{width: 633, backgroundColor: "#fff", mt: 3 }}
+                  sx={{ width: 633, backgroundColor: "#fff", mt: 3 }}
                 />
               </Grid>
 
@@ -261,7 +262,7 @@ const UploadProduct = () => {
                   sx={{
                     gap: 1,
                     width: { xs: "100%", md: "400px" },
-                    ml:0
+                    ml: 0
                   }}
                 >
                   <TextField
@@ -278,7 +279,7 @@ const UploadProduct = () => {
               </Grid>
             </Grid>
           </Box>
-          <Box sx={{ width:632, display: "flex", gap: 2, mt: 2 }}>
+          <Box sx={{ width: 632, display: "flex", gap: 2, mt: 2 }}>
             <TextField
               label="Price"
               variant="outlined"
@@ -360,14 +361,14 @@ const UploadProduct = () => {
       </Grid>
 
       {/* Add Snackbar for notifications */}
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert 
-          onClose={handleSnackbarClose} 
+        <Alert
+          onClose={handleSnackbarClose}
           severity={snackbar.severity}
           sx={{ width: '100%' }}
         >
