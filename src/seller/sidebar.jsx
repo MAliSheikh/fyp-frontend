@@ -1,4 +1,3 @@
-// sidebar.js
 import React from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +13,7 @@ export const SideBar = () => {
         alignItems: "center",
         position: { sm: "sticky" },
         top: { sm: 16 },
-        width: "100%", // Takes full width of its grid container
+        width: "250px", // Set a fixed width for the sidebar
         mt: 5,
       }}
     >
@@ -25,7 +24,6 @@ export const SideBar = () => {
           height: 45,
           mb: 2,
           width: "100%",
-          maxWidth: "100%",
           backgroundColor: "#ffffff",
           color: "grey",
           "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
@@ -40,7 +38,6 @@ export const SideBar = () => {
           height: 45,
           mb: 2,
           width: "100%",
-          maxWidth: "100%",
           backgroundColor: "#ffffff",
           color: "grey",
           "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
@@ -55,7 +52,6 @@ export const SideBar = () => {
           height: 45,
           mb: 2,
           width: "100%",
-          maxWidth: "100%",
           backgroundColor: "#ffffff",
           color: "grey",
           "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
@@ -80,7 +76,6 @@ export const SideBar = () => {
           height: 45,
           mb: 2,
           width: "100%",
-          maxWidth: "100%",
           backgroundColor: "#119994",
           "&:hover": { backgroundColor: "#0d7b76" },
         }}
@@ -94,7 +89,6 @@ export const SideBar = () => {
           height: 45,
           mb: 2,
           width: "100%",
-          maxWidth: "100%",
           backgroundColor: "#ffffff",
           color: "grey",
           "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
@@ -109,7 +103,6 @@ export const SideBar = () => {
           height: 45,
           mb: 2,
           width: "100%",
-          maxWidth: "100%",
           backgroundColor: "#ffffff",
           color: "grey",
           "&:hover": { backgroundColor: "red", color: "#ffffff" },
