@@ -77,11 +77,21 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    const token = authService.getToken1();
-    if (token) {
-      setIsLoggedIn(true);
-    }
-  }, []);
+    // Check token status whenever component mounts or auth state changes
+    const checkLoginStatus = () => {
+      const token = authService.getToken1();
+      setIsLoggedIn(!!token); // Convert token to boolean
+    };
+    
+    checkLoginStatus();
+    
+    // Add event listener for storage changes (in case token is removed in another tab)
+    window.addEventListener('storage', checkLoginStatus);
+    
+    return () => {
+      window.removeEventListener('storage', checkLoginStatus);
+    };
+  }, []); // Empty dependency array since we're setting up listeners
 
   const handleLogout = () => {
     authService.logout();

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Box, TextField, Button, Typography, Paper, CircularProgress } from "@mui/material";
+import { Box, TextField, Button, Typography, Paper, CircularProgress, Snackbar, Alert } from "@mui/material";
 import { createStore } from './seller';
 import { SideBar } from "./sidebar";
+import { useNavigate } from "react-router-dom";
 
 const StoreInfo = () => {
   const [shopName, setShopName] = useState("");
@@ -9,6 +10,12 @@ const StoreInfo = () => {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+  const navigate = useNavigate();
 
   console.log("Store Info", shopName);
 
@@ -25,18 +32,30 @@ const StoreInfo = () => {
     });
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form submitted");
     // Validation
     if (!shopName || !shopType || !description || !image) {
-      console.error("All fields are required");
+      setSnackbar({
+        open: true,
+        message: 'All fields are required',
+        severity: 'error'
+      });
       return;
     }
 
     const store_owner_id = localStorage.getItem("store_owner_id");
     if (!store_owner_id) {
-      console.error("Store owner ID not found in localStorage");
+      setSnackbar({
+        open: true,
+        message: 'Store owner ID not found',
+        severity: 'error'
+      });
       return;
     }
 
@@ -47,8 +66,24 @@ const StoreInfo = () => {
       console.log("Base64 image:", base64Image);
       const response = await createStore(store_owner_id, shopName, shopType, description, base64Image);
       console.log("Store created successfully:", response);
+      
+      setSnackbar({
+        open: true,
+        message: 'Store created successfully!',
+        severity: 'success'
+      });
+
+      // Wait for 3 seconds before redirecting
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      navigate('/seller/upload-product');
+
     } catch (error) {
       console.error("Error creating store:", error);
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || 'Failed to create store',
+        severity: 'error'
+      });
     } finally {
       setLoading(false);
     }
@@ -63,101 +98,6 @@ const StoreInfo = () => {
         gap: 3,
       }}
     >
-      {/* Sidebar */}
-      {/* <Box
-        sx={{
-          width: { xs: "100%", md: "25%" },
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-        }}
-      >
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey",
-            "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
-          }}
-        >
-          Upload Product
-        </Button>
-
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey", // Change text color
-            "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" }, // Change text color on hover
-          }}
-        >
-          Manage Products
-        </Button>
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey",
-            "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
-          }}
-        >
-          Sales
-        </Button>
-
-        <Typography
-          sx={{
-            height: 50,
-            color: "grey",
-            marginLeft: "30px",
-            marginTop: "5px",
-          }}
-        >
-          _____REGISTER STORE_____
-        </Typography>
-
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey",
-            "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" }, // Darker shade on hover
-          }}
-        >
-          Mall
-        </Button>
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50, // Customize height
-            backgroundColor: "#119994", // Customize filled color
-            "&:hover": { backgroundColor: "#0d7b76" },
-          }}
-        >
-          Independent Store
-        </Button>
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            marginTop: "auto",
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey",
-            "&:hover": { backgroundColor: "red", color: "#ffffff" },
-          }}
-        >
-          Sign Out
-        </Button>
-      </Box> */}
       <SideBar />
 
       {/* Main Content */}
@@ -260,6 +200,20 @@ const StoreInfo = () => {
           </Button>
         </Paper>
       </Box>
+
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={6000} 
+        onClose={handleSnackbarClose}
+      >
+        <Alert 
+          onClose={handleSnackbarClose} 
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
