@@ -15,6 +15,8 @@ const login = async (email, password) => {
       localStorage.setItem("access_token", response.data.access_token);
       const decodedToken = jwtDecode(response.data.access_token);
       localStorage.setItem("userId", decodedToken?.id);
+      localStorage.setItem("StoreId", response?.store_id || null);
+      localStorage.setItem("MallId", response?.mall_id || null);
       localStorage.setItem("userRole", decodedToken.role);
     }
 
@@ -45,6 +47,9 @@ const logout = () => {
   localStorage.removeItem("access_token");
   localStorage.removeItem("userId");
   localStorage.removeItem("userRole");
+  localStorage.removeItem("StoreId");
+  localStorage.removeItem("MallId");  
+  localStorage.removeItem("store_owner_id");  
 };
 
 const getToken = () => {

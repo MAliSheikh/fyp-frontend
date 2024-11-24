@@ -12,9 +12,10 @@ import ProductDetailsPage from "./products/productInfo";
 import PrivateRoute from "./components/privateRoute";
 import Unauthorized from "./components/unauthorized";
 import UploadProduct from "./seller//upload_product";
+import SearchResults from "./products/search_results";
 
 function App() {
-  return (  
+  return (
     <Router>
       <Routes>
         {/* Default route - shows Products page with Navbar and Footer */}
@@ -26,15 +27,12 @@ function App() {
             </Layout>
           }
         />
-        <Route
-          path="/products"
-          element={<Layout>{<Products />}</Layout>}
-        />
+        <Route path="/products" element={<Layout>{<Products />}</Layout>} />
         <Route
           path="/products/:id"
           element={<Layout>{<ProductDetailsPage />}</Layout>}
         />
-
+        <Route path="/search" element={<Layout>{<SearchResults />}</Layout>} />
         {/* Seller */}
         <Route
           path="/store_info"

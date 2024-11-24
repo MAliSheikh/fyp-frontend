@@ -73,7 +73,8 @@ const Header = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const token = authService.getToken1();
@@ -88,6 +89,13 @@ const Header = () => {
     navigate("/");
   };
   const navItems = ["Men", "Women", "Kids", "Beauty", "Others"];
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?search_string=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   return (
     <Box>
@@ -124,13 +132,19 @@ const Header = () => {
 
             {/* Search Bar */}
             <SearchWrapper>
-              <StyledInputBase
-                placeholder="Search"
-                inputProps={{ "aria-label": "search" }}
-              />
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
+              <form onSubmit={handleSearch} style={{ width: '100%' }}>
+                <StyledInputBase
+                  placeholder="Search"
+                  inputProps={{ "aria-label": "search" }}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <SearchIconWrapper>
+                  <IconButton type="submit">
+                    <SearchIcon />
+                  </IconButton>
+                </SearchIconWrapper>
+              </form>
             </SearchWrapper>
 
             {/* Right Side Menu */}

@@ -79,14 +79,14 @@ const ProductCard = ({ product }) => {
     navigate(`/products/${product.product_id}`);
   };
   return (
-    <Card borderTop="50px" sx={{ maxWidth: 'auto', margin: 'auto', height: 350, }}>
+    <Card sx={{ maxWidth: 'auto', margin: 'auto', height: 350, borderRadius: '20px 20px 0 0' }}>
       <CardMedia
-        borderTop="50px"
         component="img"
         height="200"
         image={product.images[0]} // Assuming the base64 string is for a JPEG image
         // image={`data:image/jpeg;base64,${product.images[0]}`} // Assuming the base64 string is for a JPEG image
         alt={product.name}
+        sx={{ borderRadius: '20px 20px 0 0' }}
       />
       <CardContent sx={{ flexGrow: 1 }}>
         {/* <Typography variant="h6">{product.name}</Typography> */}
