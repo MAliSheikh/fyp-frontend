@@ -121,13 +121,14 @@ const MallInfo = () => {
         <Grid xs={12} sm={8} md={10}>
           <Box
             sx={{
-              width: { lg: "350%", md: "200%", xs: "100%" },
+              width: {lg: "300%", md: "200%", xs: "100%" },
               margin: "0 auto",
+              
             }}
           >
-            <Paper sx={{ p: 3 }}>
+            <Paper sx={{ p: 3}}>
             {/* Mall Information Section */}
-            <Typography variant="h5" gutterBottom sx={{ mt: { xs: 2, sm: 0 } }}>
+            <Typography variant="h5" gutterBottom sx={{ mt: { xs: 2, sm: 0 }}}>
               Add Mall Information
             </Typography>
             <Box

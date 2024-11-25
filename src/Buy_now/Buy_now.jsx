@@ -4,10 +4,10 @@ import Box from "@mui/material/Box";
 // import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useNavigate } from "react-router-dom";
-import tryImage from "../components/Logos/try.jpg";
+import { Grid2 } from "@mui/material";
+//import tryImage from "../components/Logos/try.jpg";
 
 const BuyNowPage = () => {
   const location = useLocation();
@@ -97,28 +97,29 @@ const BuyNowPage = () => {
           Confirm Your Order
         </Typography>
         
-        {/* Grid Container for Image and Content */}
-        <Grid container spacing={2} alignItems="center" sx={{ mb: 4}}>
+        {/* Grid2 Container for Image and Content */}
+        <Grid2 container spacing={2} alignItems="center" sx={{ mb: 4}}>
           {/* Product Image on the left side */}
-          <Grid item xs={12} md={4}>
+          <Grid2 item xs={12} md={4}>
             <img
-              src={tryImage} // product.image if you're using product's image URL
-              alt="not found" // product.name if you prefer the product name
+              src={product.images[0]} // Fallback image if product.image is not available
+              alt={product.name} // product.name if you prefer the product name
               style={{
                 width: "100%",
                 maxWidth: 300,
                 height: "auto",            
-                marginBottom: 20,
+                marginBottom: 22,
                 
               }}
             />
-          </Grid>
+          </Grid2>
 
           {/* Product Details on the right side */}
-          <Grid item xs={12} md={8}>
+          <Grid2 item xs={12} md={8}>
             <Box
                sx={{
-                marginBottom:22,
+                marginBottom:20,
+                marginLeft:10,
                 gap:2,
                 display: "flex",
                 flexDirection: "column",
@@ -126,25 +127,25 @@ const BuyNowPage = () => {
                 height: "100%", // Take full height of the parent container
               }}
             >
-              <Grid size={12}>
+              <Grid2 size={12}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Typography fontWeight="500">Product: </Typography>
                   <Typography color="#000"><strong>{product.name}</strong></Typography>
                 </Box>
-              </Grid>
-              <Grid size={12}>
+              </Grid2>
+              <Grid2 size={12}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Typography fontWeight="500">Per Unit Price: </Typography>
-                   <Typography color="#000"><strong>Rs.{product.stock}</strong></Typography>
+                   <Typography color="#000"><strong>Rs.{product.price}</strong></Typography>
                 </Box>
-              </Grid>
+              </Grid2>
 
-              <Grid size={12}>
+              <Grid2 size={12}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Typography fontWeight="500">Quantity: </Typography>
                    <Typography color="#000"><strong>{quantity}</strong></Typography>
                 </Box>
-              </Grid>
+              </Grid2>
               {/* <Typography variant="body1" fontWeight="500">
                 Total Price: <strong>Rs. {product.price * quantity}</strong>
               </Typography> */}
@@ -155,8 +156,8 @@ const BuyNowPage = () => {
                   </Typography>
                 </Box>
             </Box>
-          </Grid>
-        </Grid>
+          </Grid2>
+        </Grid2>
 
 
 
@@ -166,8 +167,8 @@ const BuyNowPage = () => {
         {/* <Typography variant="h6" gutterBottom>
           Delivery Details
         </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
+        <Grid2 container spacing={2}>
+          <Grid2 item xs={12} md={6}>
             <TextField
               fullWidth
               label="Name"
@@ -176,8 +177,8 @@ const BuyNowPage = () => {
               onChange={handleChange}
               required
             />
-          </Grid>
-          <Grid item xs={12} md={5}>
+          </Grid2>
+          <Grid2 item xs={12} md={5}>
             <TextField
               fullWidth
               label="Phone"
@@ -186,8 +187,8 @@ const BuyNowPage = () => {
               onChange={handleChange}
               required
             />
-          </Grid>
-          <Grid item xs={12}>
+          </Grid2>
+          <Grid2 item xs={12}>
             <TextField
               fullWidth
               label="Address"
@@ -198,8 +199,8 @@ const BuyNowPage = () => {
               onChange={handleChange}
               required
             />
-          </Grid>
-          <Grid item xs={12}>
+          </Grid2>
+          <Grid2 item xs={12}>
             <TextField
               fullWidth
               label="Email"
@@ -209,8 +210,8 @@ const BuyNowPage = () => {
               onChange={handleChange}
               required
             />
-          </Grid>
-        </Grid> */}
+          </Grid2>
+        </Grid2> */}
         <Button
           type="submit"
           fullWidth

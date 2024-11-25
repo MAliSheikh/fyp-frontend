@@ -101,7 +101,7 @@ const StoreInfo = () => {
       <SideBar />
 
       {/* Main Content */}
-      <Box sx={{ width: "100%" }}>
+      <Box sx={{ width: "auto" }}>
         <Paper sx={{ p: 3 }}>
           <Typography variant="h5" gutterBottom>
             Add Store Information
