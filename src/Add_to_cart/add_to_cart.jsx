@@ -23,7 +23,7 @@ const AddToCartPage = () => {
   // Only run the effect when product is available
   useEffect(() => {
     if (!product) return; // Do nothing if product is not available
-    
+
     const fetchCartItems = async () => {
       try {
         const response = await new Promise((resolve) =>
@@ -34,7 +34,7 @@ const AddToCartPage = () => {
                   id: product.id,
                   name: product.name,
                   price: product.price,
-                  image:product.images[0] //product.image,
+                  image: product.images[0], //product.image,
                 },
               ]),
             1000
@@ -65,20 +65,21 @@ const AddToCartPage = () => {
     setCartItems((prev) =>
       prev.map((cartItem) =>
         cartItem.id === item.id
-          ? { ...cartItem, quantity: Math.max(1, (cartItem.quantity || 1) + delta) }
+          ? {
+              ...cartItem,
+              quantity: Math.max(1, (cartItem.quantity || 1) + delta),
+            }
           : cartItem
       )
     );
   };
 
-
-
-   
-
   // Handle delete item
   const handleDeleteItem = (itemId) => {
     setCartItems((prev) => prev.filter((cartItem) => cartItem.id !== itemId));
-    setSelectedItems((prev) => prev.filter((selected) => selected.id !== itemId));
+    setSelectedItems((prev) =>
+      prev.filter((selected) => selected.id !== itemId)
+    );
   };
 
   //Calculate subtotal
@@ -87,6 +88,12 @@ const AddToCartPage = () => {
       (total, item) => total + item.price * (item.quantity || 1),
       0
     );
+
+  // const calculateMinusSubtotal = () =>
+  //   selectedItems.reduce(
+  //     (total, item) => total + item.price * (item.quantity || 1),
+  //     0
+  //   );
 
   // Navigate to checkout with selected items
   const handleCheckout = () => {
@@ -145,7 +152,7 @@ const AddToCartPage = () => {
           />
 
           {/* Product details */}
-          <Box sx={{ flexGrow: 1 , marginLeft:3}}>
+          <Box sx={{ flexGrow: 1, marginLeft: 3 }}>
             <Typography variant="subtitle1" fontWeight="500">
               {item.name}
             </Typography>
@@ -170,10 +177,7 @@ const AddToCartPage = () => {
           </Box>
 
           {/* Delete button */}
-          <IconButton
-            onClick={() => handleDeleteItem(item.id)}
-            color="error"
-          >
+          <IconButton onClick={() => handleDeleteItem(item.id)} color="error">
             <DeleteIcon />
           </IconButton>
         </Box>
@@ -190,7 +194,9 @@ const AddToCartPage = () => {
           alignItems: "center",
         }}
       >
-        <Typography variant="h6">Subtotal: Rs. {calculateSubtotal()}</Typography>
+        <Typography variant="h6">
+          Subtotal: Rs. {calculateSubtotal()}
+        </Typography>
         <Button
           variant="contained"
           sx={{

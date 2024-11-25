@@ -108,47 +108,72 @@ const StoreInfo = () => {
       sx={{
         display: "flex",
         flexDirection: { xs: "column", md: "row" },
-        p: 2,
-        gap: 3,
+        p: { xs: 1, sm: 2 },
+        gap: { xs: 2, sm: 3 },
       }}
     >
-      <Box sx={{ width: "300px" }}>
+      {/* Sidebar */}
+      <Box sx={{ width: { xs: "100%", md: "auto" } }}>
         <SideBar />
       </Box>
+
       {/* Main Content */}
-      <Box sx={{ width: { md: "700px", xs: "auto" } }}>
-        {/* <Paper sx={{ p: 3 }}> */}
-        <Typography variant="h5" gutterBottom>
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: { md: "1200px" },
+          px: { xs: 2, sm: 3 },
+        }}
+      >
+        <Typography
+          variant="h5"
+          gutterBottom
+          sx={{
+            textAlign: { xs: "center", md: "left" },
+            mb: { xs: 3, md: 4 },
+          }}
+        >
           Add Store Information
         </Typography>
+
         <Box
           component="form"
           onSubmit={handleSubmit}
           sx={{
             display: "flex",
-            flexDirection: "row", // Align items in a row
-            gap: 2,
+            flexDirection: { xs: "column", md: "row" },
+            gap: { xs: 3, md: 4 },
+            alignItems: { xs: "stretch", md: "flex-start" },
           }}
         >
           {/* Left Side: Text Fields */}
           <Box
-            sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              width: { xs: "100%", md: "auto" },
+            }}
           >
             <TextField
               label="Shop Name"
               value={shopName}
               onChange={(e) => setShopName(e.target.value)}
               required
-              sx={{ width: { md: "400px" } }}
+              sx={{
+                width: { xs: "100%", md: "400px" },
+              }}
             />
             <TextField
               label="Shop Type"
               value={shopType}
               onChange={(e) => setShopType(e.target.value)}
               required
-              sx={{ width: { md: "400px" } }}
+              sx={{
+                width: { xs: "100%", md: "400px" },
+              }}
             />
-
             <TextField
               label="Description"
               value={description}
@@ -156,21 +181,31 @@ const StoreInfo = () => {
               multiline
               rows={10}
               required
-              sx={{ width: { md: "400px" } }}
+              sx={{
+                width: { xs: "100%", md: "400px" },
+              }}
             />
           </Box>
 
           {/* Right Side: Upload Box */}
-          <Box sx={{ml:{md:5}, display: 'flex', flexDirection: 'column', gap: 2, width: { md: "400px", xs: "100%" } }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 3,
+              width: { xs: "100%", md: "400px" },
+              alignItems: "center",
+            }}
+          >
             <Box
               sx={{
                 border: "2px dashed gray",
+                display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                height: 350,
-                width:{md:400},
+                height: { xs: 200, sm: 270 },
+                width: { xs: "100%", md: "350px" },
                 cursor: "pointer",
-                display: "flex",
                 flexShrink: 0,
               }}
             >
@@ -201,11 +236,11 @@ const StoreInfo = () => {
               onClick={handleSubmit}
               variant="contained"
               sx={{
-                display: 'block',
-                margin: '0 auto',
-                width: 150,
+                width: { xs: "100%", sm: "80%", md: "100%" },
+                maxWidth: "350px",
                 backgroundColor: "#119994",
                 color: "#ffffff",
+                mt: { xs: 2, md: 0 },
                 "&:hover": {
                   backgroundColor: "#0d7b76",
                 },
@@ -218,6 +253,7 @@ const StoreInfo = () => {
         </Box>
       </Box>
 
+      {/* Snackbar remains the same */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
