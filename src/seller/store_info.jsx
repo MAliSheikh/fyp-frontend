@@ -1,6 +1,15 @@
 import React, { useState } from "react";
-import { Box, TextField, Button, Typography, Paper, CircularProgress, Snackbar, Alert } from "@mui/material";
-import { createStore } from './seller';
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  CircularProgress,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { createStore } from "./seller";
 import { SideBar } from "./sidebar";
 import { useNavigate } from "react-router-dom";
 
@@ -12,8 +21,8 @@ const StoreInfo = () => {
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
-    message: '',
-    severity: 'success'
+    message: "",
+    severity: "success",
   });
   const navigate = useNavigate();
 
@@ -33,7 +42,7 @@ const StoreInfo = () => {
   };
 
   const handleSnackbarClose = () => {
-    setSnackbar(prev => ({ ...prev, open: false }));
+    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   const handleSubmit = async (e) => {
@@ -43,8 +52,8 @@ const StoreInfo = () => {
     if (!shopName || !shopType || !description || !image) {
       setSnackbar({
         open: true,
-        message: 'All fields are required',
-        severity: 'error'
+        message: "All fields are required",
+        severity: "error",
       });
       return;
     }
@@ -53,8 +62,8 @@ const StoreInfo = () => {
     if (!store_owner_id) {
       setSnackbar({
         open: true,
-        message: 'Store owner ID not found',
-        severity: 'error'
+        message: "Store owner ID not found",
+        severity: "error",
       });
       return;
     }
@@ -64,25 +73,30 @@ const StoreInfo = () => {
     try {
       const base64Image = await convertToBase64(image);
       console.log("Base64 image:", base64Image);
-      const response = await createStore(store_owner_id, shopName, shopType, description, base64Image);
+      const response = await createStore(
+        store_owner_id,
+        shopName,
+        shopType,
+        description,
+        base64Image
+      );
       console.log("Store created successfully:", response);
-      
+
       setSnackbar({
         open: true,
-        message: 'Store created successfully!',
-        severity: 'success'
+        message: "Store created successfully!",
+        severity: "success",
       });
 
       // Wait for 3 seconds before redirecting
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      navigate('/seller/upload-product');
-
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      navigate("/seller/upload-product");
     } catch (error) {
       console.error("Error creating store:", error);
       setSnackbar({
         open: true,
-        message: error.response?.data?.message || 'Failed to create store',
-        severity: 'error'
+        message: error.response?.data?.message || "Failed to create store",
+        severity: "error",
       });
     } finally {
       setLoading(false);
@@ -98,64 +112,66 @@ const StoreInfo = () => {
         gap: 3,
       }}
     >
-      <SideBar />
-
+      <Box sx={{ width: "300px" }}>
+        <SideBar />
+      </Box>
       {/* Main Content */}
-      <Box sx={{ width: "auto" }}>
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h5" gutterBottom>
-            Add Store Information
-          </Typography>
+      <Box sx={{ width: { md: "700px", xs: "auto" } }}>
+        {/* <Paper sx={{ p: 3 }}> */}
+        <Typography variant="h5" gutterBottom>
+          Add Store Information
+        </Typography>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            display: "flex",
+            flexDirection: "row", // Align items in a row
+            gap: 2,
+          }}
+        >
+          {/* Left Side: Text Fields */}
           <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-              display: "flex",
-              flexDirection: "row", // Align items in a row
-              gap: 2,
-            }}
+            sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}
           >
-            {/* Left Side: Text Fields */}
-            <Box
-              sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}
-            >
-              <TextField
-                label="Shop Name"
-                value={shopName}
-                onChange={(e) => setShopName(e.target.value)}
-                required
-                sx={{ width: "600px" }}
-              />
-              <TextField
-                label="Shop Type"
-                value={shopType}
-                onChange={(e) => setShopType(e.target.value)}
-                required
-                sx={{ width: "600px" }}
-              />
+            <TextField
+              label="Shop Name"
+              value={shopName}
+              onChange={(e) => setShopName(e.target.value)}
+              required
+              sx={{ width: { md: "400px" } }}
+            />
+            <TextField
+              label="Shop Type"
+              value={shopType}
+              onChange={(e) => setShopType(e.target.value)}
+              required
+              sx={{ width: { md: "400px" } }}
+            />
 
-              <TextField
-                label="Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                multiline
-                rows={10}
-                required
-                sx={{ width: "600px" }}
-              />
-            </Box>
+            <TextField
+              label="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              multiline
+              rows={10}
+              required
+              sx={{ width: { md: "400px" } }}
+            />
+          </Box>
 
-            {/* Right Side: Upload Box */}
+          {/* Right Side: Upload Box */}
+          <Box sx={{ml:{md:5}, display: 'flex', flexDirection: 'column', gap: 2, width: { md: "400px", xs: "100%" } }}>
             <Box
               sx={{
                 border: "2px dashed gray",
                 alignItems: "center",
                 justifyContent: "center",
-                height: 270,
-                width: 500,
+                height: 350,
+                width:{md:400},
                 cursor: "pointer",
                 display: "flex",
-                flexShrink: 0, // because of this shrink nai hogga box
+                flexShrink: 0,
               }}
             >
               <input
@@ -178,38 +194,39 @@ const StoreInfo = () => {
                 </Button>
               </label>
             </Box>
-          </Box>
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            onClick={handleSubmit}
-            variant="contained"
-            sx={{
-              backgroundColor: "#119994",
-              color: "#ffffff",
-              marginTop: "20px",
-              width: "100%",
-              "&:hover": {
-                backgroundColor: "#0d7b76",
-              },
-            }}
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={24} /> : "Submit"}
-          </Button>
-        </Paper>
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              onClick={handleSubmit}
+              variant="contained"
+              sx={{
+                display: 'block',
+                margin: '0 auto',
+                width: 150,
+                backgroundColor: "#119994",
+                color: "#ffffff",
+                "&:hover": {
+                  backgroundColor: "#0d7b76",
+                },
+              }}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} /> : "Submit"}
+            </Button>
+          </Box>
+        </Box>
       </Box>
 
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
         onClose={handleSnackbarClose}
       >
-        <Alert 
-          onClose={handleSnackbarClose} 
+        <Alert
+          onClose={handleSnackbarClose}
           severity={snackbar.severity}
-          sx={{ width: '100%' }}
+          sx={{ width: "100%" }}
         >
           {snackbar.message}
         </Alert>

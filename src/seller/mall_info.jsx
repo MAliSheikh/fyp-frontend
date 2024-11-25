@@ -100,7 +100,7 @@ const MallInfo = () => {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ p: 2 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ p: 1 }}>
       <Grid container spacing={8}>
         {/* Sidebar - width: 4 columns */}
         {/* <Grid xs={12} sm={4} md={2}> */}
@@ -108,8 +108,8 @@ const MallInfo = () => {
         sx={{
         display: "flex",
         flexDirection: { xs: "column", md: "row" },
-        p: 2,
-        gap: 3,
+        p: 1,
+        gap: 5,
       }}
       >
           <SideBar />
@@ -126,7 +126,7 @@ const MallInfo = () => {
               
             }}
           >
-            <Paper sx={{ p: 3}}>
+            {/* <Paper sx={{ p: 3}}> */}
             {/* Mall Information Section */}
             <Typography variant="h5" gutterBottom sx={{ mt: { xs: 2, sm: 0 }}}>
               Add Mall Information
@@ -273,7 +273,7 @@ const MallInfo = () => {
             >
               {loading ? <CircularProgress size={24} /> : "Submit"}
             </Button>
-          </Paper>
+          {/* </Paper> */}
           </Box>
 
 
