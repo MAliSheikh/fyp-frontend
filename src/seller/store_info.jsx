@@ -1,7 +1,17 @@
 import React, { useState } from "react";
-import { Box, TextField, Button, Typography, Paper, CircularProgress } from "@mui/material";
-import { createStore } from './seller';
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  CircularProgress,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { createStore } from "./seller";
 import { SideBar } from "./sidebar";
+import { useNavigate } from "react-router-dom";
 
 const StoreInfo = () => {
   const [shopName, setShopName] = useState("");
@@ -9,6 +19,12 @@ const StoreInfo = () => {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const navigate = useNavigate();
 
   console.log("Store Info", shopName);
 
@@ -25,18 +41,30 @@ const StoreInfo = () => {
     });
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form submitted");
     // Validation
     if (!shopName || !shopType || !description || !image) {
-      console.error("All fields are required");
+      setSnackbar({
+        open: true,
+        message: "All fields are required",
+        severity: "error",
+      });
       return;
     }
 
     const store_owner_id = localStorage.getItem("store_owner_id");
     if (!store_owner_id) {
-      console.error("Store owner ID not found in localStorage");
+      setSnackbar({
+        open: true,
+        message: "Store owner ID not found",
+        severity: "error",
+      });
       return;
     }
 
@@ -45,10 +73,31 @@ const StoreInfo = () => {
     try {
       const base64Image = await convertToBase64(image);
       console.log("Base64 image:", base64Image);
-      const response = await createStore(store_owner_id, shopName, shopType, description, base64Image);
+      const response = await createStore(
+        store_owner_id,
+        shopName,
+        shopType,
+        description,
+        base64Image
+      );
       console.log("Store created successfully:", response);
+
+      setSnackbar({
+        open: true,
+        message: "Store created successfully!",
+        severity: "success",
+      });
+
+      // Wait for 3 seconds before redirecting
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      navigate("/seller/upload-product");
     } catch (error) {
       console.error("Error creating store:", error);
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || "Failed to create store",
+        severity: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -59,163 +108,105 @@ const StoreInfo = () => {
       sx={{
         display: "flex",
         flexDirection: { xs: "column", md: "row" },
-        p: 2,
-        gap: 3,
+        p: { xs: 1, sm: 2 },
+        gap: { xs: 2, sm: 3 },
       }}
     >
       {/* Sidebar */}
-      {/* <Box
-        sx={{
-          width: { xs: "100%", md: "25%" },
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-        }}
-      >
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey",
-            "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
-          }}
-        >
-          Upload Product
-        </Button>
-
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey", // Change text color
-            "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" }, // Change text color on hover
-          }}
-        >
-          Manage Products
-        </Button>
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey",
-            "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
-          }}
-        >
-          Sales
-        </Button>
-
-        <Typography
-          sx={{
-            height: 50,
-            color: "grey",
-            marginLeft: "30px",
-            marginTop: "5px",
-          }}
-        >
-          _____REGISTER STORE_____
-        </Typography>
-
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey",
-            "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" }, // Darker shade on hover
-          }}
-        >
-          Mall
-        </Button>
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            height: 50, // Customize height
-            backgroundColor: "#119994", // Customize filled color
-            "&:hover": { backgroundColor: "#0d7b76" },
-          }}
-        >
-          Independent Store
-        </Button>
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            marginTop: "auto",
-            height: 50,
-            backgroundColor: "#ffffff",
-            color: "grey",
-            "&:hover": { backgroundColor: "red", color: "#ffffff" },
-          }}
-        >
-          Sign Out
-        </Button>
-      </Box> */}
-      <SideBar />
+      <Box sx={{ width: { xs: "100%", md: "auto" } }}>
+        <SideBar />
+      </Box>
 
       {/* Main Content */}
-      <Box sx={{ width: "auto" }}>
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h5" gutterBottom>
-            Add Store Information
-          </Typography>
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: { md: "1200px" },
+          px: { xs: 2, sm: 3 },
+        }}
+      >
+        <Typography
+          variant="h5"
+          gutterBottom
+          sx={{
+            textAlign: { xs: "center", md: "left" },
+            mb: { xs: 3, md: 4 },
+          }}
+        >
+          Add Store Information
+        </Typography>
+
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: { xs: 3, md: 4 },
+            alignItems: { xs: "stretch", md: "flex-start" },
+          }}
+        >
+          {/* Left Side: Text Fields */}
           <Box
-            component="form"
-            onSubmit={handleSubmit}
             sx={{
+              flex: 1,
               display: "flex",
-              flexDirection: "row", // Align items in a row
+              flexDirection: "column",
               gap: 2,
+              width: { xs: "100%", md: "auto" },
             }}
           >
-            {/* Left Side: Text Fields */}
-            <Box
-              sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}
-            >
-              <TextField
-                label="Shop Name"
-                value={shopName}
-                onChange={(e) => setShopName(e.target.value)}
-                required
-                sx={{ width: "600px" }}
-              />
-              <TextField
-                label="Shop Type"
-                value={shopType}
-                onChange={(e) => setShopType(e.target.value)}
-                required
-                sx={{ width: "600px" }}
-              />
+            <TextField
+              label="Shop Name"
+              value={shopName}
+              onChange={(e) => setShopName(e.target.value)}
+              required
+              sx={{
+                width: { xs: "100%", md: "400px" },
+              }}
+            />
+            <TextField
+              label="Shop Type"
+              value={shopType}
+              onChange={(e) => setShopType(e.target.value)}
+              required
+              sx={{
+                width: { xs: "100%", md: "400px" },
+              }}
+            />
+            <TextField
+              label="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              multiline
+              rows={10}
+              required
+              sx={{
+                width: { xs: "100%", md: "400px" },
+              }}
+            />
+          </Box>
 
-              <TextField
-                label="Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                multiline
-                rows={10}
-                required
-                sx={{ width: "600px" }}
-              />
-            </Box>
-
-            {/* Right Side: Upload Box */}
+          {/* Right Side: Upload Box */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 3,
+              width: { xs: "100%", md: "400px" },
+              alignItems: "center",
+            }}
+          >
             <Box
               sx={{
                 border: "2px dashed gray",
+                display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                height: 270,
-                width: 500,
+                height: { xs: 200, sm: 270 },
+                width: { xs: "100%", md: "350px" },
                 cursor: "pointer",
-                display: "flex",
-                flexShrink: 0, // because of this shrink nai hogga box
+                flexShrink: 0,
               }}
             >
               <input
@@ -238,28 +229,44 @@ const StoreInfo = () => {
                 </Button>
               </label>
             </Box>
-          </Box>
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            onClick={handleSubmit}
-            variant="contained"
-            sx={{
-              backgroundColor: "#119994",
-              color: "#ffffff",
-              marginTop: "20px",
-              width: "100%",
-              "&:hover": {
-                backgroundColor: "#0d7b76",
-              },
-            }}
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={24} /> : "Submit"}
-          </Button>
-        </Paper>
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              onClick={handleSubmit}
+              variant="contained"
+              sx={{
+                width: { xs: "100%", sm: "80%", md: "100%" },
+                maxWidth: "350px",
+                backgroundColor: "#119994",
+                color: "#ffffff",
+                mt: { xs: 2, md: 0 },
+                "&:hover": {
+                  backgroundColor: "#0d7b76",
+                },
+              }}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} /> : "Submit"}
+            </Button>
+          </Box>
+        </Box>
       </Box>
+
+      {/* Snackbar remains the same */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

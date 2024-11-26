@@ -6,12 +6,13 @@ import SignUp from "./components/LoginSignup/signup";
 import Login from "./components/LoginSignup/login";
 import Layout from "./layout";
 import Seller from "./seller/store_create";
-// import Mall_info from "./Mall/Mall_info";
-import StoreCreatePage from "./seller/store_create";
+import MallInfo from "./seller/mall_info";
+import StoreInfo from "./seller/store_info";
+// import StoreCreatePage from "./seller/store_create";
 import ProductDetailsPage from "./products/productInfo";
 import PrivateRoute from "./components/privateRoute";
 import Unauthorized from "./components/unauthorized";
-import UploadProduct from "./seller//upload_product";
+import UploadProduct from "./seller/upload_product";
 import BuyNowPage from "./Buy_now/Buy_now";
 import AddToCartPage from "./Add_to_cart/add_to_cart";
 
@@ -54,7 +55,17 @@ function App() {
           element={
             <PrivateRoute roles={["seller"]}>
               <Layout>
-                <StoreCreatePage />
+                <StoreInfo />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+         <Route
+          path="/mall"
+          element={
+            <PrivateRoute roles={["seller"]}>
+              <Layout>
+                <MallInfo />
               </Layout>
             </PrivateRoute>
           }

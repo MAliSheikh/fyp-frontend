@@ -23,7 +23,7 @@ function ProductDetailsPage() {
   const [quantity, setQuantity] = useState(1);
   const [open, setOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
-  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedSize, setSelectedSize] = useState("Small");
 
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
@@ -158,7 +158,7 @@ function ProductDetailsPage() {
                       <Box sx={{ display: "flex", gap: 1, mb:2 }}>
                         {["Small", "Medium", "Large"].map((size) => (
                           <Button
-                          sx={{
+                          sx={{ 
                             bgcolor: selectedSize === size ? "#26A69A" : "#ffffff",
                             color: selectedSize === size ? "#ffffff" : "#000000",
                             border: selectedSize === size ? "none" : "1px solid #26A69A",
@@ -241,7 +241,7 @@ function ProductDetailsPage() {
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Typography fontWeight="500">Price:</Typography>
                   <Typography fontWeight="500" color="blue" sx={{ ml: 3 }}>
-                    Rs.{product.price}
+                    Rs.{product.price*quantity}
                   </Typography>
                 </Box>
               </Grid>
