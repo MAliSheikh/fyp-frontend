@@ -16,6 +16,7 @@ import BuyNowPage from "./Buy_now/Buy_now";
 import AddToCartPage from "./Add_to_cart/add_to_cart";
 
 import SearchResults from "./products/search_results";
+import Profile from "./profile/profile";
 
 function App() {
   return (
@@ -40,6 +41,9 @@ function App() {
         />
         <Route
         path="/add-to-cart" element={<Layout>{<AddToCartPage />}</Layout>}
+        />
+        <Route
+        path="/profile" element={<Layout>{<Profile />}</Layout>}
         />
 
 

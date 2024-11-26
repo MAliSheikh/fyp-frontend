@@ -156,10 +156,6 @@ const Header = () => {
               }}
             >
               {!isMobile && (
-                // <>
-                //   <NavButton  onClick={() => navigate("/login")}>Login</NavButton>
-                //   <NavButton>Order & Returns</NavButton>
-                // </>
                 <>
                   {isLoggedIn ? (
                     <NavButton onClick={handleLogout}>Logout</NavButton>
@@ -168,15 +164,15 @@ const Header = () => {
                       Login
                     </NavButton>
                   )}
-                  <NavButton>Order & Returns</NavButton>
+                  
                 </>
               )}
-              <IconButton color="inherit">
+              <IconButton color="inherit" onClick={() => navigate("/add-to-cart")}>
                 <Badge badgeContent={0} color="error">
                   <CartIcon />
                 </Badge>
               </IconButton>
-              <IconButton color="inherit">
+              <IconButton color="inherit" onClick={() => navigate("/profile")}>
                 <PersonIcon />
               </IconButton>
             </Box>
