@@ -9,7 +9,7 @@ import axios from "axios";
 
 const CustomerProfile = () => {
   // State to hold user data
-  const [user, setUser] = useState({name: "", picture: "" });
+  const [user, setUser] = useState({name: ""});
 
   // Fetch user data from API
   useEffect(() => {
@@ -17,9 +17,7 @@ const CustomerProfile = () => {
       try {
         const response = await axios.get("/costumer-profiles"); 
         setUser({
-          name: response.data.phone,
-          picture: response.data.picture,
-        
+          name: response.data.name,
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -60,7 +58,7 @@ const CustomerProfile = () => {
           {user.name ? user.name.charAt(0).toUpperCase() : "U"}
         </Avatar>
         <Typography variant="h5" fontWeight="bold" gutterBottom>
-          {user.name || "Loading..."}
+          {user.name || "Anonymous"}
         </Typography>
       </Box>
 

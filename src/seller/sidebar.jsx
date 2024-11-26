@@ -39,8 +39,8 @@ export const SideBar = () => {
 
       <Button
         variant="contained"
-        sx={getButtonStyle("/manage-products")}
-        onClick={() => navigate("/manage-products")}
+        sx={getButtonStyle("/manageproducts")}
+        onClick={() => navigate("/manageproducts")}
       >
         Manage Products
       </Button>

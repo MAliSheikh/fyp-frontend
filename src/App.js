@@ -18,6 +18,7 @@ import AddToCartPage from "./Add_to_cart/add_to_cart";
 
 import SearchResults from "./products/search_results";
 import Profile from "./profile/profile";
+import ManageProducts from "./Manage_products/manage-products";
 
 function App() {
   return (
@@ -112,6 +113,8 @@ function App() {
             </PrivateRoute>
           }
         /> */}
+        
+        <Route path="/manageproducts" element={<Layout>{<ManageProducts />}</Layout>} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
