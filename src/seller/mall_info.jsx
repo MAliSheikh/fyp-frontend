@@ -11,6 +11,7 @@ import Grid from "@mui/material/Grid2"; // Import Grid2
 import { SideBar } from "./sidebar";
 import { createStoreAndMall } from "./seller";
 import { MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import authService from "../components/LoginSignup/components/token";
 
 const MallInfo = () => {
   const [mallName, setMallName] = useState("");
@@ -92,6 +93,9 @@ const MallInfo = () => {
 
       const response = await createStoreAndMall(data);
       console.log("Store and mall created successfully:", response);
+
+      // Fetch updated store info
+      await authService.fetchStoreInfo();
     } catch (error) {
       console.error("Error creating store and mall:", error);
     } finally {

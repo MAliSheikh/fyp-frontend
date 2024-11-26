@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import authService from './components/token'
 import { useNavigate } from 'react-router-dom';
+// import axios from 'axios';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -40,6 +41,7 @@ const Login = () => {
                 console.log(userId)
                 if (userRole === 'seller') {
                     await authService.fetchStoreOwnerId(userId);
+                   await authService.fetchStoreInfo();
                     navigate('/store_info');
                 } else if (userRole === 'customer') {
                     navigate('/products');
