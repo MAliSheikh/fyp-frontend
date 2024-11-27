@@ -50,7 +50,7 @@ export const SideBar = () => {
         sx={getButtonStyle("/sales")}
         onClick={() => navigate("/sales")}
       >
-        Sales
+        Orders
       </Button>
 
       <Typography

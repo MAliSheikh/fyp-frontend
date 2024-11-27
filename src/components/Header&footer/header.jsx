@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import logo from "../Logos/logo.png";
+import BNLOGO2 from "../Logos/BNLOGO2.png";
 import authService from "../LoginSignup/components/token";
 // import logo from 'D:/frontend/fyp-frontend/src/components/Logos/logo.png';
 import {
@@ -127,12 +127,12 @@ const Header = () => {
               <Box
                 component="img"
                 onClick={()=>{navigate("/")} }
-                src={logo}
+                src={BNLOGO2}
                 alt="Bazaar Nest logo"
                 sx={{
                   height: 70,
-                  width: 70,
-                  borderRadius: "50%",
+                  width: 140,
+                  borderRadius: "0%",
                   padding: 2,
                   marginRight: 32,
                   objectFit: "cover",
