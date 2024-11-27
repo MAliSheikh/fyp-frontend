@@ -1,37 +1,19 @@
-// App.js
-import './App.css';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import ProductPage from './product_by_id/product_by_id';
-import Products from './products/products_page';
-import SignUp from './components/LoginSignup/signup';
-import Login from './components/LoginSignup/login';
-import Layout from './layout';
-import React from 'react';
+// src/App.js
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Dashboard from "./components/graph";
+import Layout from "./layout";  // Assuming you have a Layout component
+import SignUp from "./components/LoginSignup/signup";
+import Login from "./components/LoginSignup/login";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Default route - shows Products page with Navbar and Footer */}
-        <Route
-          path="/"
-          element={
-            <Layout>
-              <Products />
-            </Layout>
-          }
-          
-        />
-        {/* Route for Product by ID page */}
-        <Route
-          path="/product/:id"  // Adjust the path as needed, e.g., /product/1
-          element={
-            <Layout>
-              <ProductPage />
-            </Layout>
-          }
-        />
-        {/* Other routes like Login and Signup without Layout */}
+        <Route path="/" element={<Layout />}>
+          <Route path="graph" element={<Dashboard />} />
+        </Route>
+
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
       </Routes>
@@ -40,4 +22,3 @@ function App() {
 }
 
 export default App;
-
