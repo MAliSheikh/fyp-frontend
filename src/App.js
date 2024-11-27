@@ -15,7 +15,7 @@ import Unauthorized from "./components/unauthorized";
 import UploadProduct from "./seller/upload_product";
 import BuyNowPage from "./Buy_now/Buy_now";
 import AddToCartPage from "./Add_to_cart/add_to_cart";
-
+import MallListingPage from "./mall_store_listing/mall_list";
 import SearchResults from "./products/search_results";
 import Profile from "./profile/profile";
 
@@ -37,16 +37,13 @@ function App() {
           path="/products/:id"
           element={<Layout>{<ProductDetailsPage />}</Layout>}
         />
+        <Route path="/buy-now" element={<Layout>{<BuyNowPage />}</Layout>} />
         <Route
-        path="/buy-now" element={<Layout>{<BuyNowPage />}</Layout>}
+          path="/add-to-cart"
+          element={<Layout>{<AddToCartPage />}</Layout>}
         />
-        <Route
-        path="/add-to-cart" element={<Layout>{<AddToCartPage />}</Layout>}
-        />
-        <Route
-        path="/profile" element={<Layout>{<Profile />}</Layout>}
-        />
-
+        <Route path="/profile" element={<Layout>{<Profile />}</Layout>} />
+        <Route path="/mall_lists" element={<Layout>{<MallListingPage />}</Layout>} />
 
         <Route path="/search" element={<Layout>{<SearchResults />}</Layout>} />
         {/* Seller */}
@@ -60,7 +57,7 @@ function App() {
             </PrivateRoute>
           }
         />
-         <Route
+        <Route
           path="/mall"
           element={
             <PrivateRoute roles={["seller"]}>

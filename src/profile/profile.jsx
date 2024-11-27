@@ -17,7 +17,7 @@ const CustomerProfile = () => {
       try {
         const response = await axios.get("/costumer-profiles"); 
         setUser({
-          name: response.data.phone,
+          name: response.data.name,
           picture: response.data.picture,
         
         });
