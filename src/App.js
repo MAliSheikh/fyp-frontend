@@ -19,6 +19,7 @@ import AddToCartPage from "./Add_to_cart/add_to_cart";
 import SearchResults from "./products/search_results";
 import Profile from "./profile/profile";
 import ManageProducts from "./Manage_products/manage-products";
+import OrdersPage from "./seller/Order";
 
 function App() {
   return (
@@ -101,6 +102,16 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/orders"
+          element={
+            <PrivateRoute roles={["seller"]}>
+              <Layout>
+                <OrdersPage />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
 
         {/* Admin */}
         {/* <Route
@@ -113,7 +124,7 @@ function App() {
             </PrivateRoute>
           }
         /> */}
-        
+        <Route path="/orders" element={<Layout>{<OrdersPage />}</Layout>} />
         <Route path="/manageproducts" element={<Layout>{<ManageProducts />}</Layout>} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
