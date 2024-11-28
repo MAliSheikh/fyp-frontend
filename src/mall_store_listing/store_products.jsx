@@ -57,38 +57,6 @@ const StoreBanner = ({ storeInfo }) => {
   );
 };
 
-const StoreProducts = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [storeInfo, setStoreInfo] = useState(null);
-  const { storeId } = useParams();
-
-  useEffect(() => {
-    const getProducts = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchStoreProducts(storeId);
-        setProducts(data || []);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getProducts();
-  }, [storeId]);
-
-  return (
-    <Container maxWidth="lg" sx={{ mb: 10 }}>
-      {/* Banner Section */}
-      <StoreBanner storeInfo={storeInfo} />
-      
-      {/* Rest of your store products content */}
-    </Container>
-  );
-};
-
 // Product card component
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
@@ -131,6 +99,38 @@ const ProductCard = ({ product }) => {
     </CardActions> */}
     </Card>
   )
+};
+
+const StoreProducts = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [storeInfo, setStoreInfo] = useState(null);
+  const { storeId } = useParams();
+
+  useEffect(() => {
+    const getProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchStoreProducts(storeId);
+        setProducts(data || []);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getProducts();
+  }, [storeId]);
+
+  return (
+    <Container maxWidth="lg" sx={{ mb: 10 }}>
+      {/* Banner Section */}
+      <StoreBanner storeInfo={storeInfo} />
+      
+      {/* Rest of your store products content */}
+    </Container>
+  );
 };
 
 export default StoreProducts;
