@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 
 const MallInfo = () => {
   const [mallName, setMallName] = useState("");
+  const [mallNameId, setMallNameId] = useState(""); // Added state for mall ID
   const [floorNo, setFloorNo] = useState("");
   const [shopNo, setShopNo] = useState("");
   const [descriptionMall, setDescriptionMall] = useState("");
@@ -29,12 +30,16 @@ const MallInfo = () => {
 
   const navigate = useNavigate();
 
-  console.log("Store Info", shopName);
-
+  // console.log("Store Info", shopName);
+  console.log("Mall Name ID:", mallNameId);
+  const userId = localStorage.getItem("userId");
+  console.log("User ID:", userId);
+  
   useEffect(() => {
     const getMalls = async () => {
       try {
         const mallsData = await fetchMallOptions();
+        console.log("Malls Data:", mallsData);
         setMalls(mallsData);
         setLoadingMalls(false);
       } catch (error) {
@@ -52,6 +57,7 @@ const MallInfo = () => {
   const handleChange = (event) => {
     const selectedMall = malls.find((mall) => mall.name === event.target.value);
     setMallName(event.target.value);
+    setMallNameId(selectedMall?.mall_name_id || ""); // Store the mall ID
 
     if (selectedMall) {
       // Use the 'floor' property from your API response
@@ -96,7 +102,6 @@ const MallInfo = () => {
       return;
     }
 
-    const userId = localStorage.getItem("userId");
     if (!userId) {
       console.error("userId ID not found in localStorage");
       return;
@@ -106,12 +111,13 @@ const MallInfo = () => {
 
     try {
       const base64Image = await convertToBase64(image);
-      console.log("Base64 image:", base64Image);
-
+      // console.log("Base64 image:", base64Image);
+      console.log("Mall Name ID:", mallNameId);
       const data = {
         store: {
           user_id: userId,
           name: shopName,
+          mall_name_id: mallNameId, // Added mall ID to the request
           description: descriptionStore,
           shop_type: shopType,
           image: base64Image,
@@ -121,6 +127,8 @@ const MallInfo = () => {
           floor_number: floorNo,
           shop_number: shopNo,
           description: descriptionMall,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         }
       };
 

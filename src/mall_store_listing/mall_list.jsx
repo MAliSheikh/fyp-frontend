@@ -4,18 +4,21 @@ import BusinessIcon from '@mui/icons-material/Business';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import { fetchMalls } from './fetchMalls';
+import { useNavigate } from 'react-router-dom';
+// import MallStores from './mall_stores';
 
 const MallListingPage = () => {
   const [malls, setMalls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchMalls(setMalls, setLoading, setError);
   }, []);
 
   const handleMallClick = (mall) => {
-    alert(`Selected Mall: ${mall.name}\nAddress: ${mall.address}`);
+    navigate(`/mall/${mall.mall_name_id}/stores`);
   };
 
   if (loading) {

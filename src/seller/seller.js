@@ -62,7 +62,7 @@ export const createStore = async (
 export const createStoreAndMall = async (data) => {
   try {
     const token = localStorage.getItem("access_token"); // Retrieve the token from localStorage
-
+    const user_id = localStorage.getItem("userId");
     if (!token) {
       throw new Error("No access token found");
     }
@@ -71,7 +71,8 @@ export const createStoreAndMall = async (data) => {
       `${base_URL}/store_owners/create_mall_store`,
       {
         store: {
-          user_id: parseInt(data.store.userId),
+          mall_name_id: data.store.mall_name_id,
+          user_id: parseInt(user_id),
           name: data.store.name,
           description: data.store.description,
           shop_type: data.store.shop_type,
@@ -84,6 +85,7 @@ export const createStoreAndMall = async (data) => {
           description: data.mall.description,
           created_at: data.mall.created_at,
           updated_at: data.mall.updated_at,
+
         },
       },
       {

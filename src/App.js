@@ -18,6 +18,8 @@ import AddToCartPage from "./Add_to_cart/add_to_cart";
 import MallListingPage from "./mall_store_listing/mall_list";
 import SearchResults from "./products/search_results";
 import Profile from "./profile/profile";
+import MallStores from "./mall_store_listing/mall_stores";
+import StoreProducts from "./mall_store_listing/store_products";
 
 function App() {
   return (
@@ -43,7 +45,10 @@ function App() {
           element={<Layout>{<AddToCartPage />}</Layout>}
         />
         <Route path="/profile" element={<Layout>{<Profile />}</Layout>} />
-        <Route path="/mall_lists" element={<Layout>{<MallListingPage />}</Layout>} />
+        <Route
+          path="/mall_lists"
+          element={<Layout>{<MallListingPage />}</Layout>}
+        />
 
         <Route path="/search" element={<Layout>{<SearchResults />}</Layout>} />
         {/* Seller */}
@@ -112,6 +117,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="/mall/:mallId/stores" element={<Layout><MallStores /></Layout>} />
+        <Route path="/store/:storeId/products" element={<Layout><StoreProducts /></Layout>} />
       </Routes>
     </Router>
   );
