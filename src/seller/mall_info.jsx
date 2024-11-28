@@ -1,17 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
   Button,
   Typography,
   CircularProgress,
-  Paper,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2"; // Import Grid2
 import { SideBar } from "./sidebar";
-import { createStoreAndMall } from "./seller";
+import { createStoreAndMall, fetchMallOptions } from "./seller";
 import { MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 import authService from "../components/LoginSignup/components/token";
+import { useNavigate } from "react-router-dom";
 
 const MallInfo = () => {
   const [mallName, setMallName] = useState("");
@@ -23,14 +23,49 @@ const MallInfo = () => {
   const [descriptionStore, setDescriptionStore] = useState("");
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [malls, setMalls] = useState([]);
+  const [loadingMalls, setLoadingMalls] = useState(true);
+  const [availableFloors, setAvailableFloors] = useState([]);
+
+  const navigate = useNavigate();
 
   console.log("Store Info", shopName);
+
+  useEffect(() => {
+    const getMalls = async () => {
+      try {
+        const mallsData = await fetchMallOptions();
+        setMalls(mallsData);
+        setLoadingMalls(false);
+      } catch (error) {
+        console.error("Error fetching malls:", error);
+        setLoadingMalls(false);
+      }
+    };
+
+    getMalls();
+  }, []);
 
   const handleFileChange = (event) => {
     setImage(event.target.files[0]);
   };
   const handleChange = (event) => {
+    const selectedMall = malls.find((mall) => mall.name === event.target.value);
     setMallName(event.target.value);
+
+    if (selectedMall) {
+      // Use the 'floor' property from your API response
+      const maxFloors = parseInt(selectedMall.floor) || 3; // Convert to number and fallback to 3 if not defined
+      const floors = Array.from(
+        { length: maxFloors },
+        (_, index) => (index + 1).toString() // Convert to string for value
+      );
+      setAvailableFloors(floors);
+      setFloorNo("1"); // Set default floor to 1
+    } else {
+      setAvailableFloors([]);
+      setFloorNo("");
+    }
   };
 
   const convertToBase64 = (file) => {
@@ -61,9 +96,9 @@ const MallInfo = () => {
       return;
     }
 
-    const store_owner_id = localStorage.getItem("store_owner_id");
-    if (!store_owner_id) {
-      console.error("Store owner ID not found in localStorage");
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      console.error("userId ID not found in localStorage");
       return;
     }
 
@@ -75,7 +110,7 @@ const MallInfo = () => {
 
       const data = {
         store: {
-          store_owner_id: store_owner_id,
+          user_id: userId,
           name: shopName,
           description: descriptionStore,
           shop_type: shopType,
@@ -86,16 +121,23 @@ const MallInfo = () => {
           floor_number: floorNo,
           shop_number: shopNo,
           description: descriptionMall,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
+        }
       };
 
+      console.log("Submitting data:", data);
       const response = await createStoreAndMall(data);
       console.log("Store and mall created successfully:", response);
 
-      // Fetch updated store info
-      await authService.fetchStoreInfo();
+      // Fetch store info immediately after successful creation
+      try {
+        await authService.fetchStoreInfo();
+        console.log("Store info fetched successfully after creation");
+      } catch (storeInfoError) {
+        console.error("Error fetching store info after creation:", storeInfoError);
+      }
+
+      // Show success message or redirect
+      navigate('/seller/upload-product');
     } catch (error) {
       console.error("Error creating store and mall:", error);
     } finally {
@@ -109,76 +151,140 @@ const MallInfo = () => {
         {/* Sidebar - width: 4 columns */}
         {/* <Grid xs={12} sm={4} md={2}> */}
         <Box
-        sx={{
-        display: "flex",
-        flexDirection: { xs: "column", md: "row" },
-        p: 1,
-        gap: 5,
-      }}
-      >
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            p: 1,
+            gap: 5,
+          }}
+        >
           <SideBar />
         </Box>
         {/* </Grid> */}
 
-        
         {/* Mall Content - width: 8 columns */}
         <Grid xs={12} sm={8} md={10}>
           <Box
             sx={{
-              width: {lg: "300%", md: "200%", xs: "100%" },
+              width: { lg: "100%", md: "100%", xs: "100%" },
               margin: "0 auto",
-              
             }}
           >
             {/* <Paper sx={{ p: 3}}> */}
             {/* Mall Information Section */}
-            <Typography variant="h5" gutterBottom sx={{ mt: { xs: 2, sm: 0 }}}>
+            <Typography variant="h5" gutterBottom sx={{ mt: { xs: 2, sm: 0 } }}>
               Add Mall Information
             </Typography>
             <Box
-              sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 4 }}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 3,
+                mb: 4,
+              }}
             >
+              {/* Mall Selection */}
               <FormControl fullWidth>
                 <InputLabel id="mall-select-label">Select Mall</InputLabel>
-
                 <Select
                   labelId="mall-select-label"
                   id="mall-select"
                   value={mallName}
                   onChange={handleChange}
                   label="Select Mall"
+                  disabled={loadingMalls}
+                  sx={{ 
+                    height: "56px",
+                    "& .MuiSelect-select": {
+                      // display: "flex",
+                      // alignItems: "center",
+                      width:{md: "700px", xs: "100%"},
+                      gap: 1,
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis"
+                    }
+                  }}
                 >
-                  <MenuItem value="Dolmen Mall">Dolmen Mall (Karachi)</MenuItem>
-                  <MenuItem value="Emporium Mall">
-                    Emporium Mall (Lahore)
-                  </MenuItem>
-                  <MenuItem value="Lucky One Mall">
-                    Lucky One Mall (Karachi)
-                  </MenuItem>
-                  <MenuItem value="Centaurus Mall">
-                    Centaurus Mall (Islamabad)
-                  </MenuItem>
-                  <MenuItem value="Giga Mall">Giga Mall (Islamabad)</MenuItem>
+                  {loadingMalls ? (
+                    <MenuItem disabled>Loading malls...</MenuItem>
+                  ) : (
+                    malls.map((mall) => (
+                      <MenuItem
+                        key={mall.name}
+                        value={mall.name}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          padding: "12px 16px",
+                          gap: 1,
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis"
+                        }}
+                      >
+                        <Typography noWrap>{mall.name}</Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          ({mall.location})
+                        </Typography>
+                      </MenuItem>
+                    ))
+                  )}
                 </Select>
               </FormControl>
+
+              {/* Floor Selection */}
+              <FormControl fullWidth>
+                <InputLabel id="floor-select-label">Floor Number</InputLabel>
+                <Select
+                  labelId="floor-select-label"
+                  id="floor-select"
+                  value={floorNo}
+                  onChange={(e) => setFloorNo(e.target.value)}
+                  label="Floor Number"
+                  disabled={!mallName || availableFloors.length === 0}
+                  sx={{ 
+                    height: "56px",
+                    "& .MuiSelect-select": {
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis"
+                    }
+                  }}
+                >
+                  {availableFloors.map((floor) => (
+                    <MenuItem
+                      key={floor}
+                      value={floor}
+                      sx={{
+                        padding: "8px 16px",
+                        minHeight: "40px",
+                      }}
+                    >
+                      {floor}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {/* Shop Number */}
               <TextField
-                label="Floor No"
-                value={floorNo}
-                onChange={(e) => setFloorNo(e.target.value)}
-                type="number"
-                required
-                fullWidth
-              />
-              <TextField
-                label="Shop No"
+                label="Shop Number"
                 value={shopNo}
                 onChange={(e) => setShopNo(e.target.value)}
                 type="number"
                 required
                 fullWidth
+                sx={{
+                  "& .MuiInputBase-root": {
+                    height: "56px",
+                  },
+                }}
               />
+
+              {/* Mall Description */}
               <TextField
-                label="Description"
+                label="Mall Description"
                 value={descriptionMall}
                 onChange={(e) => setDescriptionMall(e.target.value)}
                 multiline
@@ -277,14 +383,10 @@ const MallInfo = () => {
             >
               {loading ? <CircularProgress size={24} /> : "Submit"}
             </Button>
-          {/* </Paper> */}
+            {/* </Paper> */}
           </Box>
-
-
         </Grid>
-        
       </Grid>
-      
     </Box>
   );
 };

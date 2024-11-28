@@ -85,15 +85,15 @@ export const SideBar = () => {
         <>
           <Button
             variant="contained"
-            sx={getButtonStyle("/seller/mall")}
-            onClick={() => navigate("/seller/mall")}
+            sx={getButtonStyle("/mall")}
+            onClick={() => navigate("/mall")}
           >
             Mall
           </Button>
           <Button
-            onClick={() => navigate("/seller/store_info")}
+            onClick={() => navigate("/store_info")}
             variant="contained"
-            sx={getButtonStyle("/seller/store_info")}
+            sx={getButtonStyle("/store_info")}
           >
             Independent Store
           </Button>

@@ -48,19 +48,24 @@ const logout = () => {
   localStorage.removeItem("userId");
   localStorage.removeItem("userRole");
   localStorage.removeItem("store_id");
-  localStorage.removeItem("mall_id");  
-  localStorage.removeItem("store_owner_id");  
+  localStorage.removeItem("mall_id");
+  localStorage.removeItem("store_owner_id");
 };
 
+// const getToken = () => {
+//   return JSON.parse(localStorage.getItem("access_token"));
+// };
+
+// Changed this function
 const getToken = () => {
-  return JSON.parse(localStorage.getItem("access_token"));
+  return localStorage.getItem("access_token"); // Remove JSON.parse
 };
 
 const getToken1 = () => {
   const token = localStorage.getItem("access_token");
   if (!token) return null;
   try {
-    console.log('jwtDecode(token)', jwtDecode(token));
+    console.log("jwtDecode(token)", jwtDecode(token));
     // localStorage.setItem("userId", token.id);
     return jwtDecode(token);
   } catch (e) {
@@ -101,35 +106,46 @@ const register = (email, password, username, role) => {
       };
     });
 };
-const fetchStoreOwnerId = async (userId) => {
-  try {
-    const response = await axiosInstance.get(`/store_owners/store_owner/${userId}`);
-    if (response.data) {
-      localStorage.setItem("store_owner_id", response.data.store_owner_id);
-    }
-    return response.data.store_owner_id;
-  } catch (error) {
-    console.error("Error fetching store owner ID:", error);
-    throw error;
-  }
-};
+// const fetchStoreOwnerId = async (userId) => {
+//   try {
+//     const response = await axiosInstance.get(`/store_owners/store_owner/${userId}`);
+//     if (response.data) {
+//       localStorage.setItem("store_owner_id", response.data.store_owner_id);
+//     }
+//     return response.data.store_owner_id;
+//   } catch (error) {
+//     console.error("Error fetching store owner ID:", error);
+//     throw error;
+//   }
+// };
 const fetchStoreInfo = async () => {
   try {
-    const store_owner_id = localStorage.getItem('store_owner_id')
-    const response = await axios.get(`http://localhost:8000/store/${store_owner_id}/store-info`);
-    if (response.data) {
-      if (response.data.store_id) localStorage.setItem('store_id', response.data.store_id);
-      if (response.data.mall_id) localStorage.setItem('mall_id', response.data.mall_id);
-      // localStorage.setItem("mall_id", response.data.mall_id);
+    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("access_token");
+
+    if (!userId || !token) {
+      throw new Error("Missing userId or token");
     }
-    return response.data.store_owner_id;
+
+    const response = await axios.get(`${base_URL}/store/${userId}/store-info`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.data) {
+      localStorage.setItem("store_id", response.data.store_id);
+      console.log("Store ID saved:", response.data.store_id);
+      localStorage.setItem("mall_id", response.data.mall_id);
+      console.log("Mall ID saved:", response.data.mall_id);
+    }
+    return response.data;
   } catch (error) {
-    console.error("Error fetching store owner ID:", error);
+    console.error("Error fetching store info:", error);
     throw error;
   }
 };
-
-
 
 const authService = {
   fetchStoreInfo,
@@ -140,7 +156,7 @@ const authService = {
   getToken,
   register,
   getUserRole,
-  fetchStoreOwnerId
+  // fetchStoreOwnerId
 };
 
 export default authService;

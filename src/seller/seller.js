@@ -71,7 +71,7 @@ export const createStoreAndMall = async (data) => {
       `${base_URL}/store_owners/create_mall_store`,
       {
         store: {
-          store_owner_id: data.store.store_owner_id,
+          user_id: parseInt(data.store.userId),
           name: data.store.name,
           description: data.store.description,
           shop_type: data.store.shop_type,
@@ -79,8 +79,8 @@ export const createStoreAndMall = async (data) => {
         },
         mall: {
           name: data.mall.name,
-          floor_number: data.mall.floor_number,
-          shop_number: data.mall.shop_number,
+          floor_number: parseInt(data.mall.floor_number),
+          shop_number: parseInt(data.mall.shop_number),
           description: data.mall.description,
           created_at: data.mall.created_at,
           updated_at: data.mall.updated_at,
@@ -135,6 +135,27 @@ export const createProduct = async (productData) => {
     return response.data;
   } catch (error) {
     console.error("Error creating product:", error);
+    throw error;
+  }
+};
+
+export const fetchMallOptions = async () => {
+  try {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      throw new Error("No access token found");
+    }
+
+    const response = await axios.get(`${base_URL}/store/mall_options`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    return response.data.malls; // Return just the malls array
+  } catch (error) {
+    console.error("Error fetching mall options:", error);
     throw error;
   }
 };
