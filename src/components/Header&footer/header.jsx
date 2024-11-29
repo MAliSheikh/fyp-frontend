@@ -202,6 +202,23 @@ const Header = () => {
               >
                 Malls
               </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: '#fff',
+                  color: '#009688',
+                  '&:hover': {
+                    backgroundColor: '#e0e0e0'
+                  },
+                  textTransform: 'none',
+                  fontWeight: 'medium',
+                  fontSize: '14px',
+                  padding: '6px 16px'
+                }}
+                onClick={() => navigate("/store_lists")}
+              >
+                Stores
+              </Button>
             </Box>
           </Toolbar>
         </Container>

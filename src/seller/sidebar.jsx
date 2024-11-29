@@ -13,12 +13,12 @@ export const SideBar = () => {
   // useEffect(() => {
   //   const storeId = localStorage.getItem("store_id");
   //   const mallId = localStorage.getItem("mall_id");
-    
+
   //   // Show both options if neither exists
   //   if (!storeId && !mallId) {
   //     setShowMall(true);
   //     setShowStore(true);
-  //   } 
+  //   }
   //   // If either exists, only show mall option
   //   else if (storeId || mallId) {
   //     setShowMall(false);
@@ -81,26 +81,27 @@ export const SideBar = () => {
         REGISTER STORE
       </Typography>
 
-      {!localStorage.getItem('store_id') && !localStorage.getItem('mall_id') && (
-        <>
-          <Button
-            variant="contained"
-            sx={getButtonStyle("/mall")}
-            onClick={() => navigate("/mall")}
-          >
-            Mall
-          </Button>
-          <Button
-            onClick={() => navigate("/store_info")}
-            variant="contained"
-            sx={getButtonStyle("/store_info")}
-          >
-            Independent Store
-          </Button>
-        </>
-      )}
+      {!localStorage.getItem("store_id") &&
+        !localStorage.getItem("mall_id") && (
+          <>
+            <Button
+              variant="contained"
+              sx={getButtonStyle("/mall")}
+              onClick={() => navigate("/mall")}
+            >
+              Mall
+            </Button>
+            <Button
+              variant="contained"
+              sx={getButtonStyle("/store_info")}
+              onClick={() => navigate("/store_info")}
+            >
+              Independent Store
+            </Button>
+          </>
+        )}
 
-      {localStorage.getItem('store_id') && localStorage.getItem('mall_id') && (
+      {localStorage.getItem("store_id") && localStorage.getItem("mall_id") && (
         <Button
           variant="contained"
           sx={getButtonStyle("/mall")}
@@ -110,7 +111,7 @@ export const SideBar = () => {
         </Button>
       )}
 
-      {localStorage.getItem('store_id') && !localStorage.getItem('mall_id') && (
+      {localStorage.getItem("store_id") && !localStorage.getItem("mall_id") && (
         <Button
           onClick={() => navigate("/store_info")}
           variant="contained"

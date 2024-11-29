@@ -59,8 +59,8 @@ const StoreInfo = () => {
       return;
     }
 
-    const store_owner_id = localStorage.getItem("store_owner_id");
-    if (!store_owner_id) {
+    const user_id = localStorage.getItem("userId");
+    if (!user_id) {
       setSnackbar({
         open: true,
         message: "Store owner ID not found",
@@ -75,7 +75,7 @@ const StoreInfo = () => {
       const base64Image = await convertToBase64(image);
       console.log("Base64 image:", base64Image);
       const response = await createStore(
-        store_owner_id,
+        user_id,
         shopName,
         shopType,
         description,

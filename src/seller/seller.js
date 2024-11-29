@@ -24,7 +24,7 @@ import { base_URL } from "../utils";
 // };
 
 export const createStore = async (
-  store_owner_id,
+  user_id,
   shopName,
   shopType,
   description,
@@ -35,7 +35,7 @@ export const createStore = async (
     const response = await axios.post(
       `${base_URL}/store_owners/stores`,
       {
-        store_owner_id: store_owner_id,
+        user_id: parseInt(user_id),
         name: shopName,
         description: description,
         shop_type: shopType,

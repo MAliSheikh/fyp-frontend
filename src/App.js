@@ -8,6 +8,7 @@ import Layout from "./layout";
 import Seller from "./seller/store_create";
 import MallInfo from "./seller/mall_info";
 import StoreInfo from "./seller/store_info";
+import IndependentStores from "../src/independent_stores/IndependentStores";
 // import StoreCreatePage from "./seller/store_create";
 import ProductDetailsPage from "./products/productInfo";
 import PrivateRoute from "./components/privateRoute";
@@ -50,6 +51,10 @@ function App() {
         <Route
           path="/mall_lists"
           element={<Layout>{<MallListingPage />}</Layout>}
+        />
+        <Route
+          path="/store_lists"
+          element={<Layout>{<IndependentStores />}</Layout>}
         />
 
         <Route path="/search" element={<Layout>{<SearchResults />}</Layout>} />
