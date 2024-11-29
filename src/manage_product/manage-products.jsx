@@ -5,7 +5,7 @@ import { SideBar } from "../seller/sidebar";
 import DeleteIcon from "@mui/icons-material/Delete";
 // import Grid2 from "@mui/material/Unstable_Grid2";
 
-const OrdersPage = () => {
+const ManageProducts = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
@@ -66,7 +66,7 @@ const OrdersPage = () => {
       <Grid2
         item
         xs={12}
-        md={9}
+        md={8}
         lg={10}
         sx={{
           p: { xs: 2, md: 3, width: "100%", maxWidth: "1200px" },
@@ -172,4 +172,4 @@ const OrdersPage = () => {
   );
 };
 
-export default OrdersPage;
+export default ManageProducts;
