@@ -5,6 +5,7 @@ import Products from "./products/products_page";
 import SignUp from "./components/LoginSignup/signup";
 import Login from "./components/LoginSignup/login";
 import Layout from "./layout";
+import Layout2 from "./layout2";
 import Seller from "./seller/store_create";
 import MallInfo from "./seller/mall_info";
 import StoreInfo from "./seller/store_info";
