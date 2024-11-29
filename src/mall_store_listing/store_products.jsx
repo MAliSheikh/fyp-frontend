@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { fetchStoreProducts } from './mallStoreApi'; // Assuming this is the correct import path
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import Grid2 from '@mui/material/Grid2';
 
 // Banner component for store products page
 const StoreBanner = ({ storeInfo }) => {
@@ -84,8 +85,8 @@ const ProductCard = ({ product }) => {
           Rs. {product.price}
         </Typography>
 
-        <Rating name="product-rating" value={4} precision={0.5} readOnly />
-        {/* <Rating name="product-rating" value={product.rating} precision={0.5} readOnly /> */}
+        {/* <Rating name="product-rating" value={4} precision={0.5} readOnly /> */}
+        <Rating name="product-rating" value={product.average_rating} precision={0.5} readOnly />
         
         <Button variant="contained" color="primary" onClick={handleViewProduct}>
           See Details
@@ -126,9 +127,17 @@ const StoreProducts = () => {
   return (
     <Container maxWidth="lg" sx={{ mb: 10 }}>
       {/* Banner Section */}
-      <StoreBanner storeInfo={storeInfo} />
+      {/* <StoreBanner storeInfo={storeInfo} /> */}
       
       {/* Rest of your store products content */}
+        {/* Product Grid */}
+        <Grid2 container spacing={3}>
+        {products.map((product, index) => (
+          <Grid2 item size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product.product}>
+            <ProductCard product={product} />
+          </Grid2>
+        ))}
+      </Grid2>
     </Container>
   );
 };
