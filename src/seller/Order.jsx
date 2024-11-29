@@ -1,78 +1,99 @@
 import React, { useState, useEffect } from "react";
 import { Box, TextField, Typography } from "@mui/material";
 import { SideBar } from "../seller/sidebar";
+import axiosInstance from "../components/axiosInstance";
 
 const OrdersPage = () => {
-  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchOrders = async () => {
       try {
         setLoading(true);
-        // Simulated API call
-        const response = await new Promise((resolve) =>
-          setTimeout(() => {
-            resolve({
-              data: [
-                { id: 1, name: "Smart Watch", category: "Electronics", quantity: 10 },
-                { id: 2, name: "Leather Bag", category: "Accessories", quantity: 5 },
-                { id: 3, name: "Wireless Earbuds", category: "Electronics", quantity: 20 },
-                { id: 4, name: "Office Chair", category: "Furniture", quantity: 2 },
-                { id: 5, name: "Running Shoes", category: "Footwear", quantity: 15 },
-              ],
-            });
-          }, 1000)
-        );
-        setProducts(response.data);
+        const store_id = localStorage.getItem("store_id");
+        const response = await axiosInstance.get(`/orders/store/${store_id}`);
+        setOrders(response.data);
       } catch (error) {
-        console.error("Error fetching products:", error);
-        // Fallback dummy data
-        setProducts([
-          { id: 1, name: "Smart Watch", category: "Electronics", quantity: 10 },
-          { id: 2, name: "Leather Bag", category: "Accessories", quantity: 5 },
-          { id: 3, name: "Wireless Earbuds", category: "Electronics", quantity: 20 },
-          { id: 4, name: "Office Chair", category: "Furniture", quantity: 2 },
-          { id: 5, name: "Running Shoes", category: "Footwear", quantity: 15 },
-        ]);
+        console.error("Error fetching orders:", error);
+        setOrders([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProducts();
+    fetchOrders();
   }, []);
 
-  const handleApprove = async (id) => {
-    try {
-      alert(`Product with ID ${id} approved!`);
-    } catch (error) {
-      console.error("Error approving product:", error);
-      alert("Failed to approve product");
-    }
-  };
-
-  const handleDecline = async (id) => {
-    try {
-      alert(`Product with ID ${id} declined!`);
-    } catch (error) {
-      console.error("Error declining product:", error);
-      alert("Failed to decline product");
-    }
-  };
-
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // Convert orders and their items into flat array for display
+  const flattenedOrderItems = orders.flatMap(order => 
+    Object.values(order.order_items).map(item => ({
+      order_id: order.order_id,
+      status: order.status,
+      order_date: new Date(order.order_date).toLocaleDateString(),
+      quantity: item.quantity,
+      price: item.price,
+      total: order.total_amount,
+      product_name: item.product_name
+    }))
   );
 
+  const filteredOrders = flattenedOrderItems.filter(order =>
+    String(order.order_id).includes(searchTerm) ||
+    order.status.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const store_id = localStorage.getItem("store_id");
+  
+  const handleApprove = async (order_id, value) => {
+    try {
+      const response = await axiosInstance.put(`/orders/${order_id}/store/${store_id}/status?status=approved`);
+      
+      // Update the local state to reflect the change
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          order.order_id === order_id 
+            ? { ...order, status: 'approved' }
+            : order
+        )
+      );
+
+      // Show success message
+      alert('Order approved successfully');
+    } catch (error) {
+      console.error('Error approving order:', error);
+      alert('Failed to approve order');
+    }
+  };
+
+  const handleDecline = async (order_id, value) => {
+    try {
+      const response = await axiosInstance.put(`/orders/${order_id}/store/${store_id}/status?status=cancelled`);
+      
+      // Update the local state to reflect the change
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          order.order_id === order_id 
+            ? { ...order, status: 'cancelled' }
+            : order
+        )
+      );
+
+      // Show success message
+      alert('Order declined successfully');
+    } catch (error) {
+      console.error('Error declining order:', error);
+      alert('Failed to decline order');
+    }
+  };
+
   return (
-    <Box display="flex" sx={{ height: "100vh", overflow: "auto" }}>
+    <Box display="flex" sx={{ height: "100vh" }}>
       {/* Sidebar */}
       <Box
         sx={{
           width: { xs: "0", md: "20%" },
-          display: { xs: "none", md: "block" },
+          display: { xs: "none", md: "block" }
         }}
       >
         <SideBar />
@@ -83,123 +104,128 @@ const OrdersPage = () => {
         sx={{
           flex: 1,
           p: { xs: 2, md: 3 },
-          width: "100%",
+          width: "75%",
           maxWidth: "1200px",
-          mx: "auto",
+          overflow: { xs: "auto", md: "hidden" } // Only enable scrolling on small screens
         }}
       >
         <Typography variant="h6" sx={{ mb: 3 }}>
-          Manage Products
+          Manage Orders
         </Typography>
 
         {/* Search Field */}
         <TextField
-          label="Search Products"
+          label="Search Orders"
           variant="outlined"
           fullWidth
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           sx={{
             mb: 3,
-            maxWidth: { xs: "100%", sm: "75%", md: "50%" },
+            maxWidth: { xs: "100%", sm: "75%", md: "50%" }
           }}
         />
 
-        {/* Header Row */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            backgroundColor: "#00897b",
-            color: "white",
-            p: 2,
-            borderRadius: 3,
-            mb: 2,
-            fontWeight: "bold",
-          }}
-        >
-          <Typography sx={{ flex: 0.8, textAlign: "left" }}>ID</Typography>
-          <Typography sx={{ flex: 1, textAlign: "left" }}>Product Name</Typography>
-          <Typography sx={{ flex: 1, textAlign: "left" }}>Category</Typography>
-          <Typography sx={{ flex: 1, textAlign: "left" }}>Quantity</Typography>
-          <Typography sx={{ flex: 1, textAlign: "center" }}>Actions</Typography>
-        </Box>
+        {/* Scrollable Container */}
+        <Box sx={{ overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 200px)" }}>
+          {/* Header Row */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backgroundColor: "#00897b",
+              color: "white",
+              p: 2,
+              borderRadius: 3,
+              mb: 2,
+              fontWeight: "bold",
+              minWidth: "900px" // Minimum width to prevent squishing
+            }}
+          >
+            <Typography sx={{ flex: 0.8, textAlign: "left" }}>Order ID</Typography>
+            <Typography sx={{ flex: 1, textAlign: "left" }}>Name</Typography>
+            <Typography sx={{ flex: 1, textAlign: "left" }}>Status</Typography>
+            <Typography sx={{ flex: 1, textAlign: "left" }}>Date</Typography>
+            <Typography sx={{ flex: 1, textAlign: "left" }}>Quantity</Typography>
+            <Typography sx={{ flex: 1, textAlign: "left" }}>Price</Typography>
+            <Typography sx={{ flex: 1, textAlign: "center" }}>Actions</Typography>
+          </Box>
 
-        {/* Product Rows */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
-          {filteredProducts.map((product) => (
-            <Box
-              key={product.id}
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                backgroundColor: "white",
-                p: 2,
-                borderRadius: 3,
-                boxShadow: 2,
-                transition: "all 0.3s ease-in-out",
-                "&:hover": {
-                  boxShadow: 4,
-                  backgroundColor: "#f5f5f5",
-                },
-              }}
-            >
-              <Typography sx={{ flex: 0.8, textAlign: "left" }}>{product.id}</Typography>
-              <Typography sx={{ flex: 1, textAlign: "left" }}>{product.name}</Typography>
-              <Typography sx={{ flex: 1, textAlign: "left" }}>{product.category}</Typography>
-              <Typography sx={{ flex: 1, textAlign: "left" }}>{product.quantity}</Typography>
+          {/* Order Rows */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              minWidth: "900px" // Minimum width to prevent squishing
+            }}
+          >
+            {filteredOrders.map((order, index) => (
               <Box
+                key={`${order.order_id}-${index}`}
                 sx={{
-                  flex: 1,
                   display: "flex",
-                  justifyContent: "center",
-                  gap: 2,
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  backgroundColor: "white",
+                  p: 2,
+                  borderRadius: 3,
+                  boxShadow: 2,
+                  cursor: "pointer",
+                  transition: "all 0.3s ease-in-out",
+                  "&:hover": {
+                    boxShadow: 4,
+                    backgroundColor: "#f5f5f5",
+                  },
                 }}
               >
+                <Typography sx={{ flex: 0.8, textAlign: "left" }}>{order.order_id}</Typography>
+                <Typography sx={{ flex: 1, textAlign: "left" }}>{order.product_name}</Typography>
+                <Typography sx={{ flex: 1, textAlign: "left" }}>{order.status}</Typography>
+                <Typography sx={{ flex: 1, textAlign: "left" }}>{order.order_date}</Typography>
+                <Typography sx={{ flex: 1, textAlign: "left" }}>{order.quantity}</Typography>
+                <Typography sx={{ flex: 1, textAlign: "left" }}>{order.price}</Typography>
                 <Box
                   sx={{
-                    
-                    color: "white",
-                    p: 1,
-                    borderRadius: 2,
-                    cursor: "pointer",
-                    textAlign: "center",
-                    bgcolor: "#009688",
-                    "&:hover": {
-                                bgcolor: "#00796b",
-                    },
+                    flex: 1,
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: 2
                   }}
-                  onClick={() => handleApprove(product.id)}
                 >
-                  Approve
-                </Box>
-                <Box
-                  sx={{
-                    backgroundColor: "#f44336",
-                    color: "white",
-                    p: 1,
-                    borderRadius: 2,
-                    cursor: "pointer",
-                    textAlign: "center",
-                    "&:hover": {
-                      backgroundColor: "#d32f2f",
-                    },
-                  }}
-                  onClick={() => handleDecline(product.id)}
-                >
-                  Decline
+                  <Box
+                    sx={{
+                      color: "white",
+                      p: 1,
+                      borderRadius: 2,
+                      cursor: "pointer",
+                      textAlign: "center",
+                      bgcolor: "#009688",
+                      "&:hover": { bgcolor: "#00796b" },
+                    }}
+                    onClick={() => handleApprove(order.order_id)}
+                  >
+                    Approve
+                  </Box>
+                  <Box
+                    sx={{
+                      backgroundColor: "#f44336",
+                      color: "white",
+                      p: 1,
+                      borderRadius: 2,
+                      cursor: "pointer",
+                      textAlign: "center",
+                      "&:hover": { backgroundColor: "#d32f2f" },
+                    }}
+                    onClick={() => handleDecline(order.order_id)}
+                  >
+                    Decline
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-          ))}
+            ))}
+          </Box>
         </Box>
       </Box>
     </Box>
