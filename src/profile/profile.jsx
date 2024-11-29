@@ -34,8 +34,12 @@ const CustomerProfile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get("/costumer-profiles");
-        setUser({ name: response.data.name });
+        const response = await axios.get("/costumer-profiles"); 
+        setUser({
+          name: response.data.name,
+          picture: response.data.picture,
+        
+        });
       } catch (error) {
         console.error("Error fetching user data:", error);
       }

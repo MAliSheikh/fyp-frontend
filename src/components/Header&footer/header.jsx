@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import BNLOGO2 from "../Logos/BNLOGO2.png";
 import authService from "../LoginSignup/components/token";
-// import logo from 'D:/frontend/fyp-frontend/src/components/Logos/logo.png';
+import MallListingPage from "../../mall_store_listing/mall_list";
 import {
   AppBar,
   Box,
@@ -185,6 +185,23 @@ const Header = () => {
               <IconButton color="inherit" onClick={() => navigate("/profile")}>
                 <PersonIcon />
               </IconButton>
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: '#fff',
+                  color: '#009688',
+                  '&:hover': {
+                    backgroundColor: '#e0e0e0'
+                  },
+                  textTransform: 'none',
+                  fontWeight: 'medium',
+                  fontSize: '14px',
+                  padding: '6px 16px'
+                }}
+                onClick={() => navigate("/mall_lists")}
+              >
+                Malls
+              </Button>
             </Box>
           </Toolbar>
         </Container>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import authService from "../components/LoginSignup/components/token";
@@ -7,6 +7,24 @@ export const SideBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
+  // const [showMall, setShowMall] = useState(false);
+  // const [showStore, setShowStore] = useState(true);
+
+  // useEffect(() => {
+  //   const storeId = localStorage.getItem("store_id");
+  //   const mallId = localStorage.getItem("mall_id");
+    
+  //   // Show both options if neither exists
+  //   if (!storeId && !mallId) {
+  //     setShowMall(true);
+  //     setShowStore(true);
+  //   } 
+  //   // If either exists, only show mall option
+  //   else if (storeId || mallId) {
+  //     setShowMall(false);
+  //     setShowStore(false);
+  //   }
+  // }, []);
 
   const getButtonStyle = (path) => ({
     height: 45,
@@ -63,21 +81,44 @@ export const SideBar = () => {
         REGISTER STORE
       </Typography>
 
-      <Button
-        variant="contained"
-        sx={getButtonStyle("/mall")}
-        onClick={() => navigate("/mall")}
-      >
-        Mall
-      </Button>
+      {!localStorage.getItem('store_id') && !localStorage.getItem('mall_id') && (
+        <>
+          <Button
+            variant="contained"
+            sx={getButtonStyle("/mall")}
+            onClick={() => navigate("/mall")}
+          >
+            Mall
+          </Button>
+          <Button
+            onClick={() => navigate("/store_info")}
+            variant="contained"
+            sx={getButtonStyle("/store_info")}
+          >
+            Independent Store
+          </Button>
+        </>
+      )}
 
-      <Button
-        onClick={() => navigate("/store_info")}
-        variant="contained"
-        sx={getButtonStyle("/store_info")}
-      >
-        Independent Store
-      </Button>
+      {localStorage.getItem('store_id') && localStorage.getItem('mall_id') && (
+        <Button
+          variant="contained"
+          sx={getButtonStyle("/mall")}
+          onClick={() => navigate("/mall")}
+        >
+          Mall
+        </Button>
+      )}
+
+      {localStorage.getItem('store_id') && !localStorage.getItem('mall_id') && (
+        <Button
+          onClick={() => navigate("/store_info")}
+          variant="contained"
+          sx={getButtonStyle("/store_info")}
+        >
+          Independent Store
+        </Button>
+      )}
 
       <Button
         variant="contained"

@@ -12,6 +12,7 @@ import {
 import { createStore } from "./seller";
 import { SideBar } from "./sidebar";
 import { useNavigate } from "react-router-dom";
+import authService from "../components/LoginSignup/components/token";
 
 const StoreInfo = () => {
   const [shopName, setShopName] = useState("");
@@ -81,6 +82,9 @@ const StoreInfo = () => {
         base64Image
       );
       console.log("Store created successfully:", response);
+
+      // Fetch updated store info
+      await authService.fetchStoreInfo();
 
       setSnackbar({
         open: true,
