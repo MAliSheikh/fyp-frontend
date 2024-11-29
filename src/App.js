@@ -19,7 +19,7 @@ import AddToCartPage from "./Add_to_cart/add_to_cart";
 import MallListingPage from "./mall_store_listing/mall_list";
 import SearchResults from "./products/search_results";
 import Profile from "./profile/profile";
-import ManageProducts from "./Manage_products/manage-products";
+import ManageProducts from "./manage_product/manage-products";
 import OrdersPage from "./seller/Order";
 import MallStores from "./mall_store_listing/mall_stores";
 import StoreProducts from "./mall_store_listing/store_products";

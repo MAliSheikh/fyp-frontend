@@ -3,25 +3,29 @@ import { Box, TextField, Typography, Grid2 } from "@mui/material";
 import axiosInstance from "../components/axiosInstance";
 import { SideBar } from "../seller/sidebar";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useNavigate } from 'react-router-dom';
 // import Grid2 from "@mui/material/Unstable_Grid2";
 
-const OrdersPage = () => {
+const ManageProducts = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const store_id = localStorage.getItem("store_id");  
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get("/api/products"); // Adjust the endpoint according to your API
-        setProducts(response.data);
+        const response = await axiosInstance.get(`/products/store/${store_id}`); // Adjust the endpoint according to your API
+        // Sort products by product_id in ascending order
+        const sortedProducts = response.data.sort((a, b) => a.product_id - b.product_id);
+        setProducts(sortedProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
-        setProducts([
-          { id: 1, name: "Watch", category: "Apparel & Accessories", quantity: 20 },
-          { id: 2, name: "Bag", category: "Accessories", quantity: 15 },
-        ]);
+        // setProducts([
+        //   { id: 1, name: "Watch", category: "Apparel & Accessories", quantity: 20 },
+        //   { id: 2, name: "Bag", category: "Accessories", quantity: 15 },
+        // ]);
       } finally {
         setLoading(false);
       }
@@ -30,11 +34,11 @@ const OrdersPage = () => {
     fetchProducts();
   }, []);
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (product_id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await axiosInstance.delete(`/api/products/${id}`);
-        setProducts((prev) => prev.filter((product) => product.id !== id));
+        await axiosInstance.delete(`products/${product_id}`);
+        setProducts((prev) => prev.filter((product) => product.id !== product_id));
       } catch (error) {
         console.error("Error deleting product:", error);
         alert("Failed to delete product");
@@ -52,7 +56,7 @@ const OrdersPage = () => {
       <Grid2
         item
         xs={12}
-        md={3}
+        md={4}
         lg={2}
         sx={{
           display: { xs: "none", md: "block" },
@@ -66,10 +70,10 @@ const OrdersPage = () => {
       <Grid2
         item
         xs={12}
-        md={9}
+        md={8}
         lg={10}
         sx={{
-          p: { xs: 2, md: 3, width: "100%", maxWidth: "1200px" },
+          p: { xs: 2, md: 3, width: "75%", maxWidth: "1200px" },
         }}
       >
         <Typography variant="h6" sx={{ mb: 3 }}>
@@ -121,7 +125,7 @@ const OrdersPage = () => {
               >
                 {filteredProducts.map((product) => (
                   <Box
-                    key={product.id}
+                    key={product.product_id}
                     sx={{
                       display: "flex",
                       justifyContent: "space-between",
@@ -139,10 +143,10 @@ const OrdersPage = () => {
                     }}
                     onClick={() => console.log(`Clicked on product ${product.name}`)}
                   >
-                    <Typography sx={{ flex: 0.8, textAlign: "left" }}>{product.id}</Typography>
+                    <Typography sx={{ flex: 0.8, textAlign: "left" }}>{product.product_id}</Typography>
                     <Typography sx={{ flex: 1, textAlign: "left" }}>{product.name}</Typography>
                     <Typography sx={{ flex: 1, textAlign: "left" }}>{product.category}</Typography>
-                    <Typography sx={{ flex: 1, textAlign: "left" }}>Quantity: {product.quantity}</Typography>
+                    <Typography sx={{ flex: 1, textAlign: "left" }}>{product.stock}</Typography>
                     <Box
                       sx={{
                         flex: 0.5,
@@ -154,8 +158,8 @@ const OrdersPage = () => {
                       <DeleteIcon
                         color="error"
                         onClick={(e) => {
-                          e.stopPropagation(); // Prevent triggering parent click
-                          handleDelete(product.id);
+                          e.stopPropagation();
+                          handleDelete(product.product_id);
                         }}
                         sx={{
                           cursor: "pointer",
@@ -172,4 +176,4 @@ const OrdersPage = () => {
   );
 };
 
-export default OrdersPage;
+export default ManageProducts;
