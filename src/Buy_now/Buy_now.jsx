@@ -1,36 +1,50 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Box from "@mui/material/Box";
-// import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useNavigate } from "react-router-dom";
 import { Grid2 } from "@mui/material";
-//import tryImage from "../components/Logos/try.jpg";
-import AddressInputPage from "../Address/address";
+import axios from "axios";
 
 const BuyNowPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { product, quantity } = location.state || {}; // Fallback to avoid errors
-
-  // Handle form data state
-  // const [formData, setFormData] = useState({
-  //   // name: "",
-  //   address: "",
-  //   phone: "",
-  //   // email: "",
-  // });
+  const { product, quantity } = location.state || {};
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [address, setAddress] = useState(null);
+  const [addressLoading, setAddressLoading] = useState(true);
 
   useEffect(() => {
     if (!product) {
-      navigate("/");  // Redirect if product data is missing
+      navigate("/");
     }
   }, [product, navigate]);
+
+  useEffect(() => {
+    const fetchAddress = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        const userId = parseInt(localStorage.getItem("userId"));
+        const response = await axios.get(`http://localhost:8000/address/user/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        setAddress(response.data.addresses[0]);
+        setAddressLoading(false);
+      } catch (error) {
+        console.error("Error fetching address:", error);
+        setAddressLoading(false);
+      }
+    };
+
+    fetchAddress();
+  }, []);
 
   if (!product) {
     return (
@@ -42,22 +56,12 @@ const BuyNowPage = () => {
     );
   }
 
-  // Handle form changes
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [name]: value,
-  //   }));
-  // };
-
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       setSuccess(true);
       setLoading(false);
     } catch (error) {
@@ -66,7 +70,6 @@ const BuyNowPage = () => {
     }
   };
 
-  // Loading spinner when submitting
   if (loading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
@@ -75,7 +78,6 @@ const BuyNowPage = () => {
     );
   }
 
-  // Success message after order is placed
   if (success) {
     return (
       <Box sx={{ textAlign: "center", mt: 5 }}>
@@ -93,140 +95,87 @@ const BuyNowPage = () => {
   }
 
   return (
-          <Box sx={{ px: { xs: 2, md: 10 }, py: 5 }}>
-        <Typography variant="h4" gutterBottom>
-          Confirm Your Order
-        </Typography>
-        
-        {/* Grid2 Container for Image and Content */}
-        <Grid2 container spacing={2} alignItems="center" sx={{ mb: 4}}>
-          {/* Product Image on the left side */}
-          <Grid2 item xs={12} md={4}>
-            <img
-              src={product.images[0]} // Fallback image if product.image is not available
-              alt={product.name} // product.name if you prefer the product name
-              style={{
-                width: "100%",
-                maxWidth: 300,
-                height: "auto",            
-                marginBottom: 22,
-                
-              }}
-            />
-          </Grid2>
-
-          {/* Product Details on the right side */}
-          <Grid2 item xs={12} md={8}>
-            <Box
-               sx={{
-                marginBottom:20,
-                marginLeft:10,
-                gap:2,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start", // Align to the left horizontally
-                height: "100%", // Take full height of the parent container
-              }}
-            >
-              <Grid2 size={12}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Typography fontWeight="500">Product: </Typography>
-                  <Typography color="#000"><strong>{product.name}</strong></Typography>
-                </Box>
-              </Grid2>
-              <Grid2 size={12}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Typography fontWeight="500">Per Unit Price: </Typography>
-                   <Typography color="#000"><strong>Rs.{product.price}</strong></Typography>
-                </Box>
-              </Grid2>
-
-              <Grid2 size={12}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Typography fontWeight="500">Quantity: </Typography>
-                   <Typography color="#000"><strong>{quantity}</strong></Typography>
-                </Box>
-              </Grid2>
-              {/* <Typography variant="body1" fontWeight="500">
-                Total Price: <strong>Rs. {product.price * quantity}</strong>
-              </Typography> */}
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <Typography fontWeight="500">Price:</Typography>
-                  <Typography fontWeight="500" color="blue" sx={{ ml: 2 }}>
-                    Rs.{product.price * quantity}
-                  </Typography>
-                </Box>
-            </Box>
-          </Grid2>
-        </Grid2>
-        
-        {/* Address Details */}
-        
-        {/* <Box sx={{ padding: 4 }}> */}
-
-      {/* <Typography variant="h5" fontWeight="bold" mb={3}>
-        Address Details
+    <Box sx={{ px: { xs: 2, md: 10 }, py: 5 }}>
+      <Typography variant="h4" gutterBottom>
+        Confirm Your Order
       </Typography>
-      <Typography variant="body1"><strong>State:</strong> {address.state}</Typography>
-      <Typography variant="body1"><strong>City:</strong> {address.city}</Typography>
-      <Typography variant="body1"><strong>Full Address:</strong> {address.full_address}</Typography>
-      <Typography variant="body1"><strong>Zip Code:</strong> {address.zip_code}</Typography>
-      <Typography variant="body1"><strong>Phone:</strong> {address.phone}</Typography>
-    </Box> */}
+      
+      <Grid2 container spacing={2} alignItems="center" sx={{ mb: 4}}>
+        <Grid2 item xs={12} md={4}>
+          <img
+            src={product.images[0]}
+            alt={product.name}
+            style={{
+              width: "100%",
+              maxWidth: 300,
+              height: "auto",            
+              marginBottom: 22,
+            }}
+          />
+        </Grid2>
 
+        <Grid2 item xs={12} md={8}>
+          <Box
+             sx={{
+              marginBottom:20,
+              marginLeft:10,
+              gap:2,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              height: "100%",
+            }}
+          >
+            <Grid2 size={12}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Typography fontWeight="500">Product: </Typography>
+                <Typography color="#000"><strong>{product.name}</strong></Typography>
+              </Box>
+            </Grid2>
+            <Grid2 size={12}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Typography fontWeight="500">Per Unit Price: </Typography>
+                 <Typography color="#000"><strong>Rs.{product.price}</strong></Typography>
+              </Box>
+            </Grid2>
 
-
-        
+            <Grid2 size={12}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Typography fontWeight="500">Quantity: </Typography>
+                 <Typography color="#000"><strong>{quantity}</strong></Typography>
+              </Box>
+            </Grid2>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography fontWeight="500">Price:</Typography>
+                <Typography fontWeight="500" color="blue" sx={{ ml: 2 }}>
+                  Rs.{product.price * quantity}
+                </Typography>
+              </Box>
+          </Box>
+        </Grid2>
+      </Grid2>
+      
+      {/* Address Details */}
+      <Box sx={{ padding: 4 }}> 
+        <Typography variant="h5" fontWeight="bold" mb={3}>
+          Address Details
+        </Typography>
+        {addressLoading ? (
+          <CircularProgress />
+        ) : address ? (
+          <>
+            <Typography variant="body1"><strong>State:</strong> {address.state}</Typography>
+            <Typography variant="body1"><strong>City:</strong> {address.city}</Typography>
+            <Typography variant="body1"><strong>Full Address:</strong> {address.full_address}</Typography>
+            <Typography variant="body1"><strong>Zip Code:</strong> {address.zip_code}</Typography>
+            <Typography variant="body1"><strong>Phone:</strong> {address.phone_no}</Typography>
+          </>
+        ) : (
+          <Typography variant="body1">No address found. Please add an address.</Typography>
+        )}
+      </Box>
 
       <Box component="form" onSubmit={handleSubmit}>
-        {/* <Typography variant="h6" gutterBottom>
-          Delivery Details
-        </Typography>
-        <Grid2 container spacing={2}>
-          <Grid2 item xs={12} md={6}>
-            <TextField
-              fullWidth
-              label="Name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </Grid2>
-          <Grid2 item xs={12} md={5}>
-            <TextField
-              fullWidth
-              label="Phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-            />
-          </Grid2>
-          <Grid2 item xs={12}>
-            <TextField
-              fullWidth
-              label="Address"
-              name="address"
-              multiline  // Makes the input a textarea
-              rows={3}
-              value={formData.address}
-              onChange={handleChange}
-              required
-            />
-          </Grid2>
-          <Grid2 item xs={12}>
-            <TextField
-              fullWidth
-              label="Email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </Grid2>
-        </Grid2> */}
         <Button
           type="submit"
           fullWidth
@@ -245,8 +194,6 @@ const BuyNowPage = () => {
         </Button>
       </Box>
     </Box>
-
-    
   );
 };
 
