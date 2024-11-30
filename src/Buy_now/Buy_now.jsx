@@ -8,6 +8,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { useNavigate } from "react-router-dom";
 import { Grid2 } from "@mui/material";
 //import tryImage from "../components/Logos/try.jpg";
+import AddressInputPage from "../Address/address";
 
 const BuyNowPage = () => {
   const location = useLocation();
@@ -158,6 +159,20 @@ const BuyNowPage = () => {
             </Box>
           </Grid2>
         </Grid2>
+        
+        {/* Address Details */}
+        
+        {/* <Box sx={{ padding: 4 }}> */}
+
+      {/* <Typography variant="h5" fontWeight="bold" mb={3}>
+        Address Details
+      </Typography>
+      <Typography variant="body1"><strong>State:</strong> {address.state}</Typography>
+      <Typography variant="body1"><strong>City:</strong> {address.city}</Typography>
+      <Typography variant="body1"><strong>Full Address:</strong> {address.full_address}</Typography>
+      <Typography variant="body1"><strong>Zip Code:</strong> {address.zip_code}</Typography>
+      <Typography variant="body1"><strong>Phone:</strong> {address.phone}</Typography>
+    </Box> */}
 
 
 
@@ -230,6 +245,8 @@ const BuyNowPage = () => {
         </Button>
       </Box>
     </Box>
+
+    
   );
 };
 

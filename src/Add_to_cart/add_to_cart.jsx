@@ -118,97 +118,105 @@ const AddToCartPage = () => {
         Add to Cart
       </Typography>
 
-      {/* Display cart items */}
-      {cartItems.map((item) => (
-        <Box
-          key={item.id}
-          sx={{
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            p: 2,
-            mb: 2,
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          {/* Checkbox */}
-          <Checkbox
-            checked={selectedItems.some((selected) => selected.id === item.id)}
-            onChange={() => handleCheckboxChange(item)}
-          />
+      {cartItems.length === 0 ? (
+        <Typography variant="h6" sx={{ textAlign: 'center', my: 4 }}>
+          Add products
+        </Typography>
+      ) : (
+        <>
+          {/* Display cart items */}
+          {cartItems.map((item) => (
+            <Box
+              key={item.id}
+              sx={{
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                p: 2,
+                mb: 2,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              {/* Checkbox */}
+              <Checkbox
+                checked={selectedItems.some((selected) => selected.id === item.id)}
+                onChange={() => handleCheckboxChange(item)}
+              />
 
-          {/* Product image */}
-          <img
-            src={item.image}
-            alt={item.name}
-            style={{
-              width: "100px",
-              height: "100px",
-              objectFit: "cover",
-              borderRadius: "8px",
-              marginRight: "16px",
-              marginLeft: "10px",
-            }}
-          />
+              {/* Product image */}
+              <img
+                src={item.image}
+                alt={item.name}
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                  marginRight: "16px",
+                  marginLeft: "10px",
+                }}
+              />
 
-          {/* Product details */}
-          <Box sx={{ flexGrow: 1, marginLeft: 3 }}>
-            <Typography variant="subtitle1" fontWeight="500">
-              {item.name}
-            </Typography>
-            <Typography color="gray">Price: Rs. {item.price}</Typography>
+              {/* Product details */}
+              <Box sx={{ flexGrow: 1, marginLeft: 3 }}>
+                <Typography variant="subtitle1" fontWeight="500">
+                  {item.name}
+                </Typography>
+                <Typography color="gray">Price: Rs. {item.price}</Typography>
 
-            {/* Quantity controls */}
-            <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-              <IconButton
-                onClick={() => handleQuantityChange(item, -1)}
-                size="small"
-              >
-                <RemoveIcon />
-              </IconButton>
-              <Typography sx={{ mx: 2 }}>{item.quantity || 1}</Typography>
-              <IconButton
-                onClick={() => handleQuantityChange(item, 1)}
-                size="small"
-              >
-                <AddIcon />
+                {/* Quantity controls */}
+                <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+                  <IconButton
+                    onClick={() => handleQuantityChange(item, -1)}
+                    size="small"
+                  >
+                    <RemoveIcon />
+                  </IconButton>
+                  <Typography sx={{ mx: 2 }}>{item.quantity || 1}</Typography>
+                  <IconButton
+                    onClick={() => handleQuantityChange(item, 1)}
+                    size="small"
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </Box>
+              </Box>
+
+              {/* Delete button */}
+              <IconButton onClick={() => handleDeleteItem(item.id)} color="error">
+                <DeleteIcon />
               </IconButton>
             </Box>
+          ))}
+
+          {/* Subtotal and checkout */}
+          <Box
+            sx={{
+              borderTop: "1px solid #ddd",
+              mt: 3,
+              pt: 2,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h6">
+              Subtotal: Rs. {calculateSubtotal()}
+            </Typography>
+            <Button
+              variant="contained"
+              sx={{
+                textTransform: "none",
+                bgcolor: "#26A69A",
+                "&:hover": { bgcolor: "#219688" },
+              }}
+              onClick={handleCheckout}
+            >
+              Checkout
+            </Button>
           </Box>
-
-          {/* Delete button */}
-          <IconButton onClick={() => handleDeleteItem(item.id)} color="error">
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-      ))}
-
-      {/* Subtotal and checkout */}
-      <Box
-        sx={{
-          borderTop: "1px solid #ddd",
-          mt: 3,
-          pt: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="h6">
-          Subtotal: Rs. {calculateSubtotal()}
-        </Typography>
-        <Button
-          variant="contained"
-          sx={{
-            textTransform: "none",
-            bgcolor: "#26A69A",
-            "&:hover": { bgcolor: "#219688" },
-          }}
-          onClick={handleCheckout}
-        >
-          Checkout
-        </Button>
-      </Box>
+        </>
+      )}
     </Box>
   );
 };

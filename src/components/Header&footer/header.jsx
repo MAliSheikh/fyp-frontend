@@ -28,6 +28,7 @@ import {
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
+
 // Custom styled components
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: "#009688",
@@ -47,7 +48,7 @@ const SearchWrapper = styled("div")(({ theme }) => ({
 const SearchIconWrapper = styled("div")({
   position: "absolute",
   right: "20px",
-  top: "58%",
+  top: "52%",
   transform: "translateY(-50%)",
   color: "#119994",
   padding: "2px",
@@ -177,7 +178,7 @@ const Header = () => {
                   
                 </>
               )}
-              <IconButton color="inherit" onClick={() => navigate("/add-to-cart")}>
+              <IconButton color="inherit" onClick={() => navigate("/add_to_cart")}>
                 <Badge badgeContent={0} color="error">
                   <CartIcon />
                 </Badge>

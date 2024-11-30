@@ -49,7 +49,7 @@ function ProductDetailsPage() {
   };
 
   const handleaddtoCart = () => {
-    navigate(`/add-to-cart`, { state: { product, quantity } });
+    navigate(`/add_to_cart`, { state: { product, quantity } });
   };
 
   const handleIncrement = () => {

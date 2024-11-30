@@ -5,7 +5,6 @@ import Products from "./products/products_page";
 import SignUp from "./components/LoginSignup/signup";
 import Login from "./components/LoginSignup/login";
 import Layout from "./layout";
-import Layout2 from "./layout2";
 import Seller from "./seller/store_create";
 import MallInfo from "./seller/mall_info";
 import StoreInfo from "./seller/store_info";
@@ -23,6 +22,7 @@ import ManageProducts from "./manage_product/manage-products";
 import OrdersPage from "./seller/Order";
 import MallStores from "./mall_store_listing/mall_stores";
 import StoreProducts from "./mall_store_listing/store_products";
+import AddressInputPage from "./Address/address";
 
 function App() {
   return (
@@ -42,11 +42,9 @@ function App() {
           path="/products/:id"
           element={<Layout>{<ProductDetailsPage />}</Layout>}
         />
+        <Route path="/address" element={<Layout>{<AddressInputPage />}</Layout>} /> 
         <Route path="/buy-now" element={<Layout>{<BuyNowPage />}</Layout>} />
-        <Route
-          path="/add-to-cart"
-          element={<Layout>{<AddToCartPage />}</Layout>}
-        />
+        <Route path="/add_to_cart" element={<Layout>{<AddToCartPage />}</Layout>} />
         <Route path="/profile" element={<Layout>{<Profile />}</Layout>} />
         <Route
           path="/mall_lists"
@@ -127,6 +125,7 @@ function App() {
             </PrivateRoute>
           }
         /> */}
+        
         <Route path="/orders" element={<Layout>{<OrdersPage />}</Layout>} />
         <Route path="/manageproducts" element={<Layout>{<ManageProducts />}</Layout>} />
         <Route path="/login" element={<Login />} />
