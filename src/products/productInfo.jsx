@@ -12,10 +12,13 @@ import { fetchProductByIdDetails } from "./product";
 import CircularProgress from "@mui/material/CircularProgress";
 import Modal from "@mui/material/Modal";
 import CloseIcon from "@mui/icons-material/Close";
+import axios from "axios";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 function ProductDetailsPage() {
   const { id } = useParams();
-  const navigate = useNavigate(); // Correct placement of useNavigate
+  const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,6 +27,7 @@ function ProductDetailsPage() {
   const [open, setOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedSize, setSelectedSize] = useState("Small");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
@@ -47,9 +51,29 @@ function ProductDetailsPage() {
   const handleBuyNow = () => {
     navigate(`/buy-now`, { state: { product, quantity } });
   };
+  // console.log(product)
+  const handleaddtoCart = async () => {
+    const user_id = parseInt(localStorage.getItem('userId'))
+    try {
+      const cartData = {
+        user_id: user_id,
+        product_id: product.product_id,
+        name: product.name,
+        image: product.images[0],
+        quantity: quantity,
+        price: product.price * quantity
+      };
 
-  const handleaddtoCart = () => {
-    navigate(`/add_to_cart`, { state: { product, quantity } });
+      await axios.post('http://localhost:8000/cart/cart-items', cartData, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        }
+      });
+      setSnackbarOpen(true);
+      // navigate(`/add_to_cart`, { state: { product, quantity } });
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+    }
   };
 
   const handleIncrement = () => {
@@ -72,6 +96,13 @@ function ProductDetailsPage() {
     setSelectedImage(null);
   };
 
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
   if (loading) {
     return <CircularProgress />;
   }
@@ -79,17 +110,6 @@ function ProductDetailsPage() {
   if (error) {
     return <div>Error: {error.message}</div>;
   }
-
-  // const product = {
-  //   name: "Glasses For Women",
-  //   shortDescription:
-  //     "Polygon Metal Sunglasses Vintage Frame For Women Sunglasses Men Luxury Brand Design Sun Glasses Women Mirror Gafas De Sol Uv400",
-  //   rating: 4,
-  //   brand: "Prada",
-  //   price: 5000,
-  //   description:
-  //     "Elevate your style with our chic women's glasses, designed to blend fashion with functionality. Crafted with lightweight materials and available in a variety of trendy frames and colors, these glasses offer a perfect fit for every face shape. Whether you're looking for a bold statement piece or a subtle accent, our collection ensures you see clearly while looking effortlessly stylish.",
-  // };
 
   return (
     <>
@@ -100,14 +120,11 @@ function ProductDetailsPage() {
             {/* Main Image */}
             <img
               src={product.images[0]}
-              // src={`data:image/jpeg;base64,${product.images[0]}`}
               alt={product.name}
               style={{
                 width: "100%",
                 height: "350px",
-                // height: "auto",
                 display: "block",
-                // maxHeight: "600px",
                 objectFit: "contain",
               }}
             />
@@ -136,7 +153,6 @@ function ProductDetailsPage() {
             </Typography>
 
             <Rating
-              // value={product.rating}
               value={4}
               readOnly
               sx={{ mb: 1, fontSize: "1.2rem" }}
@@ -291,7 +307,6 @@ function ProductDetailsPage() {
           <Grid container spacing={1}>
             {product.images.slice(1).map((image, index) => (
               <Grid xs={6} sm={4} md={3} key={index}>
-                {/* <Modal open={open} onClose={handleClose}> */}
                 <Box
                   sx={{
                     position: "relative",
@@ -303,7 +318,6 @@ function ProductDetailsPage() {
                   <img
                     src={image}
                     alt={`View ${index + 1}`}
-                    // width="100%"
                     style={{
                       width: "100%",
                       height: "100px",
@@ -311,7 +325,6 @@ function ProductDetailsPage() {
                     }}
                   />
                 </Box>
-                {/* </Modal> */}
               </Grid>
             ))}
           </Grid>
@@ -366,6 +379,12 @@ function ProductDetailsPage() {
           </Box>
         </Grid>
       </Grid>
+
+      <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+          Item successfully added to cart!
+        </Alert>
+      </Snackbar>
     </>
   );
 }

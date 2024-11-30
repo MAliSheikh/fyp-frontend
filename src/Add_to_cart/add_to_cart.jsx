@@ -7,101 +7,154 @@ import IconButton from "@mui/material/IconButton";
 import Checkbox from "@mui/material/Checkbox";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import DeleteIcon from "@mui/icons-material/Delete"; // Import Delete Icon
+import DeleteIcon from "@mui/icons-material/Delete";
 import CircularProgress from "@mui/material/CircularProgress";
-// import tryImage from "../components/Logos/try.jpg";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import axios from "axios";
 
 const AddToCartPage = () => {
-  const [cartItems, setCartItems] = useState([]); // Cart items fetched from the API
-  const [selectedItems, setSelectedItems] = useState([]); // Tracks selected items for checkout
+  const [cartItems, setCartItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success"
+  });
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
 
-  const { product } = location.state || {}; // Fallback to avoid errors
+  const user_id = localStorage.getItem("userId");
 
-  // Only run the effect when product is available
   useEffect(() => {
-    if (!product) return; // Do nothing if product is not available
-
     const fetchCartItems = async () => {
       try {
-        const response = await new Promise((resolve) =>
-          setTimeout(
-            () =>
-              resolve([
-                {
-                  id: product.id,
-                  name: product.name,
-                  price: product.price,
-                  image: product.images[0], //product.image,
-                },
-              ]),
-            1000
-          )
+        const response = await axios.get(
+          `http://localhost:8000/cart/cart-items/${user_id}`
         );
-        setCartItems(response);
+        console.log("API Response:", response.data);
+        setCartItems(response.data);
         setLoading(false);
       } catch (error) {
-        console.error("Failed to fetch cart items:", error);
+        console.error("Error fetching cart items:", error);
         setLoading(false);
       }
     };
 
     fetchCartItems();
-  }, [product]); // Trigger effect when the product object changes
+  }, [user_id]);
 
-  // Handle checkbox selection
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   const handleCheckboxChange = (item) => {
-    setSelectedItems((prev) =>
-      prev.includes(item)
-        ? prev.filter((selected) => selected.id !== item.id)
-        : [...prev, item]
-    );
+    setSelectedItems((prev) => {
+      const isSelected = prev.some(
+        (selected) => selected.item_id === item.item_id
+      );
+      if (isSelected) {
+        return prev.filter((selected) => selected.item_id !== item.item_id);
+      } else {
+        return [...prev, item];
+      }
+    });
   };
 
-  //Handle quantity change
-  const handleQuantityChange = (item, delta) => {
-    setCartItems((prev) =>
-      prev.map((cartItem) =>
-        cartItem.id === item.id
-          ? {
-              ...cartItem,
-              quantity: Math.max(1, (cartItem.quantity || 1) + delta),
-            }
-          : cartItem
-      )
-    );
+  const handleQuantityChange = async (item, delta) => {
+    const newQuantity = Math.max(1, (item.quantity || 1) + delta);
+    const newPrice = item.price * newQuantity;
+
+    try {
+      const updateData = {
+        product_id: item.product_id,
+        name: item.name,
+        image: item.image,
+        quantity: newQuantity,
+        price: parseFloat(newPrice),
+        user_id: parseInt(user_id),
+      };
+
+      await axios.put(
+        `http://localhost:8000/cart/cart-items/${item.cart_id}/${item.item_id}?user_id=${user_id}`,
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+
+      setCartItems((prev) =>
+        prev.map((cartItem) =>
+          cartItem.id === item.id
+            ? { ...cartItem, quantity: newQuantity, price: newPrice }
+            : cartItem
+        )
+      );
+
+      // Update selected items if the changed item is selected
+      setSelectedItems((prev) =>
+        prev.map((selectedItem) =>
+          selectedItem.id === item.id
+            ? { ...selectedItem, quantity: newQuantity, price: newPrice }
+            : selectedItem
+        )
+      );
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    }
   };
 
-  // Handle delete item
-  const handleDeleteItem = (itemId) => {
-    setCartItems((prev) => prev.filter((cartItem) => cartItem.id !== itemId));
-    setSelectedItems((prev) =>
-      prev.filter((selected) => selected.id !== itemId)
-    );
+  const handleDeleteItem = async (item) => {
+    try {
+      await axios.delete(
+        `http://localhost:8000/cart/cart-items/${item.cart_id}/${item.item_id}?user_id=${user_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+
+      setCartItems((prev) => prev.filter((cartItem) => cartItem.item_id !== item.item_id));
+      setSelectedItems((prev) =>
+        prev.filter((selected) => selected.item_id !== item.item_id)
+      );
+      setSnackbar({
+        open: true,
+        message: "Item deleted successfully",
+        severity: "success"
+      });
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      setSnackbar({
+        open: true,
+        message: "Error deleting item",
+        severity: "error"
+      });
+    }
   };
 
-  //Calculate subtotal
-  const calculateSubtotal = () =>
-    selectedItems.reduce(
-      (total, item) => total + item.price * (item.quantity || 1),
-      0
-    );
+  const calculateSubtotal = () => {
+    return cartItems.reduce((total, item) => total + item.price, 0);
+  };
 
-  // const calculateMinusSubtotal = () =>
-  //   selectedItems.reduce(
-  //     (total, item) => total + item.price * (item.quantity || 1),
-  //     0
-  //   );
+  const calculateSelectedSubtotal = () => {
+    return selectedItems.reduce((total, item) => total + item.price, 0);
+  };
 
-  // Navigate to checkout with selected items
   const handleCheckout = () => {
     if (selectedItems.length === 0) {
       alert("Please select at least one item to proceed.");
       return;
     }
     navigate("/buy-now", { state: { selectedItems } });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   if (loading) {
@@ -119,7 +172,7 @@ const AddToCartPage = () => {
       </Typography>
 
       {cartItems.length === 0 ? (
-        <Typography variant="h6" sx={{ textAlign: 'center', my: 4 }}>
+        <Typography variant="h6" sx={{ textAlign: "center", my: 4 }}>
           Add products
         </Typography>
       ) : (
@@ -127,7 +180,7 @@ const AddToCartPage = () => {
           {/* Display cart items */}
           {cartItems.map((item) => (
             <Box
-              key={item.id}
+              key={item.item_id}
               sx={{
                 border: "1px solid #ddd",
                 borderRadius: "8px",
@@ -139,7 +192,9 @@ const AddToCartPage = () => {
             >
               {/* Checkbox */}
               <Checkbox
-                checked={selectedItems.some((selected) => selected.id === item.id)}
+                checked={selectedItems.some(
+                  (selected) => selected.item_id === item.item_id
+                )}
                 onChange={() => handleCheckboxChange(item)}
               />
 
@@ -183,7 +238,10 @@ const AddToCartPage = () => {
               </Box>
 
               {/* Delete button */}
-              <IconButton onClick={() => handleDeleteItem(item.id)} color="error">
+              <IconButton
+                onClick={() => handleDeleteItem(item)}
+                color="error"
+              >
                 <DeleteIcon />
               </IconButton>
             </Box>
@@ -200,9 +258,11 @@ const AddToCartPage = () => {
               alignItems: "center",
             }}
           >
-            <Typography variant="h6">
-              Subtotal: Rs. {calculateSubtotal()}
-            </Typography>
+            <Box>
+              <Typography variant="h6">
+                Total: Rs. {calculateSelectedSubtotal()}
+              </Typography>
+            </Box>
             <Button
               variant="contained"
               sx={{
@@ -217,6 +277,20 @@ const AddToCartPage = () => {
           </Box>
         </>
       )}
+
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={3000} 
+        onClose={handleCloseSnackbar}
+      >
+        <Alert 
+          onClose={handleCloseSnackbar} 
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
