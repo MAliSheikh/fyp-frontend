@@ -8,6 +8,7 @@ import Layout from "./layout";
 import Seller from "./seller/store_create";
 import MallInfo from "./seller/mall_info";
 import StoreInfo from "./seller/store_info";
+import Dashboard from "./seller/dashboard"
 // import StoreCreatePage from "./seller/store_create";
 import ProductDetailsPage from "./products/productInfo";
 import PrivateRoute from "./components/privateRoute";
@@ -59,6 +60,16 @@ function App() {
             <PrivateRoute roles={["seller"]}>
               <Layout>
                 <StoreInfo />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute roles={["seller"]}>
+              <Layout>
+                <Dashboard />
               </Layout>
             </PrivateRoute>
           }

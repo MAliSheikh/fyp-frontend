@@ -88,7 +88,7 @@ const OrdersPage = () => {
   };
 
   return (
-    <Box display="flex" sx={{ height: "100vh" }}>
+    <Box display="flex" sx={{ height: "100vh",p:2 }}>
       {/* Sidebar */}
       <Box
         sx={{

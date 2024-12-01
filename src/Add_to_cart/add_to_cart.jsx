@@ -64,9 +64,7 @@ const AddToCartPage = () => {
 
   const handleQuantityChange = async (item, delta) => {
     const newQuantity = Math.max(1, (item.quantity || 1) + delta);
-    // Store the unit price (price per item) in a new variable
     const unitPrice = item.price / (item.quantity || 1);
-    // Calculate new total price based on unit price
     const newPrice = unitPrice * newQuantity;
 
     try {
