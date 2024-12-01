@@ -165,7 +165,13 @@ const AddToCartPage = () => {
       alert("Please select at least one item to proceed.");
       return;
     }
-    navigate("/buy-now", { state: { selectedItems } });
+    const totalAmount = calculateSelectedSubtotal();
+    navigate("/order-now", { 
+      state: { 
+        orderItems: selectedItems,
+        totalAmount: totalAmount
+      } 
+    });
   };
 
   const handleCloseSnackbar = () => {

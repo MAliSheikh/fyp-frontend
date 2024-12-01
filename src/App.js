@@ -25,6 +25,7 @@ import MallStores from "./mall_store_listing/mall_stores";
 import StoreProducts from "./mall_store_listing/store_products";
 import AddressInputPage from "./Address/address";
 import PaymentInputPage from "./Payment/payment";
+import OrderNow from "./order/OrderNow";
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
           path="/products/:id"
           element={<Layout>{<ProductDetailsPage />}</Layout>}
         />
+        <Route path="/order-now" element={<Layout>{<OrderNow />}</Layout>} />
         <Route path="/address" element={<Layout>{<AddressInputPage />}</Layout>} /> 
         <Route path="/payment" element={<Layout>{<PaymentInputPage />}</Layout>} />
         <Route path="/buy-now" element={<Layout>{<BuyNowPage />}</Layout>} />
