@@ -16,6 +16,9 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import LogoutIcon from "@mui/icons-material/Logout";
 import axiosInstance from "../components/axiosInstance";
+import AddressInputPage from "../Address/address";
+import Add_to_cart from "../Add_to_cart/add_to_cart";
+
 
 
 const CustomerProfile = () => {
@@ -54,6 +57,9 @@ const CustomerProfile = () => {
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
+    if (newValue === 3) { // Index 3 corresponds to the Address tab
+      navigate();
+    }
   };
 
   const handleSignOut = () => {
@@ -145,6 +151,18 @@ const CustomerProfile = () => {
           borderWidth: 1,
         }}
       />
+
+      {/* Render the selected tab content */}
+      {activeTab === 1 && (
+        <Box sx={{ mt: 2, width: '100%' }}>
+          <Add_to_cart />
+        </Box>
+      )}
+      {activeTab === 3 && (
+        <Box sx={{ mt: 2, width: '100%' }}>
+          <AddressInputPage />
+        </Box>
+      )}
 
       {/* Signout Button */}
       <Button

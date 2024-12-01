@@ -12,6 +12,20 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import axios from "axios";
+const Loader = () => (
+  <Box
+    sx={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh'
+    }}
+  >
+    <CircularProgress sx={{ color: '#009688' }} />
+  </Box>
+);
+
+
 
 const AddToCartPage = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -46,7 +60,7 @@ const AddToCartPage = () => {
   }, [user_id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
 
   const handleCheckboxChange = (item) => {

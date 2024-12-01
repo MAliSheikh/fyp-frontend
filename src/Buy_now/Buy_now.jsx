@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useNavigate } from "react-router-dom";
 import { Grid2 } from "@mui/material";
+import { Card, CardContent } from '@mui/material';
 import axios from "axios";
 
 const BuyNowPage = () => {
@@ -17,6 +18,8 @@ const BuyNowPage = () => {
   const [success, setSuccess] = useState(false);
   const [address, setAddress] = useState(null);
   const [addressLoading, setAddressLoading] = useState(true);
+  const [payment, setPayment] = useState(null);
+  const [paymentLoading, setPaymentLoading] = useState(true);
 
   useEffect(() => {
     if (!product) {
@@ -43,7 +46,26 @@ const BuyNowPage = () => {
       }
     };
 
+    const fetchPayment = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        const userId = parseInt(localStorage.getItem("userId"));
+        const response = await axios.get(`http://localhost:8000/payment/user/${userId}/payment`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        setPayment(response.data.payment_info);
+        setPaymentLoading(false);
+      } catch (error) {
+        console.error("Error fetching payment:", error);
+        setPaymentLoading(false);
+      }
+    };
+
     fetchAddress();
+    fetchPayment();
   }, []);
 
   if (!product) {
@@ -99,8 +121,8 @@ const BuyNowPage = () => {
       <Typography variant="h4" gutterBottom>
         Confirm Your Order
       </Typography>
-      
-      <Grid2 container spacing={2} alignItems="center" sx={{ mb: 4}}>
+
+      <Grid2 container spacing={2} alignItems="center" sx={{ mb: 4 }}>
         <Grid2 item xs={12} md={4}>
           <img
             src={product.images[0]}
@@ -108,7 +130,7 @@ const BuyNowPage = () => {
             style={{
               width: "100%",
               maxWidth: 300,
-              height: "auto",            
+              height: "auto",
               marginBottom: 22,
             }}
           />
@@ -116,10 +138,10 @@ const BuyNowPage = () => {
 
         <Grid2 item xs={12} md={8}>
           <Box
-             sx={{
-              marginBottom:20,
-              marginLeft:10,
-              gap:2,
+            sx={{
+              marginBottom: 20,
+              marginLeft: 10,
+              gap: 2,
               display: "flex",
               flexDirection: "column",
               alignItems: "flex-start",
@@ -128,50 +150,126 @@ const BuyNowPage = () => {
           >
             <Grid2 size={12}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Typography fontWeight="500">Product: </Typography>
-                <Typography color="#000"><strong>{product.name}</strong></Typography>
+                <Typography fontSize={18} fontWeight="500"><strong>Product: </strong></Typography>
+                <Typography fontSize={18} color="#000">{product.name}</Typography>
               </Box>
             </Grid2>
             <Grid2 size={12}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Typography fontWeight="500">Per Unit Price: </Typography>
-                 <Typography color="#000"><strong>Rs.{product.price}</strong></Typography>
+                <Typography fontSize={18} fontWeight="500"><strong>Per Unit Price: </strong></Typography>
+                <Typography fontSize={18}color="#000">Rs.{product.price}</Typography>
               </Box>
             </Grid2>
 
             <Grid2 size={12}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Typography fontWeight="500">Quantity: </Typography>
-                 <Typography color="#000"><strong>{quantity}</strong></Typography>
+                <Typography fontSize={18}fontWeight="500"><strong>Quantity: </strong></Typography>
+                <Typography fontSize={18} color="#000">{quantity}</Typography>
               </Box>
             </Grid2>
             <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Typography fontWeight="500">Price:</Typography>
-                <Typography fontWeight="500" color="blue" sx={{ ml: 2 }}>
-                  Rs.{product.price * quantity}
-                </Typography>
-              </Box>
+              <Typography fontSize={18} fontWeight="500"><strong>Price:</strong></Typography>
+              <Typography fontSize={18} fontWeight="500" color="blue" sx={{ ml: 2 }}>
+                Rs.{product.price * quantity}
+              </Typography>
+            </Box>
           </Box>
         </Grid2>
       </Grid2>
-      
+
       {/* Address Details */}
-      <Box sx={{ padding: 4 }}> 
-        <Typography variant="h5" fontWeight="bold" mb={3}>
-          Address Details
-        </Typography>
+      <Box sx={{
+        padding: 4,
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        width: '40%',
+        marginTop: '200px',
+        marginRight: '20px'
+      }}>
+
         {addressLoading ? (
-          <CircularProgress />
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <CircularProgress />
+          </Box>
         ) : address ? (
-          <>
-            <Typography variant="body1"><strong>State:</strong> {address.state}</Typography>
-            <Typography variant="body1"><strong>City:</strong> {address.city}</Typography>
-            <Typography variant="body1"><strong>Full Address:</strong> {address.full_address}</Typography>
-            <Typography variant="body1"><strong>Zip Code:</strong> {address.zip_code}</Typography>
-            <Typography variant="body1"><strong>Phone:</strong> {address.phone_no}</Typography>
-          </>
+          <Card elevation={3} sx={{ maxWidth: 500, margin: '0 auto', padding: 2, mb: 4 }}>
+            <CardContent>
+              <Typography variant="h5" mb={3} textAlign="center">
+                Address Details
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                <strong>State:</strong> {address.state}
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                <strong>City:</strong> {address.city}
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                <strong>Full Address:</strong> {address.full_address}
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                <strong>Zip Code:</strong> {address.zip_code}
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                <strong>Phone:</strong> {address.phone_no}
+              </Typography>
+            </CardContent>
+          </Card>
         ) : (
-          <Typography variant="body1">No address found. Please add an address.</Typography>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="body1" color="error" gutterBottom>
+              No address found. Please add an address.
+            </Typography>
+            <Button
+              variant="contained"
+              onClick={() => navigate('/address')}
+              sx={{
+                mt: 2,
+                bgcolor: "#26A69A",
+                "&:hover": { bgcolor: "#219688" }
+              }}
+            >
+              Add Address
+            </Button>
+          </Box>
+        )}
+
+        {/* Payment Details */}
+        {paymentLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <CircularProgress />
+          </Box>
+        ) : payment ? (
+          <Card elevation={3} sx={{ maxWidth: 500, margin: '0 auto', padding: 2, mt: 4 }}>
+            <CardContent>
+              <Typography variant="h5" mb={3} textAlign="center">
+                Payment Details
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                <strong>Card Number:</strong> **** **** **** {payment.card_number.slice(-4)}
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                <strong>Expiry Date:</strong> {payment.expiry_date}
+              </Typography>
+            </CardContent>
+          </Card>
+        ) : (
+          <Box sx={{ textAlign: 'center', mt: 4 }}>
+            <Typography variant="body1" color="error" gutterBottom>
+              No payment method found. Please add a payment method.
+            </Typography>
+            <Button
+              variant="contained"
+              onClick={() => navigate('/payment')}
+              sx={{
+                mt: 2,
+                bgcolor: "#26A69A",
+                "&:hover": { bgcolor: "#219688" }
+              }}
+            >
+              Add Payment Method
+            </Button>
+          </Box>
         )}
       </Box>
 
@@ -180,6 +278,7 @@ const BuyNowPage = () => {
           type="submit"
           fullWidth
           variant="contained"
+          disabled={!address || !payment}
           sx={{
             height: 45,
             textTransform: "none",
@@ -187,7 +286,7 @@ const BuyNowPage = () => {
             "&:hover": {
               bgcolor: "#219688",
             },
-            mt: 3,
+            mt: 15, // Increased from 3 to 5 to lower the button
           }}
         >
           Place Order
