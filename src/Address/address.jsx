@@ -3,6 +3,7 @@ import { Box, TextField, Button, Typography, Select, MenuItem, FormControl, Inpu
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+
 const AddressInputPage = () => {
   const [address, setAddress] = useState({
     state: "",
@@ -71,7 +72,7 @@ const AddressInputPage = () => {
         padding: 4,
         boxShadow: 4,
         borderRadius: 2,
-        bgcolor: "#f9f9f9",
+        bgcolor: "white",
         display: "flex",
         flexDirection: "column",
         gap: 3, 
