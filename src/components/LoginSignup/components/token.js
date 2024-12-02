@@ -8,6 +8,7 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
+      localStorage.removeItem("access_token");
       logout();
       window.location.href = '/login';
     }

@@ -18,7 +18,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import axiosInstance from "../components/axiosInstance";
 import AddressInputPage from "../Address/address";
 import Add_to_cart from "../Add_to_cart/add_to_cart";
-
+import ReviewHistory from './review_history'
+import OrderHistory from './OrderHistory';
 
 
 const CustomerProfile = () => {
@@ -153,9 +154,19 @@ const CustomerProfile = () => {
       />
 
       {/* Render the selected tab content */}
+      {activeTab === 0 && (
+        <Box sx={{ mt: 2, width: '100%' }}>
+          <ReviewHistory />
+        </Box>
+      )}
       {activeTab === 1 && (
         <Box sx={{ mt: 2, width: '100%' }}>
           <Add_to_cart />
+        </Box>
+      )}
+      {activeTab === 2 && (
+        <Box sx={{ mt: 2, width: '100%' }}>
+          <OrderHistory />
         </Box>
       )}
       {activeTab === 3 && (

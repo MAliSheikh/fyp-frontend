@@ -6,7 +6,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid,
+  // CartesianGrid,
 } from "recharts";
 import { Paper, Typography, Box } from "@mui/material";
 import { SideBar } from "./sidebar";

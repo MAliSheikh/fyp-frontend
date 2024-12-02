@@ -15,6 +15,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import Reviews from '../reviews/Reviews';
 
 function ProductDetailsPage() {
   const { id } = useParams();
@@ -379,6 +380,13 @@ function ProductDetailsPage() {
           </Box>
         </Grid>
       </Grid>
+
+      {/* <Box sx={{ mt: 4, px: { xs: 2, md: 10 } }}>
+        <Typography variant="h5" gutterBottom>
+          Product Reviews
+        </Typography>
+        <Reviews storeId={product?.store_id} />
+      </Box> */}
 
       <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
         <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
