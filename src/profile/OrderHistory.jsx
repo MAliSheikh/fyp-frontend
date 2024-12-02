@@ -16,6 +16,11 @@ const OrderHistory = () => {
         const user_id = localStorage.getItem("userId");
         const response = await axiosInstance.get(`/orders/user/${user_id}`);
         setOrders(response.data);
+
+        // Fetch reviewed products
+        const reviewsResponse = await axiosInstance.get(`/reviews/user/${user_id}`);
+        const reviewedProductIds = new Set(reviewsResponse.data.map(review => review.product_id));
+        setReviewedProducts(reviewedProductIds);
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
@@ -44,32 +49,34 @@ const OrderHistory = () => {
       </Typography>
       <Stack spacing={2}>
         {orders.flatMap(order => 
-          Object.values(order.order_items).map(item => (
-            <Box
-              key={item.product_id}
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                p: 2,
-                borderRadius: 2,
-                boxShadow: 1,
-                bgcolor: "white",
-              }}
-            >
-              <Typography>{item.product_name}</Typography>
-              <Typography>Quantity: {item.quantity}</Typography>
-              <Typography>Price: Rs.{item.price}</Typography>
-              {order.status === "delivered" && !reviewedProducts.has(item.product_id) && (
-                <Button
-                  variant="contained"
-                  onClick={() => handleReview(item.product_id, order.store_id)}
-                >
-                  Review
-                </Button>
-              )}
-            </Box>
-          ))
+          Object.values(order.order_items)
+            .filter(item => !reviewedProducts.has(item.user_id))
+            .map(item => (
+              <Box
+                key={item.product_id}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  p: 2,
+                  borderRadius: 2,
+                  boxShadow: 1,
+                  bgcolor: "white",
+                }}
+              >
+                <Typography>{item.product_name}</Typography>
+                <Typography>Quantity: {item.quantity}</Typography>
+                <Typography>Price: Rs.{item.price}</Typography>
+                {order.status === "delivered" && (
+                  <Button
+                    variant="contained"
+                    onClick={() => handleReview(item.product_id, order.store_id)}
+                  >
+                    Review
+                  </Button>
+                )}
+              </Box>
+            ))
         )}
       </Stack>
 
