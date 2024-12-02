@@ -49,6 +49,14 @@ export const SideBar = () => {
     >
       <Button
         variant="contained"
+        onClick={() => navigate("/dashboard")}
+        sx={getButtonStyle("/dashboard")}
+      >
+        Dashboard
+      </Button>
+
+      <Button
+        variant="contained"
         onClick={() => navigate("/seller/upload-product")}
         sx={getButtonStyle("/seller/upload-product")}
       >
@@ -92,9 +100,9 @@ export const SideBar = () => {
               Mall
             </Button>
             <Button
+              onClick={() => navigate("/store_info")}
               variant="contained"
               sx={getButtonStyle("/store_info")}
-              onClick={() => navigate("/store_info")}
             >
               Independent Store
             </Button>

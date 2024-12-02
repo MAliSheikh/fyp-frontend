@@ -3,6 +3,18 @@ import { base_URL } from "../../../utils";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
+// Add an interceptor to handle 401 errors
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      logout();
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 const login = async (email, password) => {
   try {
     // console.log('email', email, 'password', password);

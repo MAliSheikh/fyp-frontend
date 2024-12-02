@@ -7,101 +7,175 @@ import IconButton from "@mui/material/IconButton";
 import Checkbox from "@mui/material/Checkbox";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import DeleteIcon from "@mui/icons-material/Delete"; // Import Delete Icon
+import DeleteIcon from "@mui/icons-material/Delete";
 import CircularProgress from "@mui/material/CircularProgress";
-// import tryImage from "../components/Logos/try.jpg";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import axios from "axios";
+const Loader = () => (
+  <Box
+    sx={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh'
+    }}
+  >
+    <CircularProgress sx={{ color: '#009688' }} />
+  </Box>
+);
+
+
 
 const AddToCartPage = () => {
-  const [cartItems, setCartItems] = useState([]); // Cart items fetched from the API
-  const [selectedItems, setSelectedItems] = useState([]); // Tracks selected items for checkout
+  const [cartItems, setCartItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success"
+  });
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
 
-  const { product } = location.state || {}; // Fallback to avoid errors
+  const user_id = localStorage.getItem("userId");
 
-  // Only run the effect when product is available
   useEffect(() => {
-    if (!product) return; // Do nothing if product is not available
-
     const fetchCartItems = async () => {
       try {
-        const response = await new Promise((resolve) =>
-          setTimeout(
-            () =>
-              resolve([
-                {
-                  id: product.id,
-                  name: product.name,
-                  price: product.price,
-                  image: product.images[0], //product.image,
-                },
-              ]),
-            1000
-          )
+        const response = await axios.get(
+          `http://localhost:8000/cart/cart-items/${user_id}`
         );
-        setCartItems(response);
+        console.log("API Response:", response.data);
+        setCartItems(response.data);
         setLoading(false);
       } catch (error) {
-        console.error("Failed to fetch cart items:", error);
+        console.error("Error fetching cart items:", error);
         setLoading(false);
       }
     };
 
     fetchCartItems();
-  }, [product]); // Trigger effect when the product object changes
+  }, [user_id]);
 
-  // Handle checkbox selection
+  if (loading) {
+    return <Loader />;
+  }
+
   const handleCheckboxChange = (item) => {
-    setSelectedItems((prev) =>
-      prev.includes(item)
-        ? prev.filter((selected) => selected.id !== item.id)
-        : [...prev, item]
-    );
+    setSelectedItems((prev) => {
+      const isSelected = prev.some(
+        (selected) => selected.item_id === item.item_id
+      );
+      if (isSelected) {
+        return prev.filter((selected) => selected.item_id !== item.item_id);
+      } else {
+        return [...prev, item];
+      }
+    });
   };
 
-  //Handle quantity change
-  const handleQuantityChange = (item, delta) => {
-    setCartItems((prev) =>
-      prev.map((cartItem) =>
-        cartItem.id === item.id
-          ? {
-              ...cartItem,
-              quantity: Math.max(1, (cartItem.quantity || 1) + delta),
-            }
-          : cartItem
-      )
-    );
+  const handleQuantityChange = async (item, delta) => {
+    const newQuantity = Math.max(1, (item.quantity || 1) + delta);
+    const unitPrice = item.price / (item.quantity || 1);
+    const newPrice = unitPrice * newQuantity;
+
+    try {
+      const updateData = {
+        product_id: item.product_id,
+        name: item.name,
+        image: item.image,
+        quantity: newQuantity,
+        price: parseFloat(newPrice),
+        user_id: parseInt(user_id),
+      };
+
+      await axios.put(
+        `http://localhost:8000/cart/cart-items/${item.cart_id}/${item.item_id}?user_id=${user_id}`,
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+
+      setCartItems((prev) =>
+        prev.map((cartItem) =>
+          cartItem.item_id === item.item_id
+            ? { ...cartItem, quantity: newQuantity, price: newPrice }
+            : cartItem
+        )
+      );
+
+      // Update selected items if the changed item is selected
+      setSelectedItems((prev) =>
+        prev.map((selectedItem) =>
+          selectedItem.id === item.id
+            ? { ...selectedItem, quantity: newQuantity, price: newPrice }
+            : selectedItem
+        )
+      );
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    }
   };
 
-  // Handle delete item
-  const handleDeleteItem = (itemId) => {
-    setCartItems((prev) => prev.filter((cartItem) => cartItem.id !== itemId));
-    setSelectedItems((prev) =>
-      prev.filter((selected) => selected.id !== itemId)
-    );
+  const handleDeleteItem = async (item) => {
+    try {
+      await axios.delete(
+        `http://localhost:8000/cart/cart-items/${item.cart_id}/${item.item_id}?user_id=${user_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+
+      setCartItems((prev) => prev.filter((cartItem) => cartItem.item_id !== item.item_id));
+      setSelectedItems((prev) =>
+        prev.filter((selected) => selected.item_id !== item.item_id)
+      );
+      setSnackbar({
+        open: true,
+        message: "Item deleted successfully",
+        severity: "success"
+      });
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      setSnackbar({
+        open: true,
+        message: "Error deleting item",
+        severity: "error"
+      });
+    }
   };
 
-  //Calculate subtotal
-  const calculateSubtotal = () =>
-    selectedItems.reduce(
-      (total, item) => total + item.price * (item.quantity || 1),
-      0
-    );
+  const calculateSubtotal = () => {
+    return cartItems.reduce((total, item) => total + item.price, 0);
+  };
 
-  // const calculateMinusSubtotal = () =>
-  //   selectedItems.reduce(
-  //     (total, item) => total + item.price * (item.quantity || 1),
-  //     0
-  //   );
+  const calculateSelectedSubtotal = () => {
+    return selectedItems.reduce((total, item) => total + item.price, 0);
+  };
 
-  // Navigate to checkout with selected items
   const handleCheckout = () => {
     if (selectedItems.length === 0) {
       alert("Please select at least one item to proceed.");
       return;
     }
-    navigate("/buy-now", { state: { selectedItems } });
+    const totalAmount = calculateSelectedSubtotal();
+    navigate("/order-now", { 
+      state: { 
+        orderItems: selectedItems,
+        totalAmount: totalAmount
+      } 
+    });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   if (loading) {
@@ -118,97 +192,126 @@ const AddToCartPage = () => {
         Add to Cart
       </Typography>
 
-      {/* Display cart items */}
-      {cartItems.map((item) => (
-        <Box
-          key={item.id}
-          sx={{
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            p: 2,
-            mb: 2,
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          {/* Checkbox */}
-          <Checkbox
-            checked={selectedItems.some((selected) => selected.id === item.id)}
-            onChange={() => handleCheckboxChange(item)}
-          />
+      {cartItems.length === 0 ? (
+        <Typography variant="h6" sx={{ textAlign: "center", my: 4 }}>
+          Add products
+        </Typography>
+      ) : (
+        <>
+          {/* Display cart items */}
+          {cartItems.map((item) => (
+            <Box
+              key={item.item_id}
+              sx={{
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                p: 2,
+                mb: 2,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              {/* Checkbox */}
+              <Checkbox
+                checked={selectedItems.some(
+                  (selected) => selected.item_id === item.item_id
+                )}
+                onChange={() => handleCheckboxChange(item)}
+              />
 
-          {/* Product image */}
-          <img
-            src={item.image}
-            alt={item.name}
-            style={{
-              width: "100px",
-              height: "100px",
-              objectFit: "cover",
-              borderRadius: "8px",
-              marginRight: "16px",
-              marginLeft: "10px",
-            }}
-          />
+              {/* Product image */}
+              <img
+                src={item.image}
+                alt={item.name}
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                  marginRight: "16px",
+                  marginLeft: "10px",
+                }}
+              />
 
-          {/* Product details */}
-          <Box sx={{ flexGrow: 1, marginLeft: 3 }}>
-            <Typography variant="subtitle1" fontWeight="500">
-              {item.name}
-            </Typography>
-            <Typography color="gray">Price: Rs. {item.price}</Typography>
+              {/* Product details */}
+              <Box sx={{ flexGrow: 1, marginLeft: 3 }}>
+                <Typography variant="subtitle1" fontWeight="500">
+                  {item.name}
+                </Typography>
+                <Typography color="gray">Price: Rs. {item.price}</Typography>
 
-            {/* Quantity controls */}
-            <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+                {/* Quantity controls */}
+                <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+                  <IconButton
+                    onClick={() => handleQuantityChange(item, -1)}
+                    size="small"
+                  >
+                    <RemoveIcon />
+                  </IconButton>
+                  <Typography sx={{ mx: 2 }}>{item.quantity || 1}</Typography>
+                  <IconButton
+                    onClick={() => handleQuantityChange(item, 1)}
+                    size="small"
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </Box>
+              </Box>
+
+              {/* Delete button */}
               <IconButton
-                onClick={() => handleQuantityChange(item, -1)}
-                size="small"
+                onClick={() => handleDeleteItem(item)}
+                color="error"
               >
-                <RemoveIcon />
-              </IconButton>
-              <Typography sx={{ mx: 2 }}>{item.quantity || 1}</Typography>
-              <IconButton
-                onClick={() => handleQuantityChange(item, 1)}
-                size="small"
-              >
-                <AddIcon />
+                <DeleteIcon />
               </IconButton>
             </Box>
+          ))}
+
+          {/* Subtotal and checkout */}
+          <Box
+            sx={{
+              borderTop: "1px solid #ddd",
+              mt: 3,
+              pt: 2,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Box>
+              <Typography variant="h6">
+                Total: Rs. {calculateSelectedSubtotal()}
+              </Typography>
+            </Box>
+            <Button
+              variant="contained"
+              sx={{
+                textTransform: "none",
+                bgcolor: "#26A69A",
+                "&:hover": { bgcolor: "#219688" },
+              }}
+              onClick={handleCheckout}
+            >
+              Checkout
+            </Button>
           </Box>
+        </>
+      )}
 
-          {/* Delete button */}
-          <IconButton onClick={() => handleDeleteItem(item.id)} color="error">
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-      ))}
-
-      {/* Subtotal and checkout */}
-      <Box
-        sx={{
-          borderTop: "1px solid #ddd",
-          mt: 3,
-          pt: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={3000} 
+        onClose={handleCloseSnackbar}
       >
-        <Typography variant="h6">
-          Subtotal: Rs. {calculateSubtotal()}
-        </Typography>
-        <Button
-          variant="contained"
-          sx={{
-            textTransform: "none",
-            bgcolor: "#26A69A",
-            "&:hover": { bgcolor: "#219688" },
-          }}
-          onClick={handleCheckout}
+        <Alert 
+          onClose={handleCloseSnackbar} 
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
         >
-          Checkout
-        </Button>
-      </Box>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

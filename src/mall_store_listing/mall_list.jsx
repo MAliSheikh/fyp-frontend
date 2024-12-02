@@ -46,9 +46,9 @@ const MallListingPage = () => {
           align="center"
           sx={{
             mb: 4,
-            color: 'primary.main',
+            color: 'Black',
             fontWeight: 'bold',
-            textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
+            textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
           }}
         >
           Our Shopping Destinations

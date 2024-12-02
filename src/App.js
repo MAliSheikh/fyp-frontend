@@ -8,6 +8,7 @@ import Layout from "./layout";
 import Seller from "./seller/store_create";
 import MallInfo from "./seller/mall_info";
 import StoreInfo from "./seller/store_info";
+import Dashboard from "./seller/dashboard"
 import IndependentStores from "../src/independent_stores/IndependentStores";
 // import StoreCreatePage from "./seller/store_create";
 import ProductDetailsPage from "./products/productInfo";
@@ -23,6 +24,9 @@ import ManageProducts from "./manage_product/manage-products";
 import OrdersPage from "./seller/Order";
 import MallStores from "./mall_store_listing/mall_stores";
 import StoreProducts from "./mall_store_listing/store_products";
+import AddressInputPage from "./Address/address";
+import PaymentInputPage from "./Payment/payment";
+import OrderNow from "./order/OrderNow";
 
 function App() {
   return (
@@ -42,11 +46,11 @@ function App() {
           path="/products/:id"
           element={<Layout>{<ProductDetailsPage />}</Layout>}
         />
+        <Route path="/order-now" element={<Layout>{<OrderNow />}</Layout>} />
+        <Route path="/address" element={<Layout>{<AddressInputPage />}</Layout>} /> 
+        <Route path="/payment" element={<Layout>{<PaymentInputPage />}</Layout>} />
         <Route path="/buy-now" element={<Layout>{<BuyNowPage />}</Layout>} />
-        <Route
-          path="/add-to-cart"
-          element={<Layout>{<AddToCartPage />}</Layout>}
-        />
+        <Route path="/add_to_cart" element={<Layout>{<AddToCartPage />}</Layout>} />
         <Route path="/profile" element={<Layout>{<Profile />}</Layout>} />
         <Route
           path="/mall_lists"
@@ -65,6 +69,16 @@ function App() {
             <PrivateRoute roles={["seller"]}>
               <Layout>
                 <StoreInfo />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute roles={["seller"]}>
+              <Layout>
+                <Dashboard />
               </Layout>
             </PrivateRoute>
           }
@@ -131,6 +145,7 @@ function App() {
             </PrivateRoute>
           }
         /> */}
+        
         <Route path="/orders" element={<Layout>{<OrdersPage />}</Layout>} />
         <Route path="/manageproducts" element={<Layout>{<ManageProducts />}</Layout>} />
         <Route path="/login" element={<Login />} />
