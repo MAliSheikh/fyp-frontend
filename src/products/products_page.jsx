@@ -1,7 +1,7 @@
 import React, { useState, useEffect, } from 'react';
 import Slider from 'react-slick';
 import { useNavigate } from 'react-router-dom';
-import { Button, Container, Box, Typography, Card, CardMedia, CardContent, Rating } from '@mui/material';
+import { Button, Container, Box, Typography, Card, CardMedia, CardContent, Rating, CircularProgress } from '@mui/material';
 import Grid2 from '@mui/material/Grid2';
 //import banner1 from '../components/Logos/banner2.jpg'
 //import banner2 from '../components/Logos/banner3.jpg'
@@ -99,15 +99,18 @@ const ProductCard = ({ product }) => {
 
 const Products = () => {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getProducts = async () => {
       try {
+        setLoading(true);
         const data = await fetchProducts();
         setProducts(data);
-
       } catch (error) {
         console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -126,14 +129,20 @@ const Products = () => {
         Categories
       </Typography>
 
-      {/* Product Grid */}
-      <Grid2 container spacing={3}>
-        {products.map((product, index) => (
-          <Grid2 item size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product.product}>
-            <ProductCard product={product} />
-          </Grid2>
-        ))}
-      </Grid2>
+      {/* Loading Indicator or Product Grid */}
+      {loading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Grid2 container spacing={3}>
+          {products.map((product, index) => (
+            <Grid2 item size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product.product}>
+              <ProductCard product={product} />
+            </Grid2>
+          ))}
+        </Grid2>
+      )}
     </Container>
   );
 };
