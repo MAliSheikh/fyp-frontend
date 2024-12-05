@@ -27,9 +27,11 @@ import StoreProducts from "./mall_store_listing/store_products";
 import AddressInputPage from "./Address/address";
 import PaymentInputPage from "./Payment/payment";
 import OrderNow from "./order/OrderNow";
-import Reviews from './profile/Reviews';
-import OrderHistory from './profile/OrderHistory'
+// import Reviews from './profile/Reviews';
+// import OrderHistory from './profile/OrderHistory'
 import ReviewHistory from './profile/review_history'
+import Viewer from './3d_viewer/viewer'
+// import ThreeSixtyVieww from './3d_viewer/view_360'
 
 function App() {
   return (
@@ -57,6 +59,8 @@ function App() {
         <Route path="/profile" element={<Layout>{<Profile />}</Layout>} />
         {/* <Route path="/review" element={<Reviews />} /> */}
         <Route path="/review" element={<Layout>{<ReviewHistory />}</Layout>} />
+        <Route path="/viewer" element={<Layout>{<Viewer />}</Layout>} />
+        {/* <Route path="/viewer_360" element={<Layout>{<ThreeSixtyVieww />}</Layout>} /> */}
         <Route
           path="/mall_lists"
           element={<Layout>{<MallListingPage />}</Layout>}
