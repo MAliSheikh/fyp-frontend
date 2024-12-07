@@ -123,7 +123,7 @@ const Products = () => {
 
       {/* Categories Heading */}
       <Typography variant="h5" gutterBottom>
-        Categories
+        Top Rated Products
       </Typography>
 
       {/* Product Grid */}

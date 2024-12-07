@@ -66,10 +66,22 @@ const OrderNow = () => {
     setLoading(true);
     try {
       const user_id = localStorage.getItem("userId");
+      
+      // Format order items according to API requirements
+      const formattedOrderItems = orderItems.map(item => ({
+        product_id: item.product_id,
+        product_name: item.product_name,
+        quantity: item.quantity,
+        price: item.price
+      }));
+
       const orderData = {
-        user_id: parseInt(user_id),
-        order_items: orderItems,
+        store_id: 1, // You may need to get this from somewhere
         total_amount: totalAmount,
+        status: "Pending",
+        items_count: orderItems.length,
+        user_id: parseInt(user_id),
+        order_items: formattedOrderItems,
         shipping_address: {
           full_name: formData.fullName,
           phone_number: formData.phoneNumber,
@@ -77,8 +89,7 @@ const OrderNow = () => {
           city: formData.city,
           state: formData.state,
           pincode: formData.pincode
-        },
-        status: "pending"
+        }
       };
 
       const response = await axiosInstance.post('/orders', orderData);
@@ -206,4 +217,4 @@ const OrderNow = () => {
   );
 };
 
-export default OrderNow; 
+export default OrderNow;
