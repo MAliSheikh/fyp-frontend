@@ -81,10 +81,25 @@ const OrderNow = () => {
           };
         })
       );
+       // Send order data to /order API
+       const orderData = {
+        total_amount: totalAmount,
+        status: "Pending",
+        items_count: orderItems.length,
+        user_id: parseInt(user_id),
+        order_items: order_items,
+      };
+      const response = await axiosInstance.post("/orders", orderData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const orderId = response.data.order_id;
 
       // Prepare data for Stripe checkout session
       const checkoutSessionData = {
-        order_id: 2, // Use the actual order ID here
+        order_id: orderId,
         order_items: order_items,
         total_amount: totalAmount,
         user_id: parseInt(user_id),
@@ -108,6 +123,8 @@ const OrderNow = () => {
       const result = await stripe.redirectToCheckout({
         sessionId: checkoutSessionId,
       });
+
+     
 
       if (result.error) {
         setSnackbar({
