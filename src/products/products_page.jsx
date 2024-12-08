@@ -124,10 +124,10 @@ const Products = () => {
         <BannerSlider />
       </Box>
 
-      {/* Categories Heading */}
+      {/* Categories Heading
       <Typography variant="h5" gutterBottom>
         Categories
-      </Typography>
+      </Typography> */}
 
       {/* Loading Indicator or Product Grid */}
       {loading ? (
