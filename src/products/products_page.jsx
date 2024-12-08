@@ -12,7 +12,7 @@ import banner7 from '../components/Logos/banner7.jpg'
 import banner8 from '../components/Logos/banner8.jpg'
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import { fetchProducts } from '../products/product';
+import { fetchProducts } from './product';
 
 
 
@@ -61,10 +61,10 @@ const ProductCard = ({ product }) => {
     navigate(`/products/${product.product_id}`);
   };
   return (
-    <Card sx={{ maxWidth: 'auto', margin: 'auto', height: 350, borderRadius: '20px 20px 0 0' }}>
+    <Card sx={{borderRadius: '20px 20px 20px 20px', maxWidth: 'auto', margin: 'auto', height: 370, borderRadius: '20px 20px 0 0', boxShadow: '0 8px 12px rgba(0, 0, 0, 0.2)' }}>
       <CardMedia
         component="img"
-        height="200"
+        height="250"
         image={product.images[0]} // Assuming the base64 string is for a JPEG image
         // image={`data:image/jpeg;base64,${product.images[0]}`} // Assuming the base64 string is for a JPEG image
         alt={product.name}
@@ -72,20 +72,21 @@ const ProductCard = ({ product }) => {
       />
       <CardContent sx={{ flexGrow: 1 }}>
         {/* <Typography variant="h6">{product.name}</Typography> */}
-        <Typography variant="h6" sx={{ height: 30, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+        <Typography variant="h6" sx={{mb:2, height: 30, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
           {product.name}
         </Typography>
 
-        <Typography variant="body2" color="text.secondary">
-          Rs. {product.price}
-        </Typography>
-
-        <Rating name="product-rating" value={4} precision={0.5} readOnly />
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Rating name="product-rating" value={product.average_rating} precision={0.5} readOnly />
+          <Typography variant="body2" color="text.secondary">
+            Rs. {product.price}
+          </Typography>
+        </Box>
         {/* <Rating name="product-rating" value={product.rating} precision={0.5} readOnly /> */}
         
-        <Button variant="contained" color="primary" onClick={handleViewProduct}>
+        {/* <Button variant="contained" color="primary" onClick={handleViewProduct}>
           See Details
-        </Button>
+        </Button> */}
       </CardContent>
 
       {/* <CardActions>

@@ -22,7 +22,8 @@ function Viewer({ productId }) {
       case 4:
         return <Purse scale={0.5} />; // Adjusted scale for Purse
       case 5:
-        return <Headphones scale={0.5} />; // Adjusted scale for Headphones
+        return <Headphones />; // Adjusted scale for Headphones
+        // return <Headphones scale={0.5} />; // Adjusted scale for Headphones
       case 6:
         return <BlackTShirt scale={0.5} />; // Adjusted scale for BlackTShirt
       default:
