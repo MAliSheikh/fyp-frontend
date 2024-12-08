@@ -32,6 +32,8 @@ import OrderNow from "./order/OrderNow";
 import ReviewHistory from './profile/review_history'
 import Viewer from './3d_viewer/viewer1'
 // import ThreeSixtyVieww from './3d_viewer/view_360'
+import Success from './Success'; // Import the Success page
+import Cancel from './Cancel';
 
 function App() {
   return (
@@ -60,6 +62,8 @@ function App() {
         {/* <Route path="/review" element={<Reviews />} /> */}
         <Route path="/review" element={<Layout>{<ReviewHistory />}</Layout>} />
         <Route path="/viewer" element={<Layout>{<Viewer />}</Layout>} />
+        <Route path="/success" element={<Success/>} />
+        <Route path="/cancel" element={<Cancel/>} />
         {/* <Route path="/viewer_360" element={<Layout>{<ThreeSixtyVieww />}</Layout>} /> */}
         <Route
           path="/mall_lists"

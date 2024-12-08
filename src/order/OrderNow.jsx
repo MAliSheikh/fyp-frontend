@@ -3,21 +3,29 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
-  TextField,
+  // TextField,
   Button,
   Grid,
   Paper,
   Snackbar,
   Alert,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import axiosInstance from "../components/axiosInstance";
+import { loadStripe } from "@stripe/stripe-js";
 
 const OrderNow = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { orderItems, totalAmount } = location.state || { orderItems: [], totalAmount: 0 };
-  console.log("orderitems",orderItems)
+  const { orderItems, totalAmount } = location.state || {
+    orderItems: [],
+    totalAmount: 0,
+  };
+  console.log("orderitems", orderItems);
+
+  const stripePromise = loadStripe(
+    "pk_test_51QTktuD5F58hnFq935pSP61wZhoJnQS8tYlQmwxVRCLgvxaNpHEhyfaOmRz39JI5BSQHYK1ITBsaGJ24QovxUk7000EGFyu9xW"
+  );
 
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,7 +39,7 @@ const OrderNow = () => {
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
-    severity: "success"
+    severity: "success",
   });
 
   // Redirect if no items
@@ -42,69 +50,78 @@ const OrderNow = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleCloseSnackbar = () => {
-    setSnackbar(prev => ({ ...prev, open: false }));
+    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
+  
   const handlePlaceOrder = async () => {
     setLoading(true);
     try {
       const user_id = localStorage.getItem("userId");
-      const order_items = await Promise.all(orderItems.map(async (item) => {
-        const response = await axiosInstance.get(`http://localhost:8000/products/${item.product_id}/store_id`);
-        const storeData = response.data; // Assuming this returns { "store_id": 1 }
-        
-        return {
-          product_id: item.product_id,
-          product_name: item.name, // Ensure product_name is included
-          quantity: item.quantity,
-          price: item.price,
-          store_id: storeData.store_id // Use the store_id from the API response
-        };
-      }));
+      const order_items = await Promise.all(
+        orderItems.map(async (item) => {
+          const response = await axiosInstance.get(
+            `http://localhost:8000/products/${item.product_id}/store_id`
+          );
+          const storeData = response.data;
 
-      const orderData = {
+          return {
+            product_id: item.product_id,
+            product_name: item.name, // Make sure this matches with your data
+            quantity: item.quantity,
+            price: item.price,
+            store_id: storeData.store_id,
+          };
+        })
+      );
+
+      // Prepare data for Stripe checkout session
+      const checkoutSessionData = {
+        order_id: 2, // Use the actual order ID here
+        order_items: order_items,
         total_amount: totalAmount,
-        status: "Pending",
-        items_count: order_items.length,
         user_id: parseInt(user_id),
-        order_items: order_items // Ensure this matches the required format
       };
 
-      console.log(orderData); // Log the final structured data
-
-      // Send the data as JSON
-      const response = await axiosInstance.post('/orders', orderData, {
-        headers: {
-          'Content-Type': 'application/json' // Set the content type to JSON
+      // Create a new Stripe Checkout Session
+      const checkoutSessionResponse = await axiosInstance.post(
+        "/payment/create-checkout-session",
+        checkoutSessionData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      });
-      
-      setSnackbar({
-        open: true,
-        message: "Order placed successfully!",
-        severity: "success"
+      );
+
+      const checkoutSessionId = checkoutSessionResponse.data.id;
+
+      // Redirect to Stripe checkout page
+      const stripe = await stripePromise;
+      const result = await stripe.redirectToCheckout({
+        sessionId: checkoutSessionId,
       });
 
-      // Navigate to order confirmation after 2 seconds
-      setTimeout(() => {
-        navigate("/order-confirmation", { 
-          state: { orderId: response.data.order_id } 
+      if (result.error) {
+        setSnackbar({
+          open: true,
+          message: result.error.message,
+          severity: "error",
         });
-      }, 2000);
-
+      }
     } catch (error) {
-      console.error('Error placing order:', error);
+      console.error("Error creating checkout session:", error);
       setSnackbar({
         open: true,
-        message: "Failed to place order. Please try again.",
-        severity: "error"
+        message: "Failed to create checkout session. Please try again.",
+        severity: "error",
       });
     } finally {
       setLoading(false);
@@ -131,7 +148,8 @@ const OrderNow = () => {
                   display: "flex",
                   alignItems: "center",
                   py: 2,
-                  borderBottom: index < orderItems.length - 1 ? "1px solid #eee" : "none"
+                  borderBottom:
+                    index < orderItems.length - 1 ? "1px solid #eee" : "none",
                 }}
               >
                 <img
@@ -141,11 +159,13 @@ const OrderNow = () => {
                     width: "80px",
                     height: "80px",
                     objectFit: "cover",
-                    borderRadius: "8px"
+                    borderRadius: "8px",
                   }}
                 />
                 <Box sx={{ ml: 2, flexGrow: 1 }}>
-                  <Typography variant="subtitle1">{item.product_name}</Typography>
+                  <Typography variant="subtitle1">
+                    {item.product_name}
+                  </Typography>
                   <Typography color="text.secondary">
                     Quantity: {item.quantity}
                   </Typography>
@@ -154,7 +174,6 @@ const OrderNow = () => {
               </Box>
             ))}
           </Paper>
-
         </Grid>
 
         {/* Order Summary Section */}
@@ -164,12 +183,22 @@ const OrderNow = () => {
               Order Summary
             </Typography>
             <Box sx={{ my: 2 }}>
-              <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+              >
                 <Typography>Subtotal:</Typography>
                 <Typography>Rs. {totalAmount}</Typography>
               </Box>
-              
-              <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2, pt: 2, borderTop: "1px solid #eee" }}>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mt: 2,
+                  pt: 2,
+                  borderTop: "1px solid #eee",
+                }}
+              >
                 <Typography variant="h6">Total:</Typography>
                 <Typography variant="h6">Rs. {totalAmount}</Typography>
               </Box>
@@ -183,24 +212,28 @@ const OrderNow = () => {
               sx={{
                 bgcolor: "#009688",
                 "&:hover": { bgcolor: "#00796b" },
-                mt: 2
+                mt: 2,
               }}
             >
-              {loading ? <CircularProgress size={24} color="inherit" /> : "Place Order"}
+              {loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Place Order"
+              )}
             </Button>
           </Paper>
         </Grid>
       </Grid>
 
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
         onClose={handleCloseSnackbar}
       >
-        <Alert 
-          onClose={handleCloseSnackbar} 
+        <Alert
+          onClose={handleCloseSnackbar}
           severity={snackbar.severity}
-          sx={{ width: '100%' }}
+          sx={{ width: "100%" }}
         >
           {snackbar.message}
         </Alert>
@@ -209,4 +242,4 @@ const OrderNow = () => {
   );
 };
 
-export default OrderNow; 
+export default OrderNow;
