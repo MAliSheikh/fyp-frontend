@@ -1,6 +1,7 @@
 export const categories = [
-    { name: "Electronics", subcategories: ["Mobile Phones", "Laptops", "Tablets", "Cameras", "TVs"] },
-    { name: "Clothing", subcategories: ["Men", "Women", "Kids", "Accessories", "Footwear"] },
+    { name: "Electronics", subcategories: ["Mobile Phones", "Laptops", "Tablets", "Cameras", "TVs", "Smartwatches", "Headphones", "Speakers","Mobile Accessories"] },
+    { name: "Clothing", subcategories: ["Men", "Women", "Kids", "Accessories"] },
+    { name: "Footwear", subcategories: ["Men", "Women", "Kids"] },
     { name: "Home Appliances", subcategories: ["Refrigerators", "Microwaves", "Washing Machines", "Air Conditioners", "Vacuum Cleaners"] },
     { name: "Books", subcategories: ["Fiction", "Non-Fiction", "Educational", "Comics", "Biographies"] },
     { name: "Beauty", subcategories: ["Makeup", "Skincare", "Haircare", "Fragrances", "Nails"] },
