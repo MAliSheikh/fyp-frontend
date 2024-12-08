@@ -17,7 +17,8 @@ const OrderNow = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { orderItems, totalAmount } = location.state || { orderItems: [], totalAmount: 0 };
-  
+  console.log("orderitems",orderItems)
+
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -52,36 +53,38 @@ const OrderNow = () => {
   };
 
   const handlePlaceOrder = async () => {
-    // Basic validation
-    if (!formData.fullName || !formData.phoneNumber || !formData.address || 
-        !formData.city || !formData.state || !formData.pincode) {
-      setSnackbar({
-        open: true,
-        message: "Please fill all required fields",
-        severity: "error"
-      });
-      return;
-    }
-
     setLoading(true);
     try {
       const user_id = localStorage.getItem("userId");
+      const order_items = await Promise.all(orderItems.map(async (item) => {
+        const response = await axiosInstance.get(`http://localhost:8000/products/${item.product_id}/store_id`);
+        const storeData = response.data; // Assuming this returns { "store_id": 1 }
+        
+        return {
+          product_id: item.product_id,
+          product_name: item.name, // Ensure product_name is included
+          quantity: item.quantity,
+          price: item.price,
+          store_id: storeData.store_id // Use the store_id from the API response
+        };
+      }));
+
       const orderData = {
-        user_id: parseInt(user_id),
-        order_items: orderItems,
         total_amount: totalAmount,
-        shipping_address: {
-          full_name: formData.fullName,
-          phone_number: formData.phoneNumber,
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          pincode: formData.pincode
-        },
-        status: "pending"
+        status: "Pending",
+        items_count: order_items.length,
+        user_id: parseInt(user_id),
+        order_items: order_items // Ensure this matches the required format
       };
 
-      const response = await axiosInstance.post('/orders', orderData);
+      console.log(orderData); // Log the final structured data
+
+      // Send the data as JSON
+      const response = await axiosInstance.post('/orders', orderData, {
+        headers: {
+          'Content-Type': 'application/json' // Set the content type to JSON
+        }
+      });
       
       setSnackbar({
         open: true,
