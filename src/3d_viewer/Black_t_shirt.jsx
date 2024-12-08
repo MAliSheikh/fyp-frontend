@@ -10,8 +10,8 @@ Title: T-shirt
 import React from 'react'
 import { useGLTF } from '@react-three/drei'
 
-export function Model(props) {
-  const { nodes, materials } = useGLTF('/black_t_shirt.gltf')
+export default function Model(props) {
+  const { nodes, materials } = useGLTF('/black_t_shirt/scene.gltf')
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.AM_102_035_003_AM_102_035_002_0.geometry} material={materials.AM_102_035_002} />
@@ -19,4 +19,4 @@ export function Model(props) {
   )
 }
 
-useGLTF.preload('/black_t_shirt.gltf')
+useGLTF.preload('/black_t_shirt/scene.gltf')

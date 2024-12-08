@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Products from "./products/products_page";
+import Products from "./3d_viewer/products_page";
 import SignUp from "./components/LoginSignup/signup";
 import Login from "./components/LoginSignup/login";
 import Layout from "./layout";
@@ -30,7 +30,7 @@ import OrderNow from "./order/OrderNow";
 // import Reviews from './profile/Reviews';
 // import OrderHistory from './profile/OrderHistory'
 import ReviewHistory from './profile/review_history'
-import Viewer from './3d_viewer/viewer'
+import Viewer from './3d_viewer/viewer1'
 // import ThreeSixtyVieww from './3d_viewer/view_360'
 
 function App() {

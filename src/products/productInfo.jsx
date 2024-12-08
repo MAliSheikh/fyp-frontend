@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Rating from "@mui/material/Rating";
@@ -13,9 +13,12 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Modal from "@mui/material/Modal";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-import Reviews from '../reviews/Reviews';
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import Reviews from "../reviews/Reviews";
+import Viewer from "../3d_viewer/viewer";
+
+
 
 function ProductDetailsPage() {
   const { id } = useParams();
@@ -29,6 +32,7 @@ function ProductDetailsPage() {
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedSize, setSelectedSize] = useState("Small");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
 
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
@@ -54,7 +58,7 @@ function ProductDetailsPage() {
   };
   // console.log(product)
   const handleaddtoCart = async () => {
-    const user_id = parseInt(localStorage.getItem('userId'))
+    const user_id = parseInt(localStorage.getItem("userId"));
     try {
       const cartData = {
         user_id: user_id,
@@ -62,13 +66,13 @@ function ProductDetailsPage() {
         name: product.name,
         image: product.images[0],
         quantity: quantity,
-        price: product.price * quantity
+        price: product.price * quantity,
       };
 
-      await axios.post('http://localhost:8000/cart/cart-items', cartData, {
+      await axios.post("http://localhost:8000/cart/cart-items", cartData, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
       });
       setSnackbarOpen(true);
       // navigate(`/add_to_cart`, { state: { product, quantity } });
@@ -97,15 +101,23 @@ function ProductDetailsPage() {
     setSelectedImage(null);
   };
 
+  const handleViewerOpen = () => {
+    setViewerOpen(true);
+  };
+
+  const handleViewerClose = () => {
+    setViewerOpen(false);
+  };
+
   const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setSnackbarOpen(false);
   };
 
   if (loading) {
-    return <CircularProgress />;
+    return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box>;
   }
 
   if (error) {
@@ -153,11 +165,7 @@ function ProductDetailsPage() {
               {product.description}
             </Typography>
 
-            <Rating
-              value={4}
-              readOnly
-              sx={{ mb: 1, fontSize: "1.2rem" }}
-            />
+            <Rating value={4} readOnly sx={{ mb: 1, fontSize: "1.2rem" }} />
 
             <Grid container spacing={2}>
               <Grid item xs={12}>
@@ -172,23 +180,29 @@ function ProductDetailsPage() {
                   {product.category === "Clothing" && (
                     <Box>
                       <Typography fontWeight="500">Sizes:</Typography>
-                      <Box sx={{ display: "flex", gap: 1, mb:2 }}>
+                      <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
                         {["Small", "Medium", "Large"].map((size) => (
                           <Button
-                          sx={{ 
-                            bgcolor: selectedSize === size ? "#26A69A" : "#ffffff",
-                            color: selectedSize === size ? "#ffffff" : "#000000",
-                            border: selectedSize === size ? "none" : "1px solid #26A69A",
-                            "&:hover": {
-                              bgcolor: selectedSize === size ? "#219688" : "#f0f0f0",
-                            },
-                          }}
-                          key={size}
-                          variant="contained"
-                          onClick={() => handleSizeSelect(size)}
-                        >
-                          {size}
-                        </Button>
+                            sx={{
+                              bgcolor:
+                                selectedSize === size ? "#26A69A" : "#ffffff",
+                              color:
+                                selectedSize === size ? "#ffffff" : "#000000",
+                              border:
+                                selectedSize === size
+                                  ? "none"
+                                  : "1px solid #26A69A",
+                              "&:hover": {
+                                bgcolor:
+                                  selectedSize === size ? "#219688" : "#f0f0f0",
+                              },
+                            }}
+                            key={size}
+                            variant="contained"
+                            onClick={() => handleSizeSelect(size)}
+                          >
+                            {size}
+                          </Button>
                         ))}
                       </Box>
                     </Box>
@@ -200,7 +214,9 @@ function ProductDetailsPage() {
                         {[6, 7, 8, 9, 10].map((size) => (
                           <Button
                             key={size}
-                            variant={selectedSize === size ? "contained" : "outlined"}
+                            variant={
+                              selectedSize === size ? "contained" : "outlined"
+                            }
                             onClick={() => handleSizeSelect(size)}
                           >
                             {size}
@@ -258,7 +274,7 @@ function ProductDetailsPage() {
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Typography fontWeight="500">Price:</Typography>
                   <Typography fontWeight="500" color="blue" sx={{ ml: 3 }}>
-                    Rs.{product.price*quantity}
+                    Rs.{product.price * quantity}
                   </Typography>
                 </Box>
               </Grid>
@@ -296,9 +312,46 @@ function ProductDetailsPage() {
                   Buy Now
                 </Button>
               </Grid>
+              {(product.product_id === 1 || product.product_id === 2 || product.product_id === 3 || product.product_id === 4 || product.product_id === 5 || product.product_id === 6) && (
+                <Grid size={6}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    onClick={handleViewerOpen}
+                    sx={{
+                      height: 45,
+                      textTransform: "none",
+                      borderColor: "#e0e0e0",
+                      color: "#000",
+                      boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                    }}
+                  >
+                    View in 3D
+                  </Button>
+                </Grid>
+              )}
             </Grid>
           </Box>
         </Grid>
+
+        {/* Modal for Viewer */}
+        <Modal open={viewerOpen} onClose={handleViewerClose}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "80%",
+              height: "80%",
+              bgcolor: "background.paper",
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            {product.product_id && <Viewer productId={product.product_id} />} {/* Pass product ID to Viewer */}
+          </Box>
+        </Modal>
 
         {/* Thumbnail Images */}
         <Box sx={{ mt: 4, ml: { xs: 1, md: 5 } }}>
@@ -328,6 +381,7 @@ function ProductDetailsPage() {
                 </Box>
               </Grid>
             ))}
+          
           </Grid>
           <Modal open={open} onClose={handleClose}>
             <Box
@@ -337,7 +391,7 @@ function ProductDetailsPage() {
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 width: "70%",
-                height: "7  0%",
+                height: "70%",
                 bgcolor: "background.paper",
                 boxShadow: 24,
                 p: 4,
@@ -388,8 +442,16 @@ function ProductDetailsPage() {
         <Reviews storeId={product?.store_id} />
       </Box> */}
 
-      <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
           Item successfully added to cart!
         </Alert>
       </Snackbar>

@@ -124,8 +124,8 @@ const Products = () => {
         <BannerSlider />
       </Box>
 
-      {/* Categories Heading */}
-      {/* <Typography variant="h5" gutterBottom>
+      {/* Categories Heading
+      <Typography variant="h5" gutterBottom>
         Categories
       </Typography> */}
 

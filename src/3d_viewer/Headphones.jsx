@@ -10,8 +10,8 @@ Title: Headphones Skullcandy Crusher Wireless
 import React from 'react'
 import { useGLTF } from '@react-three/drei'
 
-export function Model(props) {
-  const { nodes, materials } = useGLTF('/headphones.gltf')
+export default function Model(props) {
+  const { nodes, materials } = useGLTF('/headphones/scene.gltf')
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.Skullcandy_Crusher_M_Skullcandy_Crusher_0.geometry} material={materials.M_Skullcandy_Crusher} rotation={[-Math.PI / 2, 0, 0]} scale={100} />
@@ -19,4 +19,4 @@ export function Model(props) {
   )
 }
 
-useGLTF.preload('/headphones.gltf')
+useGLTF.preload('/headphones/scene.gltf')

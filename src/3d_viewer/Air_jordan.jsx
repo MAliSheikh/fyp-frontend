@@ -10,8 +10,8 @@ Title: Air Jordan 1
 import React from 'react'
 import { useGLTF } from '@react-three/drei'
 
-export function Model(props) {
-  const { nodes, materials } = useGLTF('/air_jordan.gltf')
+export default function Model(props) {
+  const { nodes, materials } = useGLTF('/air_jordan/scene.gltf')
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.shoe_shoe_0.geometry} material={materials.shoe} rotation={[-Math.PI / 2, 0, 0]} scale={100} />
@@ -20,4 +20,4 @@ export function Model(props) {
   )
 }
 
-useGLTF.preload('/air_jordan.gltf')
+useGLTF.preload('/air_jordan/scene.gltf')

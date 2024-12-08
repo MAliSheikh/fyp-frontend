@@ -10,9 +10,9 @@ Title: Purse
 import React from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
 
-export function Model(props) {
+export default function Model(props) {
   const group = React.useRef()
-  const { nodes, materials, animations } = useGLTF('/purse.gltf')
+  const { nodes, materials, animations } = useGLTF('/purse/scene.gltf')
   const { actions } = useAnimations(animations, group)
   return (
     <group ref={group} {...props} dispose={null}>
@@ -90,4 +90,4 @@ export function Model(props) {
   )
 }
 
-useGLTF.preload('/purse.gltf')
+useGLTF.preload('/purse/scene.gltf')

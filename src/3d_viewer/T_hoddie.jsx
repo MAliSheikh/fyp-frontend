@@ -10,8 +10,8 @@ Title: t shirt hoodie 3d model
 import React from 'react'
 import { useGLTF } from '@react-three/drei'
 
-export function Model(props) {
-  const { nodes, materials } = useGLTF('/t_hoddie.gltf')
+export default function Model(props) {
+  const { nodes, materials } = useGLTF('/t_shirt_hoddie/scene.gltf')
   return (
     <group {...props} dispose={null}>
       <group position={[-0.01, -0.2, 0.065]} rotation={[1.595, -0.05, 0.012]} scale={0.055}>
@@ -23,4 +23,4 @@ export function Model(props) {
   )
 }
 
-useGLTF.preload('/t_hoddie.gltf')
+useGLTF.preload('/t_shirt_hoddie/scene.gltf')

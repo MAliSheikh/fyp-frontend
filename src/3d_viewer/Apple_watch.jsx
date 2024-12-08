@@ -10,8 +10,8 @@ Title: Apple Watch Series 7 - Free Watch-Face SDC™️
 import React from 'react'
 import { useGLTF } from '@react-three/drei'
 
-export function Model(props) {
-  const { nodes, materials } = useGLTF('/apple_watch.gltf')
+export default function Model(props) {
+  const { nodes, materials } = useGLTF('/apple_watch_seires/scene.gltf')
   return (
     <group {...props} dispose={null}>
       <group position={[0.019, 0.026, 0.017]} rotation={[2.622, 0, -Math.PI / 2]} scale={0.001}>
@@ -41,4 +41,4 @@ export function Model(props) {
   )
 }
 
-useGLTF.preload('/apple_watch.gltf')
+useGLTF.preload('/apple_watch_seires/scene.gltf')
