@@ -61,14 +61,14 @@ const ProductCard = ({ product }) => {
     navigate(`/products/${product.product_id}`);
   };
   return (
-    <Card sx={{ maxWidth: 'auto', margin: 'auto', height: 350, borderRadius: '20px 20px 0 0' }}>
+    <Card sx={{ maxWidth: 'auto', margin: 'auto', height: 400, borderRadius: '20px 20px 0 0' }}>
       <CardMedia
         component="img"
-        height="200"
+        height="250"
         image={product.images[0]} // Assuming the base64 string is for a JPEG image
         // image={`data:image/jpeg;base64,${product.images[0]}`} // Assuming the base64 string is for a JPEG image
         alt={product.name}
-        sx={{ borderRadius: '20px 20px 0 0' }}
+        sx={{borderRadius: '20px 20px 0 0' }}
       />
       <CardContent sx={{ flexGrow: 1 }}>
         {/* <Typography variant="h6">{product.name}</Typography> */}
@@ -76,11 +76,12 @@ const ProductCard = ({ product }) => {
           {product.name}
         </Typography>
 
-        <Typography variant="body2" color="text.secondary">
-          Rs. {product.price}
-        </Typography>
-
-        <Rating name="product-rating" value={4} precision={0.5} readOnly />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: "10px 0" }}>
+            <Typography variant="body2" color="text.secondary" fontSize={18}>
+              Rs. {product.price}
+            </Typography>
+            <Rating name="product-rating" value={4} precision={0.5} readOnly />
+        </Box>
         {/* <Rating name="product-rating" value={product.rating} precision={0.5} readOnly /> */}
         
         <Button variant="contained" color="primary" onClick={handleViewProduct}>
