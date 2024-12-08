@@ -203,7 +203,7 @@
   "buffers": [
     {
       "byteLength": 10676072,
-      "uri": "t_hoddie.bin"
+      "uri": "./t_hoddie.bin"
     }
   ],
   "materials": [
