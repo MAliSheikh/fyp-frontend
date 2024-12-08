@@ -61,7 +61,7 @@ const ProductCard = ({ product }) => {
     navigate(`/products/${product.product_id}`);
   };
   return (
-    <Card sx={{borderRadius: '20px 20px 20px 20px', maxWidth: 'auto', margin: 'auto', height: 400, boxShadow: '0 8px 12px rgba(0, 0, 0, 0.2)' }}>
+    <Card onClick={handleViewProduct} sx={{cursor:'pointer', borderRadius: '20px 20px 20px 20px', maxWidth: 'auto', margin: 'auto', height: 400, boxShadow: '0 8px 12px rgba(0, 0, 0, 0.2)' }}>
       <CardMedia
         component="img"
         height="250"

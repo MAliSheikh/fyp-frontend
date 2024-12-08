@@ -5,10 +5,10 @@ import {
   Card,
   CardMedia,
   CardContent,
-  Button,
-  Grid,
+  // Button,
+  // Grid,
   Rating,
-  CircularProgress,
+  // CircularProgress,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -18,54 +18,54 @@ import "slick-carousel/slick/slick-theme.css";
 import Grid2 from "@mui/material/Grid2";
 
 // Banner component for store products page
-const StoreBanner = ({ storeInfo }) => {
-  return (
-    <Box
-      sx={{
-        height: "400px",
-        backgroundImage: storeInfo?.image ? `url(${storeInfo.image})` : "none",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        color: "white",
-        mb: 4,
-        position: "relative",
-      }}
-    >
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 2,
-        }}
-      >
-        <Typography
-          variant="h2"
-          component="h1"
-          sx={{ textAlign: "center", mb: 2 }}
-        >
-          {storeInfo?.name || "Store Products"}
-        </Typography>
-        {storeInfo?.shop_type && (
-          <Typography variant="h5" sx={{ textAlign: "center" }}>
-            {storeInfo.shop_type}
-          </Typography>
-        )}
-      </Box>
-    </Box>
-  );
-};
+// const StoreBanner = ({ storeInfo }) => {
+//   return (
+//     <Box
+//       sx={{
+//         height: "400px",
+//         backgroundImage: storeInfo?.image ? `url(${storeInfo.image})` : "none",
+//         backgroundSize: "cover",
+//         backgroundPosition: "center",
+//         backgroundRepeat: "no-repeat",
+//         display: "flex",
+//         alignItems: "center",
+//         justifyContent: "center",
+//         color: "white",
+//         mb: 4,
+//         position: "relative",
+//       }}
+//     >
+//       <Box
+//         sx={{
+//           position: "absolute",
+//           top: 0,
+//           left: 0,
+//           right: 0,
+//           bottom: 0,
+//           backgroundColor: "rgba(0, 0, 0, 0.5)",
+//           display: "flex",
+//           flexDirection: "column",
+//           alignItems: "center",
+//           justifyContent: "center",
+//           padding: 2,
+//         }}
+//       >
+//         <Typography
+//           variant="h2"
+//           component="h1"
+//           sx={{ textAlign: "center", mb: 2 }}
+//         >
+//           {storeInfo?.name || "Store Products"}
+//         </Typography>
+//         {storeInfo?.shop_type && (
+//           <Typography variant="h5" sx={{ textAlign: "center" }}>
+//             {storeInfo.shop_type}
+//           </Typography>
+//         )}
+//       </Box>
+//     </Box>
+//   );
+// };
 
 // Product card component
 const ProductCard = ({ product }) => {
@@ -76,6 +76,7 @@ const ProductCard = ({ product }) => {
   };
   return (
     <Card
+      onClick={handleViewProduct}
       sx={{
         borderRadius: "20px 20px 20px 20px",
         maxWidth: "auto",
@@ -83,6 +84,7 @@ const ProductCard = ({ product }) => {
         height: 370,
         borderRadius: "20px 20px 0 0",
         boxShadow: "0 8px 12px rgba(0, 0, 0, 0.2)",
+        cursor: "pointer",
       }}
     >
       <CardMedia
