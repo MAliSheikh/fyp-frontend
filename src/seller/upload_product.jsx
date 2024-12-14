@@ -302,15 +302,26 @@ const UploadProduct = () => {
                 variant="outlined"
                 value={price}
                 type="number"
-                onChange={(e) => setPrice(e.target.value)}
-                sx={{ flex: 1, backgroundColor: "#fff" }}
+                
+               // onChange={(e) => setPrice(e.target.value)}
+               onChange={(e) => {
+                const value = e.target.value;
+                setPrice(value >= 0 ? value : 0); // Prevent negative values
+              }}
+                sx={{ flex: 1, backgroundColor: "#fff"}}
+                
               />
               <TextField
                 label="Available stock"
                 variant="outlined"
                 value={stock}
                 type="number"
-                onChange={(e) => setStock(e.target.value)}
+                //onChange={(e) => setStock(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setStock(value >= 0 ? value : 0); // Prevent negative values
+                }}
+                
                 sx={{ flex: 1, backgroundColor: "#fff" }}
               />
             </Box>
