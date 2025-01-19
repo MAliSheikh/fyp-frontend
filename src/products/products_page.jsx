@@ -1,7 +1,7 @@
 import React, { useState, useEffect, } from 'react';
 import Slider from 'react-slick';
 import { useNavigate } from 'react-router-dom';
-import { Button, Container, Box, Typography, Card, CardMedia, CardContent, Rating, CircularProgress } from '@mui/material';
+import { Container, Box, Typography, Card, CardMedia, CardContent, Rating, CircularProgress } from '@mui/material';
 import Grid2 from '@mui/material/Grid2';
 //import banner1 from '../components/Logos/banner2.jpg'
 //import banner2 from '../components/Logos/banner3.jpg'
@@ -68,11 +68,11 @@ const ProductCard = ({ product }) => {
         image={product.images[0]} // Assuming the base64 string is for a JPEG image
         // image={`data:image/jpeg;base64,${product.images[0]}`} // Assuming the base64 string is for a JPEG image
         alt={product.name}
-        sx={{borderRadius: '20px 20px 0 0' }}
+        sx={{borderRadius: '20px 20px 0 0',  }}
       />
       <CardContent sx={{ flexGrow: 1 }}>
         {/* <Typography variant="h6">{product.name}</Typography> */}
-        <Typography variant="h6" sx={{mb:2, height: 30, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+        <Typography variant="h6" sx={{mb:4, height: 30, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
           {product.name}
         </Typography>
 
@@ -81,8 +81,8 @@ const ProductCard = ({ product }) => {
           <Typography variant="body2" color="text.secondary">
             Rs. {product.price}
           </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: "10px 0" }}>
+        </Box> 
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: "10px 2 0 2" }}>
             <Typography variant="body2" color="text.secondary" fontSize={18}>
               Rs. {product.price}
             </Typography>
@@ -90,16 +90,7 @@ const ProductCard = ({ product }) => {
         </Box>
         {/* <Rating name="product-rating" value={product.rating} precision={0.5} readOnly /> */}
         
-        {/* <Button variant="contained" color="primary" onClick={handleViewProduct}>
-          See Details
-        </Button> */}
       </CardContent>
-
-      {/* <CardActions>
-      <Button size="small" color="primary">
-        Buy Now
-      </Button>
-    </CardActions> */}
     </Card>
   )
 };

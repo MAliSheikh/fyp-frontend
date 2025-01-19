@@ -74,7 +74,7 @@ const OrderNow = () => {
 
           return {
             product_id: item.product_id,
-            product_name: item.name, // Make sure this matches with your data
+            product_name: item.name, 
             quantity: item.quantity,
             price: item.price,
             store_id: storeData.store_id,
