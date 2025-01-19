@@ -300,15 +300,15 @@ const UploadProduct = () => {
               <TextField
                 label="Price"
                 variant="outlined"
-                value={price}
+                value={price < 0 ? 0 : price}
                 type="number"
-                onChange={(e) => setPrice(e.target.value)}
+                onChange={(e) => setPrice(e.target.value < 0 ? 0 : e.target.value)}
                 sx={{ flex: 1, backgroundColor: "#fff" }}
               />
               <TextField
                 label="Available stock"
                 variant="outlined"
-                value={stock}
+                value={stock < 0 ? 0 : stock}
                 type="number"
                 onChange={(e) => setStock(e.target.value)}
                 sx={{ flex: 1, backgroundColor: "#fff" }}
