@@ -30,7 +30,7 @@ function ProductDetailsPage() {
   const [quantity, setQuantity] = useState(1);
   const [open, setOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
-  const [selectedSize, setSelectedSize] = useState("Small");
+  const [selectedSize, setSelectedSize] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
 
@@ -43,6 +43,12 @@ function ProductDetailsPage() {
       try {
         const data = await fetchProductByIdDetails(id);
         setProduct(data);
+        // Set default size based on category
+        if (data.category === "Clothing") {
+          setSelectedSize("Small");
+        } else if (data.category === "Footwear") {
+          setSelectedSize(6);
+        }
         setLoading(false);
       } catch (error) {
         setError(error);

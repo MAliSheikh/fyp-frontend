@@ -42,7 +42,7 @@ const Login = () => {
               console.warn("Failed to fetch store info:", error);
             });
             
-            navigate("/store_info");
+            navigate("/seller/upload-product");
             
           } catch (error) {
             console.error("Error during seller login flow:", error);

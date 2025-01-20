@@ -24,26 +24,32 @@ const SalesChart = () => {
   useEffect(() => {
     const fetchSalesData = async () => {
       const storeId = localStorage.getItem("store_id");
-      const weeklyResponse = await axios.get(
-        `http://localhost:8000/sales/sales/weekly?store_id=${storeId}`
-      );
-      const monthlyResponse = await axios.get(
-        `http://localhost:8000/sales/sales/monthly?store_id=${storeId}`
-      );
-      const totalResponse = await axios.get(
-        `http://localhost:8000/sales/sales/total?store_id=${storeId}`
-      );
+      if (!storeId) {
+        return;
+      }
+      try {
+        const weeklyResponse = await axios.get(
+          `http://localhost:8000/sales/sales/weekly?store_id=${storeId}`
+        );
+        const monthlyResponse = await axios.get(
+          `http://localhost:8000/sales/sales/monthly?store_id=${storeId}`
+        );
+        const totalResponse = await axios.get(
+          `http://localhost:8000/sales/sales/total?store_id=${storeId}`
+        );
 
-      setSalesData(weeklyResponse.data.weekly_sales);
-      setOrdersData(weeklyResponse.data.weekly_orders);
-      setTotalSalesData(totalResponse.data.total_sales);
-      setMonthlySalesData(monthlyResponse.data.monthly_sales);
+        setSalesData(weeklyResponse.data.weekly_sales);
+        setOrdersData(weeklyResponse.data.weekly_orders);
+        setTotalSalesData(totalResponse.data.total_sales);
+        setMonthlySalesData(monthlyResponse.data.monthly_sales);
+      } catch (error) {
+        console.error("Error fetching sales data:", error);
+      }
     };
 
     fetchSalesData();
   }, []);
 
-  console.log();
   return (
     <Box
       sx={{
