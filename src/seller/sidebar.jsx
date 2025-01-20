@@ -89,8 +89,8 @@ export const SideBar = () => {
         REGISTER STORE
       </Typography>
 
-      {!localStorage.getItem("store_id") &&
-        !localStorage.getItem("mall_id") && (
+      {localStorage.getItem("store_id")==='null' &&
+        localStorage.getItem("mall_id")==='null' && (
           <>
             <Button
               variant="contained"
@@ -109,7 +109,7 @@ export const SideBar = () => {
           </>
         )}
 
-      {localStorage.getItem("store_id") && localStorage.getItem("mall_id") && (
+      {localStorage.getItem("store_id")!=='null' && localStorage.getItem("mall_id")!=="null" && (
         <Button
           variant="contained"
           sx={getButtonStyle("/mall")}
@@ -119,7 +119,7 @@ export const SideBar = () => {
         </Button>
       )}
 
-      {localStorage.getItem("store_id") && !localStorage.getItem("mall_id") && (
+      {localStorage.getItem("store_id")!=='null' && localStorage.getItem("mall_id")==="null" && (
         <Button
           onClick={() => navigate("/store_info")}
           variant="contained"
