@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Button, Stack, Modal } from "@mui/material";
+import { Box, Typography, Button, Stack, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import axiosInstance from "../components/axiosInstance";
 import Reviews from './Reviews';
 
@@ -47,38 +47,45 @@ const OrderHistory = () => {
       <Typography variant="h6" gutterBottom>
         Order History
       </Typography>
-      <Stack spacing={2}>
-        {orders.flatMap(order => 
-          Object.values(order.order_items)
-            .filter(item => !reviewedProducts.has(item.user_id))
-            .map(item => (
-              <Box
-                key={item.product_id}
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  p: 2,
-                  borderRadius: 2,
-                  boxShadow: 1,
-                  bgcolor: "white",
-                }}
-              >
-                <Typography>{item.product_name}</Typography>
-                <Typography>Quantity: {item.quantity}</Typography>
-                <Typography>Price: Rs.{item.price}</Typography>
-                {order.status === "delivered" && (
-                  <Button
-                    variant="contained"
-                    onClick={() => handleReview(item.product_id, order.store_id)}
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Product Name</TableCell>
+              <TableCell align="right">Quantity</TableCell>
+              <TableCell align="right">Price</TableCell>
+              <TableCell align="right">Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {orders.flatMap(order => 
+              Object.values(order.order_items)
+                .map(item => (
+                  <TableRow
+                    key={item.product_id}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
-                    Review
-                  </Button>
-                )}
-              </Box>
-            ))
-        )}
-      </Stack>
+                    <TableCell component="th" scope="row">
+                      {item.product_name}
+                    </TableCell>
+                    <TableCell align="right">{item.quantity}</TableCell>
+                    <TableCell align="right">Rs.{item.price}</TableCell>
+                    {order.status === "delivered" && (
+                      <TableCell align="right">
+                        <Button
+                          variant="contained"
+                          onClick={() => handleReview(item.product_id, order.store_id)}
+                        >
+                          Review
+                        </Button>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       <Modal
         open={reviewModalOpen}

@@ -127,6 +127,19 @@ const BuyNowPage = () => {
         sessionId: checkoutSessionId,
       });
 
+      // After successful order placement, delete items from cart
+      await Promise.all(
+        order_items.map(async (item) => {
+          try {
+            await axiosInstance.delete(
+              `/cart/cart-items/product/${user_id}/${item.product_id}`
+            );
+          } catch (error) {
+            console.error("Error deleting cart item:", error);
+          }
+        })
+      );
+
       if (result.error) {
         setSnackbar({
           open: true,
@@ -188,7 +201,7 @@ const BuyNowPage = () => {
           <Box
             sx={{
               marginBottom: 20,
-              marginLeft: 10,
+              marginLeft: 5,
               gap: 2,
               display: "flex",
               flexDirection: "column",
@@ -198,10 +211,10 @@ const BuyNowPage = () => {
           >
             <Grid2 size={12}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Typography fontSize={18} fontWeight="500">
-                  <strong>Product: </strong>
-                </Typography>
-                <Typography fontSize={18} color="#000">
+                {/* <Typography fontSize={18} fontWeight="500">
+                  <strong>Product Name: </strong>
+                </Typography> */}
+                <Typography fontSize={18} color="#000" width="10">
                   {product.name}
                 </Typography>
               </Box>
@@ -209,7 +222,7 @@ const BuyNowPage = () => {
             <Grid2 size={12}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Typography fontSize={18} fontWeight="500">
-                  <strong>Per Unit Price: </strong>
+                  <strong>Price: </strong>
                 </Typography>
                 <Typography fontSize={18} color="#000">
                   Rs.{product.price}

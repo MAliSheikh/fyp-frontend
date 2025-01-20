@@ -124,7 +124,18 @@ const OrderNow = () => {
         sessionId: checkoutSessionId,
       });
 
-     
+      // After successful order placement, delete items from cart
+      await Promise.all(
+        orderItems.map(async (item) => {
+          try {
+            await axiosInstance.delete(
+              `/cart/cart-items/product/${user_id}/${item.product_id}`
+            );
+          } catch (error) {
+            console.error("Error deleting cart item:", error);
+          }
+        })
+      );
 
       if (result.error) {
         setSnackbar({

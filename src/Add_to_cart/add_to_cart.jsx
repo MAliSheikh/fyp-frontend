@@ -194,7 +194,8 @@ const AddToCartPage = () => {
 
       {cartItems.length === 0 ? (
         <Typography variant="h6" sx={{ textAlign: "center", my: 4 }}>
-          Add products
+          Add products 
+          <Button onClick={() => window.location.href = 'http://localhost:3000'}>Go to Home Page</Button>
         </Typography>
       ) : (
         <>
