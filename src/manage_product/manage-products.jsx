@@ -3,7 +3,7 @@ import { Box, TextField, Typography, Grid2 } from "@mui/material";
 import axiosInstance from "../components/axiosInstance";
 import { SideBar } from "../seller/sidebar";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 // import Grid2 from "@mui/material/Unstable_Grid2";
 
 const ManageProducts = () => {
@@ -34,7 +34,7 @@ const ManageProducts = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [store_id]);
 
   const handleDelete = async (product_id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {

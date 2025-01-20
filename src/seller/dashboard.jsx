@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -11,52 +11,39 @@ import {
 import { Paper, Typography, Box } from "@mui/material";
 import { SideBar } from "./sidebar";
 import { PieChart, Pie, Cell } from "recharts";
-
-const salesData = [
-  { name: "Week 1", sales: 12 },
-  { name: "Week 2", sales: 100 },
-  { name: "Week 3", sales: 62 },
-  { name: "Week 4", sales: 12 },
-  { name: "Week 5", sales: 95 },
-  { name: "Week 6", sales: 64 },
-  { name: "Week 7", sales: 99 },
-];
-
-const ordersData = [
-  { name: "Week 1", orders: 15 },
-  { name: "Week 2", orders: 85 },
-  { name: "Week 3", orders: 55 },
-  { name: "Week 4", orders: 20 },
-  { name: "Week 5", orders: 90 },
-  { name: "Week 6", orders: 70 },
-  { name: "Week 7", orders: 95 },
-];
+import axios from "axios";
 
 const COLORS = ["#FD8744", "#FFB95A", "#D05759", "#0B8FD9"];
 
-const totao_sales_data = [
-  { name: "Lahore", value: 300 },
-  { name: "Peshawar", value: 200 },
-  { name: "Karachi", value: 400 },
-  { name: "Islamabad", value: 300 },
-];
-
-const monhtly_sales_data = [
-  { month: "Jan", sales: 24, percentage: "4.0%" },
-  { month: "Feb", sales: 95, percentage: "15.8%" },
-  { month: "Mar", sales: 8, percentage: "1.7%" },
-  { month: "Apr", sales: 43, percentage: "6.2%" },
-  { month: "May", sales: 23, percentage: "3.9%" },
-  { month: "Jun", sales: 20, percentage: "3.4%" },
-  { month: "Jul", sales: 60, percentage: "10.0%" },
-  { month: "Aug", sales: 29, percentage: "4.8%" },
-  { month: "Sep", sales: 53, percentage: "8.8%" },
-  { month: "Oct", sales: 90, percentage: "15.0%" },
-  { month: "Nov", sales: 76, percentage: "12.7%" },
-  { month: "Dec", sales: 61, percentage: "10.2%" },
-];
-
 const SalesChart = () => {
+  const [salesData, setSalesData] = useState([]);
+  const [ordersData, setOrdersData] = useState([]);
+  const [totalSalesData, setTotalSalesData] = useState([]);
+  const [monthlySalesData, setMonthlySalesData] = useState([]);
+
+  useEffect(() => {
+    const fetchSalesData = async () => {
+      const storeId = localStorage.getItem("store_id");
+      const weeklyResponse = await axios.get(
+        `http://localhost:8000/sales/sales/weekly?store_id=${storeId}`
+      );
+      const monthlyResponse = await axios.get(
+        `http://localhost:8000/sales/sales/monthly?store_id=${storeId}`
+      );
+      const totalResponse = await axios.get(
+        `http://localhost:8000/sales/sales/total?store_id=${storeId}`
+      );
+
+      setSalesData(weeklyResponse.data.weekly_sales);
+      setOrdersData(weeklyResponse.data.weekly_orders);
+      setTotalSalesData(totalResponse.data.total_sales);
+      setMonthlySalesData(monthlyResponse.data.monthly_sales);
+    };
+
+    fetchSalesData();
+  }, []);
+
+  console.log();
   return (
     <Box
       sx={{
@@ -87,7 +74,13 @@ const SalesChart = () => {
               </Typography>
               <ResponsiveContainer width={300} height={200}>
                 <BarChart data={salesData}>
-                  <XAxis dataKey="sales" axisLine={false} tickLine={false} stroke="black" />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    stroke="black"
+                    tickFormatter={(value) => value.replace("Week", "w")}
+                  />
                   <YAxis hide={true} />
                   <Tooltip />
                   <Bar
@@ -111,32 +104,38 @@ const SalesChart = () => {
               </Typography>
               <ResponsiveContainer width={300} height={200}>
                 <BarChart data={ordersData}>
-                  <XAxis dataKey="orders" axisLine={false} tickLine={false} stroke="black" />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    stroke="black"
+                    tickFormatter={(value) => value.replace("Week", "w")}
+                  />
                   <YAxis hide={true} />
                   <Tooltip />
                   <Bar
                     dataKey="orders"
                     fill="#4CAF50"
-                    // stroke="black" 
+                    // stroke="black"
                     strokeWidth={1}
                     radius={[10, 10, 0, 0]}
                     barSize="8%"
+                    tickFormatter={(value) => value.replace("Week", "w")}
                   />
                 </BarChart>
               </ResponsiveContainer>
             </Paper>
           </Box>
         </Box>
-        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mt: 5 }}>
-          <Paper elevation={3} sx={{ p: 2, borderRadius: 5 }}>
+          {/* <Paper elevation={3} sx={{ p: 2, borderRadius: 5 }}>
             <Typography variant="h5" sx={{ textAlign: "center", mb: 1, mt: 0.5 }}>
               Total Sales
             </Typography>
-            <ResponsiveContainer width={300} height={245}>
+            <ResponsiveContainer width={300} height={270}>
               <PieChart>
                 <Tooltip />
                 <Pie
-                  data={totao_sales_data}
+                  data={totalSalesData}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
@@ -145,7 +144,7 @@ const SalesChart = () => {
                   dataKey="value"
                   isAnimationActive={false}
                 >
-                  {totao_sales_data.map((entry, index) => (
+                  {totalSalesData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={COLORS[index % COLORS.length]}
@@ -154,17 +153,22 @@ const SalesChart = () => {
                 </Pie>
               </PieChart>
             </ResponsiveContainer>
-          </Paper>
+          </Paper> */}
 
-          <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt :3 }}>
             <Paper
               elevation={3}
-              style={{ padding: "16px", textAlign: "center", borderRadius: 15 }}
+              style={{ padding: "16px", textAlign: "center", borderRadius: 15,  }}
             >
               <Typography variant="h5">Monthly Sales</Typography>
-              <ResponsiveContainer width={480} height={250}>
-                <BarChart data={monhtly_sales_data}>
-                  <XAxis dataKey="month" axisLine={false} tickLine={false} stroke="black" />
+              <ResponsiveContainer width={480} height={270}>
+                <BarChart data={monthlySalesData}>
+                  <XAxis
+                    dataKey="month"
+                    axisLine={false}
+                    tickLine={false}
+                    stroke="black"
+                  />
                   <YAxis hide={true} />
                   <Tooltip />
                   <Bar
@@ -174,15 +178,11 @@ const SalesChart = () => {
                     radius={[10, 10, 0, 0]}
                   />
                 </BarChart>
-                {/* {monhtly_sales_data.map((item) => (
-                  <>
-                    <Typography>{item.sales}</Typography>
-                    <Typography>{item.percentage}</Typography>
-                  </>
+                {/* {monthlySalesData.map((item) => (
+                  <Typography>{item.sales}</Typography>
                 ))} */}
               </ResponsiveContainer>
             </Paper>
-          </Box>
         </Box>
       </Box>
     </Box>

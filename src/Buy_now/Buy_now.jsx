@@ -103,8 +103,9 @@ const BuyNowPage = () => {
       const checkoutSessionData = {
         order_id: orderId,
         order_items: order_items,
-        total_amount: totalAmount,
+        total_amount: totalAmount / 280,
         user_id: parseInt(user_id),
+        currency: 'pkr'
       };
 
       // Create a new Stripe Checkout Session

@@ -76,18 +76,18 @@ const ProductCard = ({ product }) => {
           {product.name}
         </Typography>
 
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: "10px 2 0 2" }}>
+            {/* <Typography variant="body2" color="text.secondary" fontSize={18}>
+              Rs. {product.price}
+            </Typography> */}
+            {/* <Rating name="product-rating" value={4} precision={0.5} readOnly /> */}
+        </Box>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Rating name="product-rating" value={product.average_rating} precision={0.5} readOnly />
           <Typography variant="body2" color="text.secondary">
             Rs. {product.price}
           </Typography>
         </Box> 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: "10px 2 0 2" }}>
-            <Typography variant="body2" color="text.secondary" fontSize={18}>
-              Rs. {product.price}
-            </Typography>
-            <Rating name="product-rating" value={4} precision={0.5} readOnly />
-        </Box>
         {/* <Rating name="product-rating" value={product.rating} precision={0.5} readOnly /> */}
         
       </CardContent>

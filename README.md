@@ -71,7 +71,14 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
 
-product page rating
-dashboard graph apis
+product page rating  (done)
+dashboard graph apis (done)
+Dataset              (done)
+
 3d sizes
-Dataset
+Product Addresses    
+
+
+4242 4242 4242 4242
+12/34
+567

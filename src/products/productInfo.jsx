@@ -313,7 +313,7 @@ function ProductDetailsPage() {
                 </Button>
               </Grid>
               {(product.product_id === 1 || product.product_id === 2 || product.product_id === 3 || product.product_id === 4 || product.product_id === 5 || product.product_id === 6) && (
-                <Grid size={6}>
+                <Grid size={12}>
                   <Button
                     fullWidth
                     variant="outlined"

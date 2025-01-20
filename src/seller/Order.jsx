@@ -105,6 +105,7 @@ const OrdersPage = () => {
           flex: 1,
           p: { xs: 2, md: 3 },
           width: "75%",
+          ml:1,
           maxWidth: "1200px",
           overflow: { xs: "auto", md: "hidden" } // Only enable scrolling on small screens
         }}
@@ -158,7 +159,8 @@ const OrdersPage = () => {
               display: "flex",
               flexDirection: "column",
               gap: 2,
-              minWidth: "900px" // Minimum width to prevent squishing
+              ml:1,
+              minWidth: "920px" // Minimum width to prevent squishing
             }}
           >
             {filteredOrders.map((order, index) => (
@@ -182,9 +184,9 @@ const OrdersPage = () => {
               >
                 <Typography sx={{ flex: 0.8, textAlign: "left" }}>{order.order_id}</Typography>
                 <Typography sx={{ flex: 1, textAlign: "left" }}>{order.product_name}</Typography>
-                <Typography sx={{ flex: 1, textAlign: "left" }}>{order.status}</Typography>
+                <Typography sx={{ flex: 1, textAlign: "left", }}>{order.status}</Typography>
                 <Typography sx={{ flex: 1, textAlign: "left" }}>{order.order_date}</Typography>
-                <Typography sx={{ flex: 1, textAlign: "left" }}>{order.quantity}</Typography>
+                <Typography sx={{ flex: 1, textAlign: "left", ml:6 }}>{order.quantity}</Typography>
                 <Typography sx={{ flex: 1, textAlign: "left" }}>{order.price}</Typography>
                 <Box
                   sx={{
