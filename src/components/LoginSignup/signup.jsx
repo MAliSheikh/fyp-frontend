@@ -22,11 +22,13 @@ const SignUp = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    console.log('Role:', username);
+
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const handleCheckboxChange = (event) => {
-        setRole(event.target.checked ? 'customer' : 'store owner');
+        setRole(event.target.checked ? 'customer' : 'seller');
     };
 
     const handleSignup = async (event) => {
@@ -159,7 +161,7 @@ const SignUp = () => {
                     }}
                     control={
                         <Checkbox
-                            checked={role}
+                            checked={role === 'customer'}
                             onChange={handleCheckboxChange}
                         />
                     }

@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import logo from 'C:/Users/stech/Documents/GitHub/fyp-frontend/src/components/Logos/logo.png';
+import React, { useState, useEffect } from "react";
+import BNLOGO2 from "../Logos/BNLOGO2.png";
+import authService from "../LoginSignup/components/token";
+import MallListingPage from "../../mall_store_listing/mall_list";
 import {
   AppBar,
   Box,
@@ -16,66 +18,102 @@ import {
   useTheme,
   useMediaQuery,
   Badge,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Menu as MenuIcon,
   Search as SearchIcon,
   ShoppingCart as CartIcon,
   Person as PersonIcon,
-} from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
+} from "@mui/icons-material";
+import { styled } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
+
 
 // Custom styled components
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundColor: '#009688',
-  boxShadow: 'none',
+  backgroundColor: "#009688",
+  boxShadow: "none",
 }));
 
-const SearchWrapper = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: '4px',
-  backgroundColor: '#fff',
-  width: '100%',
-  maxWidth: '600px',
-  margin: '0 16px',
+const SearchWrapper = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: "4px",
+  backgroundColor: "#fff",
+  width: "100%",
+  maxWidth: "600px",
+  margin: "0 15px",
+  marginRight: "auto",
 }));
 
-const SearchIconWrapper = styled('div')({
-  position: 'absolute',
-  right: '20px',
-  top: '58%',
-  transform: 'translateY(-50%)',
-  color: '#119994',
-  padding: '2px',
+const SearchIconWrapper = styled("div")({
+  position: "absolute",
+  right: "20px",
+  top: "52%",
+  transform: "translateY(-50%)",
+  color: "#119994",
+  padding: "2px",
 });
 
 const StyledInputBase = styled(InputBase)({
-  width: '100%',
-  '& .MuiInputBase-input': {
-    padding: '8px 16px',
-    width: '100%',
+  width: "100%",
+  "& .MuiInputBase-input": {
+    padding: "8px 16px",
+    width: "100%",
   },
 });
 
 const NavButton = styled(Button)({
-  color: '#fff',
-  textTransform: 'none',
-  padding: '6px 15px'
+  color: "#fff",
+  textTransform: "none",
+  padding: "6px 15px",
 });
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
-  const navItems = ['Men', 'Women', 'Kids', 'Beauty', 'Others'];
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const navigate = useNavigate();
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    // Check token status whenever component mounts or auth state changes
+    const checkLoginStatus = () => {
+      const token = authService.getToken1();
+      setIsLoggedIn(!!token); // Convert token to boolean
+    };
+    
+    checkLoginStatus();
+    
+    // Add event listener for storage changes (in case token is removed in another tab)
+    window.addEventListener('storage', checkLoginStatus);
+    
+    return () => {
+      window.removeEventListener('storage', checkLoginStatus);
+    };
+  }, []); // Empty dependency array since we're setting up listeners
+
+  const handleLogout = () => {
+    authService.logout();
+    setIsLoggedIn(false);
+    navigate("/");
+  };
+  const navItems = ["Men", "Women", "Kids", "Beauty", "Others"];
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?search_string=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   return (
     <Box>
       {/* Top Bar */}
       <StyledAppBar position="static">
         <Container maxWidth="xl">
-          <Toolbar sx={{ padding: '8px 0' }}>
+          <Toolbar sx={{ padding: "8px 0" }}>
             {isMobile && (
               <IconButton
                 color="inherit"
@@ -87,65 +125,117 @@ const Header = () => {
             )}
 
             {/* Logo */}
-            <Box
-              component="img"
-              src={logo}
-              alt = "Bazaar Nest logo"
-              sx={{
-                height: 100,
-                width: 100,
-                borderRadius: '50%',
-                padding: 0,
-                marginRight: 50,
-                objectFit: 'cover',
-              }}
-            />
+              <Box
+                component="img"
+                onClick={()=>{navigate("/")} }
+                src={BNLOGO2}
+                alt="Bazaar Nest logo"
+                sx={{
+                  height: 70,
+                  width: 140,
+                  borderRadius: "0%",
+                  padding: 2,
+                  marginRight: 32,
+                  objectFit: "cover",
+                  cursor: "pointer",
+                }}
+              />
 
             {/* Search Bar */}
             <SearchWrapper>
-              <StyledInputBase
-                placeholder="Search"
-                inputProps={{ 'aria-label': 'search' }}
-              />
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
+              <form onSubmit={handleSearch} style={{ width: '100%' }}>
+                <StyledInputBase
+                  placeholder="Search"
+                  inputProps={{ "aria-label": "search" }}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <SearchIconWrapper>
+                  <IconButton type="submit">
+                    <SearchIcon />
+                  </IconButton>
+                </SearchIconWrapper>
+              </form>
             </SearchWrapper>
 
             {/* Right Side Menu */}
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              gap: { xs: 1, md: 2 }
-            }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: { xs: 1, md: 2 },
+              }}
+            >
               {!isMobile && (
                 <>
-                  <NavButton>Login</NavButton>
-                  <NavButton>Order & Returns</NavButton>
+                  {isLoggedIn ? (
+                    <NavButton onClick={handleLogout}>Logout</NavButton>
+                  ) : (
+                    <NavButton onClick={() => navigate("/login")}>
+                      Login
+                    </NavButton>
+                  )}
+                  
                 </>
               )}
-              <IconButton color="inherit">
+              <IconButton color="inherit" onClick={() => navigate("/add_to_cart")}>
                 <Badge badgeContent={0} color="error">
                   <CartIcon />
                 </Badge>
               </IconButton>
-              <IconButton color="inherit">
+              <IconButton color="inherit" onClick={() => navigate("/profile")}>
                 <PersonIcon />
               </IconButton>
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: '#fff',
+                  color: '#009688',
+                  '&:hover': {
+                    backgroundColor: '#e0e0e0'
+                  },
+                  textTransform: 'none',
+                  fontWeight: 'medium',
+                  fontSize: '14px',
+                  padding: '6px 16px'
+                }}
+                onClick={() => navigate("/mall_lists")}
+              >
+                Malls
+              </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: '#fff',
+                  color: '#009688',
+                  '&:hover': {
+                    backgroundColor: '#e0e0e0'
+                  },
+                  textTransform: 'none',
+                  fontWeight: 'medium',
+                  fontSize: '14px',
+                  padding: '6px 16px'
+                }}
+                onClick={() => navigate("/store_lists")}
+              >
+                Stores
+              </Button>
             </Box>
           </Toolbar>
         </Container>
 
         {/* Bottom Navigation */}
         {!isMobile && (
-          <Box sx={{ bgcolor: 'rgba(0, 0, 0, 0.1)' }}>
+          <Box sx={{ bgcolor: "rgba(0, 0, 0, 0.1)" }}>
             <Container maxWidth="xl">
-              <Box sx={{ 
-                display: 'flex',
-                justifyContent: 'right',
-                py: 1,
-                gap: 7
-              }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "right",
+                  py: 1,
+                  gap: 5,
+                }}
+              >
                 {navItems.map((item) => (
                   <NavButton key={item}>{item}</NavButton>
                 ))}
@@ -161,15 +251,15 @@ const Header = () => {
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
         sx={{
-          '& .MuiDrawer-paper': {
+          "& .MuiDrawer-paper": {
             width: 280,
-            bgcolor: '#009688',
-            color: '#fff',
+            bgcolor: "#009688",
+            color: "#fff",
           },
         }}
       >
         <Box sx={{ p: 2 }}>
-          <Typography variant="h6" sx={{ mb: 2, color: '#fff' }}>
+          <Typography variant="h6" sx={{ mb: 2, color: "#fff" }}>
             Menu
           </Typography>
           <List>
@@ -178,9 +268,18 @@ const Header = () => {
                 <ListItemText primary={item} />
               </ListItem>
             ))}
-            <ListItem button>
+            {isLoggedIn ? (
+              <ListItem button onClick={handleLogout}>
+                <ListItemText primary="Logout" />
+              </ListItem>
+            ) : (
+              <ListItem button onClick={() => navigate("/login")}>
+                <ListItemText primary="Login" />
+              </ListItem>
+            )}
+            {/* <ListItem button onClick={() => navigate("/login")}>
               <ListItemText primary="Login" />
-            </ListItem>
+            </ListItem> */}
             <ListItem button>
               <ListItemText primary="Order & Returns" />
             </ListItem>

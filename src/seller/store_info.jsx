@@ -1,0 +1,278 @@
+import React, { useState } from "react";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  //Paper,
+  CircularProgress,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { createStore } from "./seller";
+import { SideBar } from "./sidebar";
+import { useNavigate } from "react-router-dom";
+import authService from "../components/LoginSignup/components/token";
+
+const StoreInfo = () => {
+  const [shopName, setShopName] = useState("");
+  const [shopType, setShopType] = useState("");
+  const [description, setDescription] = useState("");
+  const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const navigate = useNavigate();
+
+  console.log("Store Info", shopName);
+
+  const handleFileChange = (event) => {
+    setImage(event.target.files[0]);
+  };
+
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Form submitted");
+    // Validation
+    if (!shopName || !shopType || !description || !image) {
+      setSnackbar({
+        open: true,
+        message: "All fields are required",
+        severity: "error",
+      });
+      return;
+    }
+
+    const user_id = localStorage.getItem("userId");
+    if (!user_id) {
+      setSnackbar({
+        open: true,
+        message: "Store owner ID not found",
+        severity: "error",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const base64Image = await convertToBase64(image);
+      console.log("Base64 image:", base64Image);
+      const response = await createStore(
+        user_id,
+        shopName,
+        shopType,
+        description,
+        base64Image
+      );
+      console.log("Store created successfully:", response);
+
+      // Fetch updated store info
+      await authService.fetchStoreInfo();
+
+      setSnackbar({
+        open: true,
+        message: "Store created successfully!",
+        severity: "success",
+      });
+
+      // Wait for 3 seconds before redirecting
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      navigate("/seller/upload-product");
+    } catch (error) {
+      console.error("Error creating store:", error);
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || "Failed to create store",
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: { xs: "column", md: "row" },
+        p: { xs: 1, sm: 2 },
+        gap: { xs: 2, sm: 3 },
+      }}
+    >
+      {/* Sidebar */}
+      <Box sx={{ width: { xs: "100%", md: "auto" } }}>
+        <SideBar />
+      </Box>
+
+      {/* Main Content */}
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: { md: "1200px" },
+          px: { xs: 2, sm: 3 },
+        }}
+      >
+        <Typography
+          variant="h5"
+          gutterBottom
+          sx={{
+            textAlign: { xs: "center", md: "left" },
+            mb: { xs: 3, md: 4 },
+          }}
+        >
+          Add Store Information
+        </Typography>
+
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: { xs: 3, md: 4 },
+            alignItems: { xs: "stretch", md: "flex-start" },
+          }}
+        >
+          {/* Left Side: Text Fields */}
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              width: { xs: "100%", md: "auto" },
+            }}
+          >
+            <TextField
+              label="Shop Name"
+              value={shopName}
+              onChange={(e) => setShopName(e.target.value)}
+              required
+              sx={{
+                width: { xs: "100%", md: "400px" },
+              }}
+            />
+            <TextField
+              label="Shop Type"
+              value={shopType}
+              onChange={(e) => setShopType(e.target.value)}
+              required
+              sx={{
+                width: { xs: "100%", md: "400px" },
+              }}
+            />
+            <TextField
+              label="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              multiline
+              rows={10}
+              required
+              sx={{
+                width: { xs: "100%", md: "400px" },
+              }}
+            />
+          </Box>
+
+          {/* Right Side: Upload Box */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 3,
+              width: { xs: "100%", md: "400px" },
+              alignItems: "center",
+            }}
+          >
+            <Box
+              sx={{
+                border: "2px dashed gray",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: { xs: 200, sm: 270 },
+                width: { xs: "100%", md: "350px" },
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                style={{ display: "none" }}
+                id="upload-button"
+              />
+              <label htmlFor="upload-button">
+                <Button
+                  component="span"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#119994",
+                    "&:hover": { backgroundColor: "#0d7b76" },
+                  }}
+                >
+                  {image ? image.name : "Upload Image"}
+                </Button>
+              </label>
+            </Box>
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              onClick={handleSubmit}
+              variant="contained"
+              sx={{
+                width: { xs: "100%", sm: "80%", md: "100%" },
+                maxWidth: "350px",
+                backgroundColor: "#119994",
+                color: "#ffffff",
+                mt: { xs: 2, md: 0 },
+                "&:hover": {
+                  backgroundColor: "#0d7b76",
+                },
+              }}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} /> : "Submit"}
+            </Button>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Snackbar remains the same */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Box>
+  );
+};
+
+export default StoreInfo;

@@ -1,7 +1,7 @@
 import axios from "axios";
 import authService from "./LoginSignup/components/token";
 import { base_URL } from "../utils";
-
+import { jwtDecode } from "jwt-decode";
 // const baseURL = process.env.BASE_URL;
 
 const axiosInstance = axios.create({
@@ -13,15 +13,18 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   async (config) => {
-    const token = authService.getToken();
-    if (token) {
+    const token = authService.getToken1();
+    if (typeof token === "string" && token.trim() !== "") {
       try {
         // Check if the token has expired
-        const decodedToken = JSON.parse(atob(token.split(".")[1]));
+        const decodedToken = jwtDecode(token);
         const currentTime = Math.floor(Date.now() / 1000);
         if (decodedToken.exp < currentTime) {
           // Token has expired, fetch a new one
-          const newToken = await authService.refreshToken(decodedToken.username, decodedToken.password);
+          const newToken = await authService.refreshToken(
+            decodedToken.sub,
+            decodedToken.password
+          );
           if (newToken) {
             config.headers.Authorization = `Bearer ${newToken}`;
           }
