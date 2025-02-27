@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Grid, Rating } from "@mui/material";
+import { Box, Typography, Grid, Rating, CircularProgress } from "@mui/material";
 import axiosInstance from "../components/axiosInstance";
-import { Avatar } from '@mui/material'
+import { Avatar } from '@mui/material';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 
 const ReviewHistory = () => {
   const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true); // Added loading state
   const userId = localStorage.getItem("userId");
 
   useEffect(() => {
@@ -15,11 +16,21 @@ const ReviewHistory = () => {
         setReviews(response.data);
       } catch (error) {
         console.error("Error fetching reviews:", error);
+      } finally {
+        setLoading(false); // Set loading to false after fetching
       }
     };
 
     fetchReviews();
   }, [userId]);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+        <CircularProgress />
+      </Box>
+    ); // Loader while fetching reviews
+  }
 
   return (
     <Box sx={{ p: 3 }}>
@@ -44,11 +55,9 @@ const ReviewHistory = () => {
             >
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <Avatar sx={{ width: 24, height: 24, mr: 1, p:0.5 }}>
-                  {/* {review.store_id?.toString()[0]?.toUpperCase() || '?'} */}
                   <PermIdentityIcon />
                 </Avatar>
                 <Typography variant="subtitle2">
-                  {/* Store {review.store_id} */}
                   User
                 </Typography>
               </Box>
