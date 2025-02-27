@@ -3,7 +3,7 @@ import { base_URL } from '../utils';
 
 export const fetchProducts = async (skip = 0, limit = 10) => {
   try {
-    const response = await axios.get(`${base_URL}/products`, {
+    const response = await axios.get(`${base_URL}/products/`, {
       params: {
         skip: skip,
         limit: limit

@@ -9,6 +9,7 @@ import {
   CardContent,
   Grid,
   Rating,
+  CircularProgress,
 } from "@mui/material";
 import axiosInstance from "../components/axiosInstance";
 
@@ -159,7 +160,7 @@ const IndependentStores = () => {
 
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-          <Typography>Loading stores...</Typography>
+          <CircularProgress />
         </Box>
       ) : (
         <Grid container spacing={3}>

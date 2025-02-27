@@ -8,7 +8,7 @@ import {
   // Button,
   // Grid,
   Rating,
-  // CircularProgress,
+  CircularProgress,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -155,19 +155,25 @@ const StoreProducts = () => {
       {/* Banner Section */}
       {/* <StoreBanner storeInfo={storeInfo} /> */}
 
-      {/* Rest of your store products content */}
-      {/* Product Grid */}
-      <Grid2 container spacing={3}>
-        {products.map((product, index) => (
-          <Grid2
-            item
-            size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
-            key={product.product}
-          >
-            <ProductCard product={product} />
-          </Grid2>
-        ))}
-      </Grid2>
+      {/* Loader Section */}
+      {loading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+          <CircularProgress />
+        </Box>
+      ) : (
+        /* Rest of your store products content */
+        <Grid2 container spacing={3}>
+          {products.map((product, index) => (
+            <Grid2
+              item
+              size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+              key={product.product}
+            >
+              <ProductCard product={product} />
+            </Grid2>
+          ))}
+        </Grid2>
+      )}
     </Container>
   );
 };
