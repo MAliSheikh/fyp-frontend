@@ -33,6 +33,7 @@ function ProductDetailsPage() {
   const [selectedSize, setSelectedSize] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("Item successfully added to cart!");
 
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
@@ -81,9 +82,13 @@ function ProductDetailsPage() {
         },
       });
       setSnackbarOpen(true);
-      // navigate(`/add_to_cart`, { state: { product, quantity } });
     } catch (error) {
-      console.error("Error adding to cart:", error);
+      if (error.response && error.response.status === 400 && error.response.data.detail === "Item already exists in the cart") {
+        setSnackbarOpen(true);
+        setSnackbarMessage("Item already exists in the cart.");
+      } else {
+        console.error("Error adding to cart:", error);
+      }
     }
   };
 
@@ -458,7 +463,7 @@ function ProductDetailsPage() {
           severity="success"
           sx={{ width: "100%" }}
         >
-          Item successfully added to cart!
+          {snackbarMessage}
         </Alert>
       </Snackbar>
     </>

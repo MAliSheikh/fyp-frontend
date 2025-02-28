@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
-import { Grid2 } from "@mui/material";
-import { Card, CardContent } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+  Grid2,
+  Card,
+  CardContent,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
 import axiosInstance from "../components/axiosInstance";
 
 const stripePromise = loadStripe(
   "pk_test_51QTktuD5F58hnFq935pSP61wZhoJnQS8tYlQmwxVRCLgvxaNpHEhyfaOmRz39JI5BSQHYK1ITBsaGJ24QovxUk7000EGFyu9xW"
 );
-
 
 const BuyNowPage = () => {
   const location = useLocation();
@@ -29,7 +31,7 @@ const BuyNowPage = () => {
 
   useEffect(() => {
     if (!product) {
-      navigate("/");  
+      navigate("/");
     }
   }, [product, navigate]);
 
@@ -63,7 +65,7 @@ const BuyNowPage = () => {
     try {
       const user_id = localStorage.getItem("userId");
       const order_items = await Promise.all(
-        [product].map(async (item) => { // Wrap product in an array
+        [product].map(async (item) => {
           const response = await axios.get(
             `http://localhost:8000/products/${item.product_id}/store_id`
           );
@@ -71,17 +73,15 @@ const BuyNowPage = () => {
 
           return {
             product_id: item.product_id,
-            product_name: item.name, // Ensure this matches your data
-            quantity: quantity, // Assuming quantity is defined
-            price: item.price, // Assuming item.price is defined
+            product_name: item.name,
+            quantity: quantity,
+            price: item.price,
             store_id: storeData.store_id,
           };
         })
       );
-      // Calculate total amount
-      const totalAmount = product.price * quantity; // Calculate total amount
+      const totalAmount = product.price * quantity;
 
-      // Prepare order data
       const orderData = {
         total_amount: totalAmount,
         status: "Pending",
@@ -90,44 +90,31 @@ const BuyNowPage = () => {
         order_items: order_items,
       };
 
-      // Send order data to /orders API
       const response = await axiosInstance.post("/orders", orderData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
-      const orderId = response.data.order_id; // Get the order ID from the response
-
-      // Prepare data for Stripe checkout session
+      const orderId = response.data.order_id;
       const checkoutSessionData = {
         order_id: orderId,
         order_items: order_items,
         total_amount: totalAmount,
         user_id: parseInt(user_id),
-        currency: 'pkr'
+        currency: "pkr",
       };
 
-      // Create a new Stripe Checkout Session
       const checkoutSessionResponse = await axiosInstance.post(
         "/payment/create-checkout-session",
         checkoutSessionData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        { headers: { "Content-Type": "application/json" } }
       );
 
-      const checkoutSessionId = checkoutSessionResponse.data.id; // Get the session ID from the response
-
-      // Redirect to Stripe checkout page
+      const checkoutSessionId = checkoutSessionResponse.data.id;
       const stripe = await stripePromise;
       const result = await stripe.redirectToCheckout({
         sessionId: checkoutSessionId,
       });
 
-      // After successful order placement, delete items from cart
       await Promise.all(
         order_items.map(async (item) => {
           try {
@@ -178,170 +165,134 @@ const BuyNowPage = () => {
   }
 
   return (
-    <Box sx={{ px: { xs: 2, md: 10 }, py: 5 }}>
-      <Typography variant="h4" gutterBottom>
+    <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, maxWidth: 1200, margin: "0 auto" }}>
+      <Typography variant="h4" gutterBottom align="center">
         Confirm Your Order
       </Typography>
 
-      <Grid2 container spacing={2} alignItems="center" sx={{ mb: 4 }}>
-        <Grid2 item xs={12} md={4}>
-          <img
-            src={product.images[0]}
-            alt={product.name}
-            style={{
-              width: "100%",
-              maxWidth: 300,
-              height: "auto",
-              marginBottom: 22,
-            }}
-          />
-        </Grid2>
-
-        <Grid2 item xs={12} md={8}>
-          <Box
-            sx={{
-              marginBottom: 20,
-              marginLeft: 5,
-              gap: 2,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-              height: "100%",
-            }}
-          >
-            <Grid2 size={12}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                {/* <Typography fontSize={18} fontWeight="500">
-                  <strong>Product Name: </strong>
-                </Typography> */}
-                <Typography fontSize={18} color="#000" width="10">
-                  {product.name}
-                </Typography>
-              </Box>
-            </Grid2>
-            <Grid2 size={12}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Typography fontSize={18} fontWeight="500">
-                  <strong>Price: </strong>
-                </Typography>
-                <Typography fontSize={18} color="#000">
-                  Rs.{product.price}
-                </Typography>
-              </Box>
-            </Grid2>
-
-            <Grid2 size={12}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Typography fontSize={18} fontWeight="500">
-                  <strong>Quantity: </strong>
-                </Typography>
-                <Typography fontSize={18} color="#000">
-                  {quantity}
-                </Typography>
-              </Box>
-            </Grid2>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography fontSize={18} fontWeight="500">
-                <strong>Price:</strong>
-              </Typography>
-              <Typography
-                fontSize={18}
-                fontWeight="500"
-                color="blue"
-                sx={{ ml: 2 }}
-              >
-                Rs.{product.price * quantity}
-              </Typography>
-            </Box>
-          </Box>
-        </Grid2>
-      </Grid2>
-
-      {/* Address Details */}
-      <Box
-        sx={{
-          padding: 4,
-          position: "absolute",
-          right: 0,
-          top: 0,
-          width: "40%",
-          marginTop: "200px",
-          marginRight: "20px",
-        }}
-      >
-        {addressLoading ? (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        ) : address ? (
-          <Card
-            elevation={3}
-            sx={{ maxWidth: 300, margin: "0 auto", padding: 2, mb: 4 }}
-          >
+      <Grid2 container spacing={3}>
+        {/* Product Details Section */}
+        <Grid2 size={{ xs: 12, sm: 6, md: 4 }} sx={{mb:2}}>
+          <Card elevation={3} sx={{ p: 2, height: "100%",  }}>
             <CardContent>
-              <Typography variant="h5" mb={3} textAlign="center">
-                Address Details
+              <img
+                src={product.images[0]}
+                alt={product.name}
+                style={{
+                  width: "100%",
+                  maxWidth: 300,
+                  height: "auto",
+                  borderRadius: "8px",
+                  marginBottom: "16px",
+                }}
+              />    
+              <Typography variant="h6" gutterBottom>
+                {product.name}
               </Typography>
-              <Typography variant="body1" gutterBottom>
-                <strong>State:</strong> {address.state}
+              <Typography variant="body1">
+                <strong>Price:</strong> Rs.{product.price}
               </Typography>
-              <Typography variant="body1" gutterBottom>
-                <strong>City:</strong> {address.city}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                <strong>Full Address:</strong> {address.full_address}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                <strong>Zip Code:</strong> {address.zip_code}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                <strong>Phone:</strong> {address.phone_no}
+              <Typography variant="body1">
+                <strong>Quantity:</strong> {quantity}
               </Typography>
             </CardContent>
           </Card>
-        ) : (
-          <Box sx={{ textAlign: "center" }}>
-            <Typography variant="body1" color="error" gutterBottom>
-              No address found. Please add an address.
-            </Typography>
-            <Button
-              variant="contained"
-              onClick={() => navigate("/address")}
-              sx={{
-                mt: 2,
-                bgcolor: "#26A69A",
-                "&:hover": { bgcolor: "#219688" },
-              }}
-            >
-              Add Address
-            </Button>
-          </Box>
-        )}
-      </Box>
+        </Grid2>
 
-      <Button
-        variant="contained"
-        onClick={handlePlaceOrder}
-        sx={{
-          height: 45,
-          textTransform: "none",
-          bgcolor: "#26A69A",
-          "&:hover": {
-            bgcolor: "#219688",
-          },
-          mt: 5,
-          width:"100%"
-        }}
-      >
-        Place Order
-      </Button>
+        {/* Order Summary Section */}
+        <Grid2 size={{ xs: 12, sm: 6, md: 4 }} sx={{ mb: 2 }}>
+          <Card elevation={3} sx={{ p: 2, height: "100%" }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Order Summary
+              </Typography>
+              <Box sx={{ my: 2 }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                  <Typography>Subtotal:</Typography>
+                  <Typography>Rs.{product.price * quantity}</Typography>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    mt: 2,
+                    pt: 2,
+                    borderTop: "1px solid #eee",
+                  }}
+                >
+                  <Typography variant="h6">Total:</Typography>
+                  <Typography variant="h6">Rs.{product.price * quantity}</Typography>
+                </Box>
+              </Box>
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={handlePlaceOrder}
+                disabled={loading}
+                sx={{
+                  bgcolor: "#26A69A",
+                  "&:hover": { bgcolor: "#219688" },
+                  mt: 2,
+                  textTransform: "none",
+                }}
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : "Place Order"}
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid2>
+
+        {/* Address Details Section */}
+        <Grid2 size={{ xs: 12, sm: 12, md: 4 }}>
+          <Card elevation={3} sx={{ p: 2, height: "100%" }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Address Details
+              </Typography>
+              {addressLoading ? (
+                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                  <CircularProgress />
+                </Box>
+              ) : address ? (
+                <>
+                  <Typography variant="body1" gutterBottom>
+                    <strong>State:</strong> {address.state}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    <strong>City:</strong> {address.city}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    <strong>Full Address:</strong> {address.full_address}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    <strong>Zip Code:</strong> {address.zip_code}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    <strong>Phone:</strong> {address.phone_no}
+                  </Typography>
+                </>
+              ) : (
+                <Box sx={{ textAlign: "center" }}>
+                  <Typography variant="body1" color="error" gutterBottom>
+                    No address found. Please add an address.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate("/address")}
+                    sx={{
+                      mt: 2,
+                      bgcolor: "#26A69A",
+                      "&:hover": { bgcolor: "#219688" },
+                    }}
+                  >
+                    Add Address
+                  </Button>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+        </Grid2>
+      </Grid2>
 
       <Snackbar
         open={snackbar.open}
