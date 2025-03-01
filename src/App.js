@@ -53,12 +53,12 @@ function App() {
           path="/products/:id"
           element={<Layout>{<ProductDetailsPage />}</Layout>}
         />
-        <Route path="/order-now" element={<Layout>{<OrderNow />}</Layout>} />
-        <Route path="/address" element={<Layout>{<AddressInputPage />}</Layout>} /> 
-        <Route path="/payment" element={<Layout>{<PaymentInputPage />}</Layout>} />
-        <Route path="/buy-now" element={<Layout>{<BuyNowPage />}</Layout>} />
-        <Route path="/add_to_cart" element={<Layout>{<AddToCartPage />}</Layout>} />
-        <Route path="/profile" element={<Layout>{<Profile />}</Layout>} />
+        <Route path="/order-now" element={<PrivateRoute roles={["customer"]}><Layout>{<OrderNow />}</Layout></PrivateRoute>} />
+        <Route path="/address" element={<PrivateRoute roles={["customer"]}><Layout>{<AddressInputPage />}</Layout></PrivateRoute>} /> 
+        <Route path="/payment" element={<PrivateRoute roles={["customer"]}><Layout>{<PaymentInputPage />}</Layout></PrivateRoute>} />
+        <Route path="/buy-now" element={<PrivateRoute roles={["customer"]}><Layout>{<BuyNowPage />}</Layout></PrivateRoute>} />
+        <Route path="/add_to_cart" element={<PrivateRoute roles={["customer"]}><Layout>{<AddToCartPage />}</Layout></PrivateRoute>} />
+        <Route path="/profile" element={<PrivateRoute roles={["customer"]}><Layout>{<Profile />}</Layout></PrivateRoute>} />
         {/* <Route path="/review" element={<Reviews />} /> */}
         <Route path="/review" element={<Layout>{<ReviewHistory />}</Layout>} />
         <Route path="/viewer" element={<Layout>{<Viewer />}</Layout>} />
