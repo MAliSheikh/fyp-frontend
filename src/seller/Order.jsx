@@ -7,6 +7,7 @@ const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const userId = localStorage.getItem("user_id"); // Assuming user_id is stored in localStorage
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -35,7 +36,8 @@ const OrdersPage = () => {
       quantity: item.quantity,
       price: item.price,
       total: order.total_amount,
-      product_name: item.product_name
+      product_name: item.product_name,
+      product_id: item.product_id // Added product_id for generic handling
     }))
   );
 
@@ -45,9 +47,9 @@ const OrdersPage = () => {
   );
   const store_id = localStorage.getItem("store_id");
   
-  const handleApprove = async (order_id, value) => {
+  const handleApprove = async (order_id, product_id) => {
     try {
-      const response = await axiosInstance.put(`/orders/${order_id}/store/${store_id}/status?status=approved`);
+      const response = await axiosInstance.put(`/orders/${order_id}/user/${userId}/item/${product_id}/status?status=approved`);
       
       // Update the local state to reflect the change
       setOrders(prevOrders => 
@@ -66,9 +68,9 @@ const OrdersPage = () => {
     }
   };
 
-  const handleDecline = async (order_id, value) => {
+  const handleDecline = async (order_id, product_id) => {
     try {
-      const response = await axiosInstance.put(`/orders/${order_id}/store/${store_id}/status?status=cancelled`);
+      const response = await axiosInstance.put(`/orders/${order_id}/store/${store_id}/item/${product_id}/status?status=cancelled`);
       
       // Update the local state to reflect the change
       setOrders(prevOrders => 
@@ -206,7 +208,7 @@ const OrdersPage = () => {
                       bgcolor: "#009688",
                       "&:hover": { bgcolor: "#00796b" },
                     }}
-                    onClick={() => handleApprove(order.order_id)}
+                    onClick={() => handleApprove(order.order_id, order.product_id)}
                   >
                     Approve
                   </Box>
@@ -220,7 +222,7 @@ const OrdersPage = () => {
                       textAlign: "center",
                       "&:hover": { backgroundColor: "#d32f2f" },
                     }}
-                    onClick={() => handleDecline(order.order_id)}
+                    onClick={() => handleDecline(order.order_id, order.product_id)}
                   >
                     Decline
                   </Box>

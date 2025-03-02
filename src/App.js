@@ -24,7 +24,7 @@ import ManageProducts from "./manage_product/manage-products";
 import OrdersPage from "./seller/Order";
 import MallStores from "./mall_store_listing/mall_stores";
 import StoreProducts from "./mall_store_listing/store_products";
-import AddressInputPage from "./Address/address";
+import AddressInputPage from "./profile/address";
 import PaymentInputPage from "./Payment/payment";
 import OrderNow from "./order/OrderNow";
 // import Reviews from './profile/Reviews';

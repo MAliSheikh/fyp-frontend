@@ -8,10 +8,13 @@ import {
     Typography,
     Link,
     useTheme,
-    useMediaQuery
+    useMediaQuery,
+    Snackbar,
+    Alert,
+    CircularProgress
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import authService from './components/token'
+import authService from './components/token';
 
 const SignUp = () => {
     const [username, setUsername] = useState('');
@@ -20,9 +23,9 @@ const SignUp = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [role, setRole] = useState('customer');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false); // New loading state
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' }); // Snackbar state
     const navigate = useNavigate();
-
-    console.log('Role:', username);
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -37,14 +40,21 @@ const SignUp = () => {
             setError('Passwords do not match');
             return;
         }
+        setLoading(true); // Set loading to true on signup attempt
         const result = await authService.register(email, password, username, role);
+        setLoading(false); // Reset loading state
         if (result.success) {
-            console.log('Registration successful');
+            setSnackbar({ open: true, message: 'Registration successful', severity: 'success' });
             navigate('/login');
             setError('');
         } else {
             setError(result.error);
+            setSnackbar({ open: true, message: result.error, severity: 'error' });
         }
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbar({ ...snackbar, open: false });
     };
 
     return (
@@ -191,9 +201,11 @@ const SignUp = () => {
                         },
                         textTransform: 'none',
                         fontSize: isMobile ? '1rem' : '1.1rem',
+                        position: 'relative', // Position relative for loader
                     }}
+                    disabled={loading} // Disable button while loading
                 >
-                    Submit
+                    {loading ? <CircularProgress size={24} color="inherit" /> : 'Submit'}
                 </Button>
 
                 <Box sx={{ textAlign: 'center' }}>
@@ -210,6 +222,16 @@ const SignUp = () => {
                     </Link>
                 </Box>
             </Box>
+
+            <Snackbar 
+                open={snackbar.open} 
+                autoHideDuration={6000} 
+                onClose={handleCloseSnackbar}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

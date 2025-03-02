@@ -7,7 +7,9 @@ import {
   Button,
   Stack,
   Paper,
-  CircularProgress
+  CircularProgress,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import axiosInstance from '../components/axiosInstance';
 import axios from 'axios';
@@ -19,6 +21,13 @@ const Reviews = ({ productId, storeId }) => {
   });
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+  const [hasReviewed, setHasReviewed] = useState(false); // New state to track if user has reviewed
   const userId = localStorage.getItem('userId');
 
   const handleSubmitReview = async () => {
@@ -27,6 +36,7 @@ const Reviews = ({ productId, storeId }) => {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const reviewPayload = {
         store_id: storeId,
@@ -48,12 +58,15 @@ const Reviews = ({ productId, storeId }) => {
       );
 
       console.log('Review submitted successfully:', response.data);
+      setSnackbar({ open: true, message: 'Review submitted successfully!', severity: 'success' });
 
-      // Reset form
       setReviewData({ rating: 0, comment: '' });
 
     } catch (error) {
       console.error('Error submitting review:', error);
+      setSnackbar({ open: true, message: 'Error submitting review.', severity: 'error' });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -65,6 +78,9 @@ const Reviews = ({ productId, storeId }) => {
         const response = await axios.get(`http://localhost:8000/reviews/user/${user_id}`);
         if (Array.isArray(response.data)) {
           setReviews(response.data);
+          // Check if the user has already reviewed the product
+          const reviewedProduct = response.data.find(review => review.store_id === storeId);
+          setHasReviewed(!!reviewedProduct);
         }
       } catch (error) {
         console.error('Error fetching reviews:', error);
@@ -74,7 +90,7 @@ const Reviews = ({ productId, storeId }) => {
     };
 
     fetchReviews();
-  }, []); // Empty dependency array to run only once
+  }, [storeId]); // Added storeId as a dependency
 
   if (isLoading) {
     return (
@@ -111,17 +127,25 @@ const Reviews = ({ productId, storeId }) => {
           <Button 
             variant="contained" 
             onClick={handleSubmitReview}
-            disabled={!reviewData.rating || !reviewData.comment}
-            sx={{ alignSelf: 'flex-end' }}
+            disabled={!reviewData.rating || !reviewData.comment || isSubmitting || hasReviewed} // Disable if already reviewed
+            sx={{
+              alignSelf: 'flex-end',
+              bgcolor: "#009688",
+              "&:hover": { bgcolor: "#00796b" },
+            }}
           >
-            Submit Review
+            {isSubmitting ? <CircularProgress size={24} /> : 'Submit Review'}
           </Button>
         </Stack>
       </Paper>
       <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
         Your Reviews
       </Typography>
-      {reviews.length > 0 ? (
+      {isLoading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+          <CircularProgress />
+        </Box>
+      ) : reviews.length > 0 ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {reviews.map((review) => (
             <Box
@@ -149,6 +173,15 @@ const Reviews = ({ productId, storeId }) => {
       ) : (
         <Typography>No reviews yet</Typography>
       )}
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={6000} 
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

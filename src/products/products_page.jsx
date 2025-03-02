@@ -1,4 +1,4 @@
-import React, { useState, useEffect, } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Slider from 'react-slick';
 import { useNavigate } from 'react-router-dom';
 import { Container, Box, Typography, Card, CardMedia, CardContent, Rating, CircularProgress } from '@mui/material';
@@ -98,22 +98,27 @@ const ProductCard = ({ product }) => {
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const dataFetchedRef = useRef(false); // Ref to track if data has been fetched
 
-  useEffect(() => {
-    const getProducts = async () => {
+  const getProducts = async () => {
+    if (!dataFetchedRef.current) { // Only fetch if data hasn't been fetched yet
       try {
         setLoading(true);
         const data = await fetchProducts();
         setProducts(data);
+        dataFetchedRef.current = true; // Mark data as fetched
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
         setLoading(false);
       }
-    };
+    }
+  };
 
-    getProducts();
-  }, []);
+  // Call getProducts when the component is mounted
+  useEffect(() => {
+    getProducts(); // Fetch data when the component is mounted
+  }, []); // Empty dependency array ensures this runs only once
 
   return (
     <Container maxWidth="lg">
@@ -137,7 +142,7 @@ const Products = () => {
       ) : (
         <Grid2 container spacing={3}>
           {products.map((product, index) => (
-            <Grid2 item size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product.product}>
+            <Grid2 item size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product.product_id}>
               <ProductCard product={product} />
             </Grid2>
           ))}

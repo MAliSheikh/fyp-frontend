@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Button, Stack, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { Box, Typography, Button, Stack, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress } from "@mui/material";
 import axiosInstance from "../components/axiosInstance";
 import Reviews from './Reviews';
 
@@ -9,6 +9,7 @@ const OrderHistory = () => {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [selectedStoreId, setSelectedStoreId] = useState(null);
+  const [loading, setLoading] = useState(true); // Added loading state
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -23,6 +24,8 @@ const OrderHistory = () => {
         setReviewedProducts(reviewedProductIds);
       } catch (error) {
         console.error("Error fetching orders:", error);
+      } finally {
+        setLoading(false); // Set loading to false after fetching
       }
     };
 
@@ -42,6 +45,14 @@ const OrderHistory = () => {
     setReviewedProducts((prev) => new Set(prev).add(selectedProductId));
   };
 
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+        <CircularProgress />
+      </Box>
+    ); // Loader while fetching orders
+  }
+
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h6" gutterBottom>
@@ -54,11 +65,11 @@ const OrderHistory = () => {
               <TableCell>Product Name</TableCell>
               <TableCell align="right">Quantity</TableCell>
               <TableCell align="right">Price</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell align="right">Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.flatMap(order => 
+             {orders.flatMap(order => 
               Object.values(order.order_items)
                 .map(item => (
                   <TableRow
@@ -70,16 +81,26 @@ const OrderHistory = () => {
                     </TableCell>
                     <TableCell align="right">{item.quantity}</TableCell>
                     <TableCell align="right">Rs.{item.price}</TableCell>
-                    {order.status === "delivered" && (
-                      <TableCell align="right">
-                        <Button
-                          variant="contained"
-                          onClick={() => handleReview(item.product_id, order.store_id)}
-                        >
-                          Review
-                        </Button>
-                      </TableCell>
-                    )}
+                    <TableCell align="right">
+                      {item.status === "delivered" ? (
+                        reviewedProducts.has(item.product_id) ? (
+                          item.status // Show status if reviewed
+                        ) : (
+                          <Button
+                            sx={{
+                              bgcolor: "#009688",
+                              "&:hover": { bgcolor: "#00796b" },
+                            }}
+                            variant="contained"
+                            onClick={() => handleReview(item.product_id, item.store_id)}
+                          >
+                            Review
+                          </Button>
+                        )
+                      ) : (
+                          item.status
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))
             )}
@@ -110,7 +131,10 @@ const OrderHistory = () => {
           <Button 
             variant="contained" 
             onClick={handleCloseReviewModal}
-            sx={{ mt: 2 }}
+            sx={{
+              bgcolor: "#009688",
+              "&:hover": { bgcolor: "#00796b" },
+            }}
           >
             Close
           </Button>
