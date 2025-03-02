@@ -31,7 +31,6 @@ const OrdersPage = () => {
   const flattenedOrderItems = orders.flatMap(order => 
     Object.values(order.order_items).map(item => ({
       order_id: order.order_id,
-      status: order.status,
       order_date: new Date(order.order_date).toLocaleDateString(),
       quantity: item.quantity,
       price: item.price,
@@ -60,6 +59,9 @@ const OrdersPage = () => {
         )
       );
 
+      // Delete cart items after successful approval
+      // await deleteCartItems(product_id);
+
       // Show success message
       alert('Order approved successfully');
     } catch (error) {
@@ -81,6 +83,9 @@ const OrdersPage = () => {
         )
       );
 
+      // Delete cart items after successful decline
+      // await deleteCartItems(product_id);
+
       // Show success message
       alert('Order declined successfully');
     } catch (error) {
@@ -88,6 +93,8 @@ const OrdersPage = () => {
       alert('Failed to decline order');
     }
   };
+
+
 
   return (
     <Box display="flex" sx={{ height: "100vh",p:2 }}>
