@@ -42,7 +42,6 @@ const OrderHistory = () => {
     setReviewModalOpen(false);
     setSelectedProductId(null);
     setSelectedStoreId(null);
-    setReviewedProducts((prev) => new Set(prev).add(selectedProductId));
   };
 
   if (loading) {
@@ -84,12 +83,13 @@ const OrderHistory = () => {
                     <TableCell align="right">
                       {item.status === "delivered" ? (
                         reviewedProducts.has(item.product_id) ? (
-                          item.status // Show status if reviewed
+                          <Typography>Reviewed</Typography>
+                          // item.status // Show status if reviewed
                         ) : (
                           <Button
                             sx={{
                               bgcolor: "#009688",
-                              "&:hover": { bgcolor: "#00796b" },
+                                "&:hover": { bgcolor: "#00796b" },
                             }}
                             variant="contained"
                             onClick={() => handleReview(item.product_id, item.store_id)}
@@ -98,7 +98,9 @@ const OrderHistory = () => {
                           </Button>
                         )
                       ) : (
-                          item.status
+                          <Typography sx={{
+                            textTransform: 'capitalize',
+                          }}>{item.status}</Typography>
                       )}
                     </TableCell>
                   </TableRow>
@@ -127,7 +129,14 @@ const OrderHistory = () => {
           maxHeight: '90vh',
           overflow: 'auto'
         }}>
-          <Reviews productId={selectedProductId} storeId={selectedStoreId} />
+          <Reviews productId={selectedProductId} storeId={selectedStoreId} reviews={orders.flatMap(order => 
+            Object.values(order.order_items)
+              .filter(item => item.product_id === selectedProductId)
+              .map(item => ({
+                product_id: item.product_id,
+                store_id: item.store_id,
+              }))
+          )} />
           <Button 
             variant="contained" 
             onClick={handleCloseReviewModal}

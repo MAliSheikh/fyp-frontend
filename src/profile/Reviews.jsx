@@ -14,12 +14,13 @@ import {
 import axiosInstance from '../components/axiosInstance';
 import axios from 'axios';
 
-const Reviews = ({ productId, storeId }) => {
+const Reviews = ({ productId, storeId, reviews }) => {
   const [reviewData, setReviewData] = useState({
     rating: 0,
     comment: ''
   });
-  const [reviews, setReviews] = useState([]);
+  const [data, setData] = useState([]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState({
@@ -27,7 +28,7 @@ const Reviews = ({ productId, storeId }) => {
     message: '',
     severity: 'success'
   });
-  const [hasReviewed, setHasReviewed] = useState(false); // New state to track if user has reviewed
+  const [hasReviewed, setHasReviewed] = useState(false);
   const userId = localStorage.getItem('userId');
 
   const handleSubmitReview = async () => {
@@ -57,9 +58,8 @@ const Reviews = ({ productId, storeId }) => {
         }
       );
 
-      console.log('Review submitted successfully:', response.data);
+      setData(prevData => [...prevData, response.data]);
       setSnackbar({ open: true, message: 'Review submitted successfully!', severity: 'success' });
-
       setReviewData({ rating: 0, comment: '' });
 
     } catch (error) {
@@ -75,10 +75,9 @@ const Reviews = ({ productId, storeId }) => {
       setIsLoading(true);
       try {
         const user_id = localStorage.getItem('userId');
-        const response = await axios.get(`http://localhost:8000/reviews/user/${user_id}`);
+        const response = await axios.get(`http://localhost:8000/reviews/product/${productId}`);
         if (Array.isArray(response.data)) {
-          setReviews(response.data);
-          // Check if the user has already reviewed the product
+          setData(response.data);
           const reviewedProduct = response.data.find(review => review.store_id === storeId);
           setHasReviewed(!!reviewedProduct);
         }
@@ -90,7 +89,7 @@ const Reviews = ({ productId, storeId }) => {
     };
 
     fetchReviews();
-  }, [storeId]); // Added storeId as a dependency
+  }, [productId, storeId]);
 
   if (isLoading) {
     return (
@@ -127,7 +126,7 @@ const Reviews = ({ productId, storeId }) => {
           <Button 
             variant="contained" 
             onClick={handleSubmitReview}
-            disabled={!reviewData.rating || !reviewData.comment || isSubmitting || hasReviewed} // Disable if already reviewed
+            disabled={!reviewData.rating || !reviewData.comment || isSubmitting || hasReviewed}
             sx={{
               alignSelf: 'flex-end',
               bgcolor: "#009688",
@@ -141,13 +140,9 @@ const Reviews = ({ productId, storeId }) => {
       <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
         Your Reviews
       </Typography>
-      {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-          <CircularProgress />
-        </Box>
-      ) : reviews.length > 0 ? (
+      {data.length > 0 ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {reviews.map((review) => (
+          {data.map((review) => (
             <Box
               key={review.review_id}
               sx={{
