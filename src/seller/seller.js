@@ -28,7 +28,8 @@ export const createStore = async (
   shopName,
   shopType,
   description,
-  image
+  image,
+  phone_number
 ) => {
   try {
     const token = localStorage.getItem("access_token"); // Retrieve the token from localStorage
@@ -40,6 +41,7 @@ export const createStore = async (
         description: description,
         shop_type: shopType,
         image: image,
+        phone_number: phone_number
       },
       {
         headers: {
@@ -77,6 +79,7 @@ export const createStoreAndMall = async (data) => {
           description: data.store.description,
           shop_type: data.store.shop_type,
           image: data.store.image,
+          phone_number: data.store.phone_number
         },
         mall: {
           name: data.mall.name,
