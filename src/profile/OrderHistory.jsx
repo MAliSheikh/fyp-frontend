@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, Button, Stack, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress } from "@mui/material";
 import axiosInstance from "../components/axiosInstance";
 import Reviews from './Reviews';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -44,6 +45,29 @@ const OrderHistory = () => {
     setSelectedStoreId(null);
   };
 
+  const openWhatsApp = (
+    orderId,
+    productId,
+    productName,
+    image,
+    price,
+    storeId,
+    status,
+    orderDate,
+    category,
+    subcategory,
+    phoneNumber
+  ) => {
+    const message = `Order ID: ${orderId}\nProduct ID: ${productId}\nProduct Name: ${productName}\nImage: ${image}\nPrice: Rs.${price}\nStore ID: ${storeId}\nStatus: ${status}\nOrder Date: ${orderDate}\nCategory: ${category}\nSubcategory: ${subcategory}`;
+
+    // Correct WhatsApp Web URL
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    // const whatsappUrl = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+
+    window.open(whatsappUrl, "_blank");
+  };
+
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
@@ -64,47 +88,74 @@ const OrderHistory = () => {
               <TableCell>Product Name</TableCell>
               <TableCell align="right">Quantity</TableCell>
               <TableCell align="right">Price</TableCell>
+              {/* <TableCell align="right">Store Phone</TableCell> */}
               <TableCell align="right">Status</TableCell>
+              <TableCell align="right">Chat</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-             {orders.flatMap(order => 
-              Object.values(order.order_items)
-                .map(item => (
+            {orders.flatMap(order =>
+              Object.values(order.order_items).map(item => {
+                const isReviewed = reviewedProducts.has(item.product_id); // Check if the product has been reviewed
+                // console.log('isReviewed', isReviewed)
+                return (
                   <TableRow
                     key={item.product_id}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
+                      <img src={item.product.images[0]} alt={item.product_name} style={{ width: '50px', height: '50px' }} />
                       {item.product_name}
                     </TableCell>
                     <TableCell align="right">{item.quantity}</TableCell>
                     <TableCell align="right">Rs.{item.price}</TableCell>
+                    {/* <TableCell align="right">{item.store.phone_number}</TableCell> */}
                     <TableCell align="right">
-                      {item.status === "delivered" ? (
-                        reviewedProducts.has(item.product_id) ? (
-                          <Typography>Reviewed</Typography>
-                          // item.status // Show status if reviewed
-                        ) : (
-                          <Button
-                            sx={{
-                              bgcolor: "#009688",
+                      {item.status === "delivered" && (
+                        <>
+                          {isReviewed === 'true' ? (
+                            <Typography>Reviewed</Typography> // Show "Reviewed" if the product has been reviewed
+                          ) : (
+                            <Button
+                              sx={{
+                                bgcolor: "#009688",
                                 "&:hover": { bgcolor: "#00796b" },
-                            }}
-                            variant="contained"
-                            onClick={() => handleReview(item.product_id, item.store_id)}
-                          >
-                            Review
-                          </Button>
-                        )
-                      ) : (
-                          <Typography sx={{
-                            textTransform: 'capitalize',
-                          }}>{item.status}</Typography>
+                              }}
+                              variant="contained"
+                              onClick={() => handleReview(item.product_id, item.store_id)}
+                            >
+                              Review
+                            </Button>
+                          )}
+                        </>
+                      )}
+                      {item.status !== "delivered" && (
+                        <Typography sx={{ textTransform: 'capitalize' }}>{item.status}</Typography>
+
                       )}
                     </TableCell>
+                    <TableCell align="right">
+                      <Button
+                        onClick={() => openWhatsApp(
+                          order.order_id,
+                          item.product_id,
+                          item.product_name,
+                          item.product.images[0],
+                          item.price,
+                          item.store_id,
+                          item.status,
+                          order.order_date,
+                          item.product.category,
+                          item.product.subcategory,
+                          item.store.phone_number
+                        )}
+                      >
+                        <WhatsAppIcon />
+                      </Button>
+                    </TableCell>
                   </TableRow>
-                ))
+                );
+              })
             )}
           </TableBody>
         </Table>
@@ -129,7 +180,7 @@ const OrderHistory = () => {
           maxHeight: '90vh',
           overflow: 'auto'
         }}>
-          <Reviews productId={selectedProductId} storeId={selectedStoreId} reviews={orders.flatMap(order => 
+          <Reviews productId={selectedProductId} storeId={selectedStoreId} reviews={orders.flatMap(order =>
             Object.values(order.order_items)
               .filter(item => item.product_id === selectedProductId)
               .map(item => ({
@@ -137,8 +188,8 @@ const OrderHistory = () => {
                 store_id: item.store_id,
               }))
           )} />
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             onClick={handleCloseReviewModal}
             sx={{
               bgcolor: "#009688",
