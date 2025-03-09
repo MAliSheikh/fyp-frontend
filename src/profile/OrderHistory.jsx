@@ -14,6 +14,7 @@ const OrderHistory = () => {
   const [selectedStoreId, setSelectedStoreId] = useState(null);
   const [loading, setLoading] = useState(true); // Added loading state
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -158,7 +159,7 @@ const OrderHistory = () => {
                         </Button>
                       <IconButton
                         onClick={() => {
-                          navigate(`/chat/${item.user_id}/${item.store_id}`, { 
+                          navigate(`/chat/${order.user_id}/${item.store_id}`, { 
                             state: {
                               orderId: order.order_id,
                               productId: item.product_id,

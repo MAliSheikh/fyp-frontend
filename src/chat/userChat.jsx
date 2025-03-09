@@ -276,7 +276,7 @@ I need assistance with this order. Please help.
             key={message.message_id || message.temp_id || `temp-${index}`}
             sx={{ 
               display: 'flex', 
-              justifyContent: message.role === 'customer' || message.role === 'user' ? 'flex-end' : 'flex-start',
+              justifyContent: message.role === 'customer' || message.role === 'seller' ? 'flex-end' : 'flex-start',
               mb: 1
             }}
           >
@@ -284,9 +284,9 @@ I need assistance with this order. Please help.
               elevation={1} 
               sx={{ 
                 p: 1.5, 
-                maxWidth: '70%', 
+                maxWidth: '80%', 
                 borderRadius: 2,
-                backgroundColor: message.role === 'customer' || message.role === 'user' ? '#DCF8C6' : 'white'
+                backgroundColor: message.role === 'customer' || message.role === 'seller' ? '#DCF8C6' : 'white'
               }}
             >
               <Typography variant="body1" style={{ whiteSpace: 'pre-wrap' }}>{message.message}</Typography>
@@ -307,7 +307,7 @@ I need assistance with this order. Please help.
         <div ref={messagesEndRef} />
       </Box>
       
-      {/* Order information card - only show if order data exists */}
+      {/* Orde  r information card - only show if order data exists */}
       {orderData.orderId && (
         <Card variant="outlined" sx={{ mx: 1, mt: 1, mb: 0 }}>
           <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
