@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Button, Stack, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress } from "@mui/material";
+import { Box, Typography, Button, IconButton, Stack, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress } from "@mui/material";
 import axiosInstance from "../components/axiosInstance";
 import Reviews from './Reviews';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
+import { useNavigate } from "react-router-dom"
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -11,6 +13,7 @@ const OrderHistory = () => {
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [selectedStoreId, setSelectedStoreId] = useState(null);
   const [loading, setLoading] = useState(true); // Added loading state
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -113,7 +116,7 @@ const OrderHistory = () => {
                     <TableCell align="right">
                       {item.status === "delivered" && (
                         <>
-                          {isReviewed === 'true' ? (
+                          {isReviewed === true ? (
                             <Typography>Reviewed</Typography> // Show "Reviewed" if the product has been reviewed
                           ) : (
                             <Button
@@ -135,24 +138,48 @@ const OrderHistory = () => {
                       )}
                     </TableCell>
                     <TableCell align="right">
-                      <Button
-                        onClick={() => openWhatsApp(
-                          order.order_id,
-                          item.product_id,
-                          item.product_name,
-                          item.product.images[0],
-                          item.price,
-                          item.store_id,
-                          item.status,
-                          order.order_date,
-                          item.product.category,
-                          item.product.subcategory,
-                          item.store.phone_number
-                        )}
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Button
+                          onClick={() => openWhatsApp(
+                            order.order_id,
+                            item.product_id,
+                            item.product_name,
+                            item.product.images[0],
+                            item.price,
+                            item.store_id,
+                            item.status,
+                            order.order_date,
+                            item.product.category,
+                            item.product.subcategory,
+                            item.store.phone_number
+                          )}
+                        >
+                          <WhatsAppIcon />
+                        </Button>
+                      <IconButton
+                        onClick={() => {
+                          navigate('/chat', { 
+                            state: {
+                              orderId: order.order_id,
+                              productId: item.product_id,
+                              productName: item.product_name,
+                              image: item.product.images[0],
+                              price: item.price,
+                              storeId: item.store_id,
+                              status: item.status,
+                              orderDate: order.order_date,
+                              category: item.product.category,
+                              subcategory: item.product.subcategory,
+                              phoneNumber: item.store.phone_number
+                            }
+                          });
+                        }}
                       >
-                        <WhatsAppIcon />
-                      </Button>
+                        <CommentOutlinedIcon />
+                      </IconButton>
+                      </Box>
                     </TableCell>
+
                   </TableRow>
                 );
               })

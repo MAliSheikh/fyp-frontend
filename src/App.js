@@ -34,6 +34,8 @@ import Viewer from './3d_viewer/viewer1'
 // import ThreeSixtyVieww from './3d_viewer/view_360'
 import Success from './Success'; // Import the Success page
 import Cancel from './Cancel';
+import Chat from "./chat/chatting";
+import SellerChat from './chat/sellerChat' 
 
 function App() {
   return (
@@ -54,7 +56,7 @@ function App() {
           element={<Layout>{<ProductDetailsPage />}</Layout>}
         />
         <Route path="/order-now" element={<Layout>{<OrderNow />}</Layout>} />
-        <Route path="/address" element={<Layout>{<AddressInputPage />}</Layout>} /> 
+        <Route path="/address" element={<Layout>{<AddressInputPage />}</Layout>} />
         <Route path="/payment" element={<Layout>{<PaymentInputPage />}</Layout>} />
         <Route path="/buy-now" element={<Layout>{<BuyNowPage />}</Layout>} />
         <Route path="/add_to_cart" element={<Layout>{<AddToCartPage />}</Layout>} />
@@ -62,8 +64,10 @@ function App() {
         {/* <Route path="/review" element={<Reviews />} /> */}
         <Route path="/review" element={<Layout>{<ReviewHistory />}</Layout>} />
         <Route path="/viewer" element={<Layout>{<Viewer />}</Layout>} />
-        <Route path="/success" element={<Success/>} />
-        <Route path="/cancel" element={<Cancel/>} />
+        <Route path="/success" element={<Success />} />
+        <Route path="/cancel" element={<Cancel />} />
+        <Route path="/chat" element={<Chat />} />
+        <Route path="/chat-seller" element={<SellerChat />} />
         {/* <Route path="/viewer_360" element={<Layout>{<ThreeSixtyVieww />}</Layout>} /> */}
         <Route
           path="/mall_lists"
@@ -158,7 +162,7 @@ function App() {
             </PrivateRoute>
           }
         /> */}
-        
+
         <Route path="/orders" element={<Layout>{<OrdersPage />}</Layout>} />
         <Route path="/manageproducts" element={<Layout>{<ManageProducts />}</Layout>} />
         <Route path="/login" element={<Login />} />
