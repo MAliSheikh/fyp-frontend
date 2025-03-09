@@ -91,10 +91,10 @@ const OrderHistory = () => {
             <TableRow>
               <TableCell>Product Name</TableCell>
               <TableCell align="right">Quantity</TableCell>
-              <TableCell align="right">Price</TableCell>
+              <TableCell align="center">Price</TableCell>
               {/* <TableCell align="right">Store Phone</TableCell> */}
-              <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Chat</TableCell>
+              <TableCell align="center">Status</TableCell>
+              <TableCell align="left">Chat</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
