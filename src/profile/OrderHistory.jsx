@@ -158,7 +158,7 @@ const OrderHistory = () => {
                         </Button>
                       <IconButton
                         onClick={() => {
-                          navigate('/chat', { 
+                          navigate(`/chat/${item.user_id}/${item.store_id}`, { 
                             state: {
                               orderId: order.order_id,
                               productId: item.product_id,
@@ -166,6 +166,7 @@ const OrderHistory = () => {
                               image: item.product.images[0],
                               price: item.price,
                               storeId: item.store_id,
+                              userId: item.user_id,
                               status: item.status,
                               orderDate: order.order_date,
                               category: item.product.category,

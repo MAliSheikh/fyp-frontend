@@ -34,8 +34,8 @@ import Viewer from './3d_viewer/viewer1'
 // import ThreeSixtyVieww from './3d_viewer/view_360'
 import Success from './Success'; // Import the Success page
 import Cancel from './Cancel';
-import Chat from "./chat/chatting";
-import SellerChat from './chat/sellerChat' 
+import UserChatComponent from "./chat/userChat";
+// import SellerChatting from './chat/seller-chatting' 
 
 function App() {
   return (
@@ -66,8 +66,9 @@ function App() {
         <Route path="/viewer" element={<Layout>{<Viewer />}</Layout>} />
         <Route path="/success" element={<Success />} />
         <Route path="/cancel" element={<Cancel />} />
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/chat-seller" element={<SellerChat />} />
+        <Route path="/chat" element={<UserChatComponent />} />
+        <Route path="/chat/:userId/:storeId" element={<UserChatComponent />} />
+        {/* <Route path="/chat-seller" element={<SellerChatting />} /> */}
         {/* <Route path="/viewer_360" element={<Layout>{<ThreeSixtyVieww />}</Layout>} /> */}
         <Route
           path="/mall_lists"
