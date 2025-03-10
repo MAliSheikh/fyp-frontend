@@ -7,15 +7,19 @@ import {
   useTheme,
   useMediaQuery,
   Link,
+  CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import authService from "./components/token";
 import { useNavigate } from "react-router-dom";
-// import axios from 'axios';
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // New loading state
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" }); // Snackbar state
 
   const navigate = useNavigate();
   const theme = useTheme();
@@ -24,9 +28,11 @@ const Login = () => {
   const handleLogin = async (event) => {
     event.preventDefault();
     setError("");
+    setLoading(true); // Set loading to true on login attempt
 
     if (!email || !password) {
       setError("Email and password are required");
+      setLoading(false); // Reset loading state
       return;
     }
 
@@ -34,16 +40,14 @@ const Login = () => {
       const response = await authService.login(email, password);
       if (response.access_token) {
         const userRole = authService.getUserRole();
-        // const userId = localStorage.getItem("userId");
+        setSnackbar({ open: true, message: "Login successful!", severity: "success" }); // Show success snackbar
 
         if (userRole === "seller") {
           try {
             await authService.fetchStoreInfo().catch(error => {
               console.warn("Failed to fetch store info:", error);
             });
-            
             navigate("/seller/upload-product");
-            
           } catch (error) {
             console.error("Error during seller login flow:", error);
             navigate("/store_info");
@@ -62,7 +66,13 @@ const Login = () => {
       } else {
         setError("Login failed. Please try again later.");
       }
+    } finally {
+      setLoading(false); // Reset loading state after login attempt
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   return (
@@ -164,9 +174,11 @@ const Login = () => {
             },
             textTransform: "none",
             fontSize: isMobile ? "1rem" : "1.1rem",
+            position: "relative", // Position relative for loader
           }}
+          disabled={loading} // Disable button while loading
         >
-          Submit
+          {loading ? <CircularProgress size={24} color="inherit" /> : "Submit"}
         </Button>
 
         <Box sx={{ textAlign: "center" }}>
@@ -183,6 +195,16 @@ const Login = () => {
           </Link>
         </Box>
       </Box>
+
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={6000} 
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

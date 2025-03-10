@@ -78,6 +78,13 @@ export const SideBar = () => {
       >
         Orders
       </Button>
+      {/* <Button
+        variant="contained"
+        sx={getButtonStyle("/chat-seller")}
+        onClick={() => navigate("/chat-seller")}
+      >
+        Chat Messages
+      </Button> */}
 
       <Typography
         sx={{

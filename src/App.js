@@ -24,7 +24,7 @@ import ManageProducts from "./manage_product/manage-products";
 import OrdersPage from "./seller/Order";
 import MallStores from "./mall_store_listing/mall_stores";
 import StoreProducts from "./mall_store_listing/store_products";
-import AddressInputPage from "./Address/address";
+import AddressInputPage from "./profile/address";
 import PaymentInputPage from "./Payment/payment";
 import OrderNow from "./order/OrderNow";
 // import Reviews from './profile/Reviews';
@@ -34,6 +34,8 @@ import Viewer from './3d_viewer/viewer1'
 // import ThreeSixtyVieww from './3d_viewer/view_360'
 import Success from './Success'; // Import the Success page
 import Cancel from './Cancel';
+import UserChatComponent from "./chat/userChat";
+// import SellerChatting from './chat/seller-chatting' 
 
 function App() {
   return (
@@ -62,8 +64,11 @@ function App() {
         {/* <Route path="/review" element={<Reviews />} /> */}
         <Route path="/review" element={<Layout>{<ReviewHistory />}</Layout>} />
         <Route path="/viewer" element={<Layout>{<Viewer />}</Layout>} />
-        <Route path="/success" element={<Success/>} />
-        <Route path="/cancel" element={<Cancel/>} />
+        <Route path="/success" element={<Success />} />
+        <Route path="/cancel" element={<Cancel />} />
+        <Route path="/chat" element={<UserChatComponent />} />
+        <Route path="/chat/:userId/:storeId" element={<UserChatComponent />} />
+        {/* <Route path="/chat-seller" element={<SellerChatting />} /> */}
         {/* <Route path="/viewer_360" element={<Layout>{<ThreeSixtyVieww />}</Layout>} /> */}
         <Route
           path="/mall_lists"
@@ -158,7 +163,7 @@ function App() {
             </PrivateRoute>
           }
         /> */}
-        
+
         <Route path="/orders" element={<Layout>{<OrdersPage />}</Layout>} />
         <Route path="/manageproducts" element={<Layout>{<ManageProducts />}</Layout>} />
         <Route path="/login" element={<Login />} />

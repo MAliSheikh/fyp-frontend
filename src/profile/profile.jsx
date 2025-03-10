@@ -16,7 +16,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import LogoutIcon from "@mui/icons-material/Logout";
 import axiosInstance from "../components/axiosInstance";
-import AddressInputPage from "../Address/address";
+import AddressInputPage from "../profile/address";
 import Add_to_cart from "../Add_to_cart/add_to_cart";
 import ReviewHistory from './review_history'
 import OrderHistory from './OrderHistory';

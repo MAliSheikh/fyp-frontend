@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Container,
   Box,
@@ -7,15 +7,13 @@ import {
   Card,
   CardMedia,
   CardContent,
-  Button,
   Grid,
   Rating,
+  CircularProgress,
 } from "@mui/material";
 import { fetchMallStores, fetchMallInfo } from "./mallStoreApi";
-// Banner component similar to products page
-const BannerSlider = ({ mallInfo }) => {
-  console.log("Mall Info in Banner:", mallInfo); // For debugging
 
+const BannerSlider = ({ mallInfo }) => {
   return (
     <Box
       sx={{
@@ -91,7 +89,7 @@ const StoreCard = ({ store }) => {
         sx={{
           borderRadius: "20px 20px 0 0",
           objectFit: "cover",
-          cursor:"pointer"
+          cursor: "pointer"
         }}
       />
       <CardContent sx={{ flexGrow: 1 }}>
@@ -99,7 +97,7 @@ const StoreCard = ({ store }) => {
           variant="h6"
           onClick={handleViewStore}
           sx={{
-            cursor:"pointer",
+            cursor: "pointer",
             height: 30,
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -111,10 +109,9 @@ const StoreCard = ({ store }) => {
           {store.name}
         </Typography>
         <Typography
-          
           variant="body2"
           color="text.secondary"
-          sx={{ mb: 1, cursor:"pointer" }}
+          sx={{ mb: 1, cursor: "pointer" }}
         >
           {store.shop_type}
         </Typography>
@@ -141,7 +138,6 @@ const MallStores = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Fetch stores and mall info in parallel
         const [storesData, mallData] = await Promise.all([
           fetchMallStores(mallId),
           fetchMallInfo(mallId),
@@ -180,24 +176,33 @@ const MallStores = () => {
           )}
           {selectedMallInfo.location && (
             <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-              Location: {selectedMallInfo.location}
+              {selectedMallInfo.location}
             </Typography>
           )}
         </Box>
       )}
 
-      {/* Stores Grid */}
-      <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
-        Available Stores
-      </Typography>
+      {/* Loader Section */}
+      {loading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          {/* Stores Grid */}
+          <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
+            Available Stores
+          </Typography>
 
-      <Grid container spacing={3}>
-        {stores.map((store) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={store.store_id}>
-            <StoreCard store={store} />
+          <Grid container spacing={3}>
+            {stores.map((store) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={store.store_id}>
+                <StoreCard store={store} />
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
+        </>
+      )}
     </Container>
   );
 };

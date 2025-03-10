@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
-  // TextField,
   Button,
   Grid,
   Paper,
@@ -84,7 +83,6 @@ const OrderNow = () => {
        // Send order data to /order API
        const orderData = {
         total_amount: totalAmount,
-        status: "Pending",
         items_count: orderItems.length,
         user_id: parseInt(user_id),
         order_items: order_items,
@@ -118,24 +116,14 @@ const OrderNow = () => {
 
       const checkoutSessionId = checkoutSessionResponse.data.id;
 
+      // Delete cart items before redirecting to Stripe checkout page
+      await Promise.all(order_items.map(item => deleteCartItems(item.product_id)));
+
       // Redirect to Stripe checkout page
       const stripe = await stripePromise;
       const result = await stripe.redirectToCheckout({
         sessionId: checkoutSessionId,
       });
-
-      // After successful order placement, delete items from cart
-      await Promise.all(
-        orderItems.map(async (item) => {
-          try {
-            await axiosInstance.delete(
-              `/cart/cart-items/product/${user_id}/${item.product_id}`
-            );
-          } catch (error) {
-            console.error("Error deleting cart item:", error);
-          }
-        })
-      );
 
       if (result.error) {
         setSnackbar({
@@ -153,6 +141,16 @@ const OrderNow = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteCartItems = async (product_id) => {
+    const userId = localStorage.getItem("userId"); // Ensure userId is retrieved correctly
+    try {
+      await axiosInstance.delete(`/cart/cart-items/product/${userId}/${product_id}`);
+      console.log('Cart item deleted successfully');
+    } catch (error) {
+      console.error('Error deleting cart item:', error);
     }
   };
 

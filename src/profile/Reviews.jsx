@@ -7,18 +7,28 @@ import {
   Button,
   Stack,
   Paper,
-  CircularProgress
+  CircularProgress,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import axiosInstance from '../components/axiosInstance';
 import axios from 'axios';
 
-const Reviews = ({ productId, storeId }) => {
+const Reviews = ({ productId, storeId, reviews }) => {
   const [reviewData, setReviewData] = useState({
     rating: 0,
     comment: ''
   });
-  const [reviews, setReviews] = useState([]);
+  const [data, setData] = useState([]);
+
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+  const [hasReviewed, setHasReviewed] = useState(false);
   const userId = localStorage.getItem('userId');
 
   const handleSubmitReview = async () => {
@@ -27,6 +37,7 @@ const Reviews = ({ productId, storeId }) => {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const reviewPayload = {
         store_id: storeId,
@@ -47,13 +58,15 @@ const Reviews = ({ productId, storeId }) => {
         }
       );
 
-      console.log('Review submitted successfully:', response.data);
-
-      // Reset form
+      setData(prevData => [...prevData, response.data]);
+      setSnackbar({ open: true, message: 'Review submitted successfully!', severity: 'success' });
       setReviewData({ rating: 0, comment: '' });
 
     } catch (error) {
       console.error('Error submitting review:', error);
+      setSnackbar({ open: true, message: 'Error submitting review.', severity: 'error' });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -62,9 +75,11 @@ const Reviews = ({ productId, storeId }) => {
       setIsLoading(true);
       try {
         const user_id = localStorage.getItem('userId');
-        const response = await axios.get(`http://localhost:8000/reviews/user/${user_id}`);
+        const response = await axios.get(`http://localhost:8000/reviews/product/${productId}`);
         if (Array.isArray(response.data)) {
-          setReviews(response.data);
+          setData(response.data);
+          const reviewedProduct = response.data.find(review => review.store_id === storeId);
+          setHasReviewed(!!reviewedProduct);
         }
       } catch (error) {
         console.error('Error fetching reviews:', error);
@@ -74,7 +89,7 @@ const Reviews = ({ productId, storeId }) => {
     };
 
     fetchReviews();
-  }, []); // Empty dependency array to run only once
+  }, [productId, storeId]);
 
   if (isLoading) {
     return (
@@ -111,19 +126,23 @@ const Reviews = ({ productId, storeId }) => {
           <Button 
             variant="contained" 
             onClick={handleSubmitReview}
-            disabled={!reviewData.rating || !reviewData.comment}
-            sx={{ alignSelf: 'flex-end' }}
+            disabled={!reviewData.rating || !reviewData.comment || isSubmitting || hasReviewed}
+            sx={{
+              alignSelf: 'flex-end',
+              bgcolor: "#009688",
+              "&:hover": { bgcolor: "#00796b" },
+            }}
           >
-            Submit Review
+            {isSubmitting ? <CircularProgress size={24} /> : 'Submit Review'}
           </Button>
         </Stack>
       </Paper>
       <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
         Your Reviews
       </Typography>
-      {reviews.length > 0 ? (
+      {data.length > 0 ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {reviews.map((review) => (
+          {data.map((review) => (
             <Box
               key={review.review_id}
               sx={{
@@ -149,6 +168,15 @@ const Reviews = ({ productId, storeId }) => {
       ) : (
         <Typography>No reviews yet</Typography>
       )}
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={6000} 
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
