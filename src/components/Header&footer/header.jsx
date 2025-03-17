@@ -18,16 +18,22 @@ import {
   useTheme,
   useMediaQuery,
   Badge,
+  Hidden,
+  Menu,
+  MenuItem,
+  Select,
+  FormControl,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
   Search as SearchIcon,
   ShoppingCart as CartIcon,
   Person as PersonIcon,
+  Close as CloseIcon,
+  KeyboardArrowDown as ArrowDownIcon,
 } from "@mui/icons-material";
-import { styled } from "@mui/material/styles";
+import { styled, alpha } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-
 
 // Custom styled components
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -39,10 +45,12 @@ const SearchWrapper = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: "4px",
   backgroundColor: "#fff",
-  width: "100%",
-  maxWidth: "600px",
+  flexGrow: 1, // Allows flexible resizing
+  minWidth: "180px", // Prevents search bar from collapsing
+  maxWidth: "580px",
   margin: "0 15px",
-  marginRight: "auto",
+  display: "flex",
+  alignItems: "center",
 }));
 
 const SearchIconWrapper = styled("div")({
@@ -68,6 +76,36 @@ const NavButton = styled(Button)({
   padding: "6px 15px",
 });
 
+const CategorySelect = styled(Select)(({ theme }) => ({
+  backgroundColor: "#fff",
+  minWidth: 130, // Adjust as needed
+  height: 40, // Fixed height for consistency
+  borderRadius: "4px 0 0 4px",
+  marginRight: "10px", // Add space between dropdown and searchbar
+  '& .MuiSelect-select': {
+    padding: "8px 32px 8px 12px",
+    display: "flex",
+    alignItems: "center", // Changed from 'left' to 'center' for better alignment
+    fontSize: "0.9rem",
+  },
+  '&:before, &:after': {
+    display: "none",
+  },
+  '& .MuiOutlinedInput-notchedOutline': {
+    border: "none", // Removes unwanted border
+  },
+  '& .MuiSelect-icon': {
+    right: 10, // Keeps arrow properly positioned
+  },
+  // Add hover effect for better interactivity
+  '&:hover': {
+    backgroundColor: alpha("#fff", 0.9),
+  },
+  // Add transition for smooth hover effect
+  transition: 'background-color 0.3s ease',
+}));
+
+
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
@@ -76,6 +114,7 @@ const Header = () => {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [category, setCategory] = useState('all');
 
   useEffect(() => {
     // Check token status whenever component mounts or auth state changes
@@ -104,7 +143,7 @@ const Header = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?search_string=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/search?search_string=${encodeURIComponent(searchQuery.trim())}&category=${category}`);
     }
   };
 
@@ -141,9 +180,23 @@ const Header = () => {
                 }}
               />
 
-            {/* Search Bar */}
+            {/* Search Bar with Category Dropdown */}
             <SearchWrapper>
-              <form onSubmit={handleSearch} style={{ width: '100%' }}>
+              <form onSubmit={handleSearch} style={{ width: '100%', display: 'flex' }}>
+                <FormControl variant="standard">
+                  <CategorySelect
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    displayEmpty
+                    IconComponent={ArrowDownIcon}
+                  >
+                    <MenuItem value="all">All</MenuItem>
+                    <MenuItem value="clothes">Clothes</MenuItem>
+                    <MenuItem value="shoes">Shoes</MenuItem>
+                    <MenuItem value="accessories">Accessories</MenuItem>
+                    <MenuItem value="electronics">Electronics</MenuItem>
+                  </CategorySelect>
+                </FormControl>
                 <StyledInputBase
                   placeholder="Search"
                   inputProps={{ "aria-label": "search" }}
