@@ -18,8 +18,6 @@ import Alert from "@mui/material/Alert";
 import Reviews from "../reviews/Reviews";
 import Viewer from "../3d_viewer/viewer";
 
-
-
 function ProductDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -31,12 +29,19 @@ function ProductDetailsPage() {
   const [open, setOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("Item successfully added to cart!");
+  const [snackbarMessage, setSnackbarMessage] = useState(
+    "Item successfully added to cart!"
+  );
 
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
+  };
+
+  const handleColorSelect = (color) => {
+    setSelectedColor(color);
   };
 
   useEffect(() => {
@@ -44,12 +49,16 @@ function ProductDetailsPage() {
       try {
         const data = await fetchProductByIdDetails(id);
         setProduct(data);
-        // Set default size based on category
-        if (data.category === "Clothing") {
-          setSelectedSize("Small");
-        } else if (data.category === "Footwear") {
-          setSelectedSize(6);
+
+        // Set default size and color if available from API
+        if (data.sizes && data.sizes.length > 0) {
+          setSelectedSize(data.sizes[0]);
         }
+
+        if (data.colors && data.colors.length > 0) {
+          setSelectedColor(data.colors[0]);
+        }
+
         setLoading(false);
       } catch (error) {
         setError(error);
@@ -83,7 +92,11 @@ function ProductDetailsPage() {
       });
       setSnackbarOpen(true);
     } catch (error) {
-      if (error.response && error.response.status === 400 && error.response.data.detail === "Item already exists in the cart") {
+      if (
+        error.response &&
+        error.response.status === 400 &&
+        error.response.data.detail === "Item already exists in the cart"
+      ) {
         setSnackbarOpen(true);
         setSnackbarMessage("Item already exists in the cart.");
       } else {
@@ -128,7 +141,18 @@ function ProductDetailsPage() {
   };
 
   if (loading) {
-    return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box>;
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
   if (error) {
@@ -183,63 +207,147 @@ function ProductDetailsPage() {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Typography fontWeight="500">Brand: </Typography>
                   <Typography color="#000">
-                    {product.subcategory} {product.category}
+                    {product.brand || "Not specified"}
                   </Typography>
                 </Box>
-                {/* Conditional rendering for sizes */}
-                <Box sx={{ mt: 2 }}>
-                  {product.category === "Clothing" && (
-                    <Box>
-                      <Typography fontWeight="500">Sizes:</Typography>
-                      <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-                        {["Small", "Medium", "Large"].map((size) => (
+
+                {/* Show colors if available */}
+                {product.colors && product.colors.length > 0 && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography fontWeight="500">Colors:</Typography>
+                    <Box
+                      sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}
+                    >
+                      {product.colors.map((color) => {
+                        // Create a color mapping for common color names to ensure CSS compatibility
+                        const colorMap = {
+                          black: "#000000",
+                          white: "#FFFFFF",
+                          red: "#FF0000",
+                          blue: "#0000FF",
+                          green: "#008000",
+                          yellow: "#FFFF00",
+                          purple: "#800080",
+                          pink: "#FFC0CB",
+                          brown: "#A52A2A",
+                          gray: "#808080",
+                          orange: "#FFA500",
+                          navy: "#000080",
+                          beige: "#F5F5DC",
+                          maroon: "#800000",
+                          teal: "#008080",
+                        };
+
+                        // Get the CSS color value (either from map or use the original color name)
+                        const cssColor = colorMap[color.toLowerCase()] || color;
+
+                        // Better contrast detection - light colors need dark text, dark colors need light text
+                        const getContrastTextColor = (colorValue) => {
+                          // For mapped colors, we can be more precise
+                          if (colorMap[colorValue.toLowerCase()]) {
+                            const lightColors = [
+                              "white",
+                              "yellow",
+                              "beige",
+                              "pink",
+                            ];
+                            return lightColors.includes(
+                              colorValue.toLowerCase()
+                            )
+                              ? "#000000"
+                              : "#FFFFFF";
+                          }
+
+                          // For unmapped colors, use the previous heuristic but improved
+                          const darkColors = [
+                            "black",
+                            "navy",
+                            "blue",
+                            "dark",
+                            "purple",
+                            "brown",
+                            "maroon",
+                            "green",
+                            "teal",
+                            "red",
+                          ];
+                          const isDark = darkColors.some((dark) =>
+                            colorValue.toLowerCase().includes(dark)
+                          );
+                          return isDark ? "#FFFFFF" : "#000000";
+                        };
+
+                        return (
                           <Button
+                            key={color}
                             sx={{
                               bgcolor:
-                                selectedSize === size ? "#26A69A" : "#ffffff",
+                                selectedColor === color ? cssColor : "#ffffff",
                               color:
-                                selectedSize === size ? "#ffffff" : "#000000",
+                                selectedColor === color
+                                  ? getContrastTextColor(color)
+                                  : "#000000",
                               border:
-                                selectedSize === size
+                                selectedColor === color
                                   ? "none"
-                                  : "1px solid #26A69A",
+                                  : `1px solid ${cssColor}`,
                               "&:hover": {
                                 bgcolor:
-                                  selectedSize === size ? "#219688" : "#f0f0f0",
+                                  selectedColor === color
+                                    ? cssColor
+                                    : "#f0f0f0",
+                                opacity: selectedColor === color ? 0.9 : 1,
                               },
+                              mb: 1,
+                              minWidth: "60px",
                             }}
-                            key={size}
                             variant="contained"
-                            onClick={() => handleSizeSelect(size)}
+                            onClick={() => handleColorSelect(color)}
                           >
-                            {size}
+                            {color}
                           </Button>
-                        ))}
-                      </Box>
+                        );
+                      })}
                     </Box>
-                  )}
-                  {product.category === "Footwear" && (
-                    <Box>
-                      <Typography fontWeight="500">Sizes:</Typography>
-                      <Box sx={{ display: "flex", gap: 1 }}>
-                        {[6, 7, 8, 9, 10].map((size) => (
-                          <Button
-                            key={size}
-                            variant={
-                              selectedSize === size ? "contained" : "outlined"
-                            }
-                            onClick={() => handleSizeSelect(size)}
-                          >
-                            {size}
-                          </Button>
-                        ))}
-                      </Box>
+                  </Box>
+                )}
+
+                {/* Show sizes if available */}
+                {product.sizes && product.sizes.length > 0 && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography fontWeight="500">Sizes:</Typography>
+                    <Box
+                      sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}
+                    >
+                      {product.sizes.map((size) => (
+                        <Button
+                          key={size}
+                          sx={{
+                            bgcolor:
+                              selectedSize === size ? "#26A69A" : "#ffffff",
+                            color:
+                              selectedSize === size ? "#ffffff" : "#000000",
+                            border:
+                              selectedSize === size
+                                ? "none"
+                                : "1px solid #26A69A",
+                            "&:hover": {
+                              bgcolor:
+                                selectedSize === size ? "#219688" : "#f0f0f0",
+                            },
+                            mb: 1,
+                          }}
+                          variant="contained"
+                          onClick={() => handleSizeSelect(size)}
+                        >
+                          {size}
+                        </Button>
+                      ))}
                     </Box>
-                  )}
-                </Box>
+                  </Box>
+                )}
               </Grid>
             </Grid>
-
             <Grid container spacing={2}>
               <Grid size={12}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -323,7 +431,12 @@ function ProductDetailsPage() {
                   Buy Now
                 </Button>
               </Grid>
-              {(product.product_id === 1 || product.product_id === 2 || product.product_id === 3 || product.product_id === 4 || product.product_id === 5 || product.product_id === 6) && (
+              {(product.product_id === 1 ||
+                product.product_id === 2 ||
+                product.product_id === 3 ||
+                product.product_id === 4 ||
+                product.product_id === 5 ||
+                product.product_id === 6) && (
                 <Grid size={12}>
                   <Button
                     fullWidth
@@ -360,7 +473,8 @@ function ProductDetailsPage() {
               p: 4,
             }}
           >
-            {product.product_id && <Viewer productId={product.product_id} />} {/* Pass product ID to Viewer */}
+            {product.product_id && <Viewer productId={product.product_id} />}{" "}
+            {/* Pass product ID to Viewer */}
           </Box>
         </Modal>
 
@@ -392,7 +506,6 @@ function ProductDetailsPage() {
                 </Box>
               </Grid>
             ))}
-          
           </Grid>
           <Modal open={open} onClose={handleClose}>
             <Box
