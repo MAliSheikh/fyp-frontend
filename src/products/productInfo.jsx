@@ -83,6 +83,9 @@ function ProductDetailsPage() {
         image: product.images[0],
         quantity: quantity,
         price: product.price * quantity,
+        colors: selectedColor ? [selectedColor] : [],
+        sizes: selectedSize ? [selectedSize] : [],
+        brand: product.brand || "No Brand"
       };
 
       await axios.post("http://localhost:8000/cart/cart-items", cartData, {
@@ -100,7 +103,7 @@ function ProductDetailsPage() {
         setSnackbarOpen(true);
         setSnackbarMessage("Item already exists in the cart.");
       } else {
-        console.error("Error adding to cart:", error);
+        console.error("Error adding to cart: ", error);
       }
     }
   };

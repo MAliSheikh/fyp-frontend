@@ -77,6 +77,10 @@ const BuyNowPage = () => {
             quantity: quantity,
             price: item.price,
             store_id: storeData.store_id,
+            status: "pending",
+            colors: item.colors && item.colors.length > 0 ? item.colors : [],
+            sizes: item.sizes && item.sizes.length > 0 ? item.sizes : [],
+            brand: item.brand || "No Brand"
           };
         })
       );
