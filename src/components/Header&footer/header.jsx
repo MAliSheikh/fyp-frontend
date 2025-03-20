@@ -78,9 +78,10 @@ const NavButton = styled(Button)({
 
 const CategorySelect = styled(Select)(({ theme }) => ({
   backgroundColor: "#fff",
-  minWidth: 130, // Adjust as needed
-  height: 40, // Fixed height for consistency
-  borderRadius: "4px 0 0 4px",
+  minWidth: 120, // Adjusted for better responsiveness
+  maxWidth: 125,
+  position: "relative", // Fixed height for consistency
+  borderRadius: "4px", // Added border radius for rounded corners
   marginRight: "10px", // Add space between dropdown and searchbar
   '& .MuiSelect-select': {
     padding: "8px 32px 8px 12px",
@@ -103,6 +104,12 @@ const CategorySelect = styled(Select)(({ theme }) => ({
   },
   // Add transition for smooth hover effect
   transition: 'background-color 0.3s ease',
+  [theme.breakpoints.down('sm')]: {
+    minWidth: 80, // Further adjust for smaller screens
+    '& .MuiSelect-select': {
+      fontSize: "0.8rem", // Smaller font size for smaller screens
+    },
+  },
 }));
 
 
@@ -143,7 +150,7 @@ const Header = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?search_string=${encodeURIComponent(searchQuery.trim())}&category=${category}`);
+      navigate(`/search?search_string=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
@@ -180,23 +187,25 @@ const Header = () => {
                 }}
               />
 
-            {/* Search Bar with Category Dropdown */}
+            {/* Category Dropdown */}
+            <FormControl variant="standard">
+              <CategorySelect
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                displayEmpty
+                IconComponent={ArrowDownIcon}
+              >
+                <MenuItem value="all">All</MenuItem>
+                <MenuItem value="clothes">Clothes</MenuItem>
+                <MenuItem value="shoes">Shoes</MenuItem>
+                <MenuItem value="accessories">Accessories</MenuItem>
+                <MenuItem value="electronics">Electronics</MenuItem>
+              </CategorySelect>
+            </FormControl>
+
+            {/* Search Bar */}
             <SearchWrapper>
               <form onSubmit={handleSearch} style={{ width: '100%', display: 'flex' }}>
-                <FormControl variant="standard">
-                  <CategorySelect
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    displayEmpty
-                    IconComponent={ArrowDownIcon}
-                  >
-                    <MenuItem value="all">All</MenuItem>
-                    <MenuItem value="clothes">Clothes</MenuItem>
-                    <MenuItem value="shoes">Shoes</MenuItem>
-                    <MenuItem value="accessories">Accessories</MenuItem>
-                    <MenuItem value="electronics">Electronics</MenuItem>
-                  </CategorySelect>
-                </FormControl>
                 <StyledInputBase
                   placeholder="Search"
                   inputProps={{ "aria-label": "search" }}

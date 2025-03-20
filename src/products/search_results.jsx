@@ -7,32 +7,29 @@ import {
   CircularProgress,
   Alert,
   Grid,
+  IconButton,
 } from "@mui/material";
-import { Button, Card, CardMedia, CardContent, Rating } from '@mui/material';
-
+import { Button, Card, CardMedia, CardContent, Rating } from "@mui/material";
+import FilterAltIcon from "@mui/icons-material/FilterAlt"; // Filter icon
+import FilterSidebar from "../components/Filter/filter"; // Import the FilterSidebar component
 import { searchProducts } from "./product";
-// import { ProductCard } from './products_page';
+
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
 
   const handleViewProduct = () => {
     navigate(`/products/${product.product_id}`);
   };
+
   return (
-    <Card
-      borderTop="50px"
-      sx={{ maxWidth: "auto", margin: "auto", height: 350 }}
-    >
+    <Card sx={{ maxWidth: "auto", margin: "auto", height: 350 }}>
       <CardMedia
-        borderTop="50px"
         component="img"
         height="200"
-        image={product.images[0]} // Assuming the base64 string is for a JPEG image
-        // image={`data:image/jpeg;base64,${product.images[0]}`} // Assuming the base64 string is for a JPEG image
+        image={product.images[0]}
         alt={product.name}
       />
       <CardContent sx={{ flexGrow: 1 }}>
-        {/* <Typography variant="h6">{product.name}</Typography> */}
         <Typography
           variant="h6"
           sx={{
@@ -46,24 +43,14 @@ const ProductCard = ({ product }) => {
         >
           {product.name}
         </Typography>
-
         <Typography variant="body2" color="text.secondary">
           Rs. {product.price}
         </Typography>
-
         <Rating name="product-rating" value={4} precision={0.5} readOnly />
-        {/* <Rating name="product-rating" value={product.rating} precision={0.5} readOnly /> */}
-
         <Button variant="contained" color="primary" onClick={handleViewProduct}>
           See Details
         </Button>
       </CardContent>
-
-      {/* <CardActions>
-        <Button size="small" color="primary">
-          Buy Now
-        </Button>
-      </CardActions> */}
     </Card>
   );
 };
@@ -73,6 +60,7 @@ const SearchResults = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filterOpen, setFilterOpen] = useState(false); // State for filter popup
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -89,8 +77,8 @@ const SearchResults = () => {
 
         const data = await searchProducts(searchQuery);
         setProducts(data);
-      } catch (error) {
-        console.error("Error fetching search results:", error);
+      } catch (err) {
+        console.error("Error fetching search results:", err);
         setError("Failed to fetch search results. Please try again.");
       } finally {
         setLoading(false);
@@ -129,38 +117,43 @@ const SearchResults = () => {
 
   return (
     <Container maxWidth="lg">
-      <Box sx={{ mt: 4, mb: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Search Results
-        </Typography>
-
-        {products.length === 0 ? (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              minHeight: "50vh",
-              justifyContent: "center",
-            }}
-          >
-            <Typography variant="h5" color="text.secondary">
-              No products found
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-              Try adjusting your search criteria
-            </Typography>
-          </Box>
-        ) : (
-          <Grid container spacing={3}>
-            {products.map((product) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={product.product_id}>
-                <ProductCard product={product} />
-              </Grid>
-            ))}
-          </Grid>
-        )}
+      {/* Filter Icon */}
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+        <IconButton onClick={() => setFilterOpen(true)} sx={{ mr: 1 }}>
+          <FilterAltIcon />
+        </IconButton>
+        <Typography variant="h5">Search Results</Typography>
       </Box>
+
+      {/* Sidebar for Filter Component */}
+      <FilterSidebar open={filterOpen} onClose={() => setFilterOpen(false)} onApply={() => setFilterOpen(false)} />
+
+      {products.length === 0 ? (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            minHeight: "50vh",
+            justifyContent: "center",
+          }}
+        >
+          <Typography variant="h5" color="text.secondary">
+            No products found
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+            Try adjusting your search criteria
+          </Typography>
+        </Box>
+      ) : (
+        <Grid container spacing={3}>
+          {products.map((product) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={product.product_id}>
+              <ProductCard product={product} />
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </Container>
   );
 };
