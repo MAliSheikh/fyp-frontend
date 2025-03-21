@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import BNLOGO2 from "../Logos/BNLOGO2.png";
 import authService from "../LoginSignup/components/token";
 import MallListingPage from "../../mall_store_listing/mall_list";
@@ -23,6 +23,7 @@ import {
   MenuItem,
   Select,
   FormControl,
+  CircularProgress,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -34,6 +35,8 @@ import {
 } from "@mui/icons-material";
 import { styled, alpha } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
+import axiosInstance from "../axiosInstance";
 
 // Custom styled components
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -76,42 +79,17 @@ const NavButton = styled(Button)({
   padding: "6px 15px",
 });
 
-const CategorySelect = styled(Select)(({ theme }) => ({
+const AutocompleteResults = styled("div")(({ theme }) => ({
+  position: "absolute",
+  top: "100%",
+  left: 0,
+  right: 0,
   backgroundColor: "#fff",
-  minWidth: 120, // Adjusted for better responsiveness
-  maxWidth: 125,
-  position: "relative", // Fixed height for consistency
-  borderRadius: "4px", // Added border radius for rounded corners
-  marginRight: "10px", // Add space between dropdown and searchbar
-  '& .MuiSelect-select': {
-    padding: "8px 32px 8px 12px",
-    display: "flex",
-    alignItems: "center", // Changed from 'left' to 'center' for better alignment
-    fontSize: "0.9rem",
-  },
-  '&:before, &:after': {
-    display: "none",
-  },
-  '& .MuiOutlinedInput-notchedOutline': {
-    border: "none", // Removes unwanted border
-  },
-  '& .MuiSelect-icon': {
-    right: 10, // Keeps arrow properly positioned
-  },
-  // Add hover effect for better interactivity
-  '&:hover': {
-    backgroundColor: alpha("#fff", 0.9),
-  },
-  // Add transition for smooth hover effect
-  transition: 'background-color 0.3s ease',
-  [theme.breakpoints.down('sm')]: {
-    minWidth: 80, // Further adjust for smaller screens
-    '& .MuiSelect-select': {
-      fontSize: "0.8rem", // Smaller font size for smaller screens
-    },
-  },
+  boxShadow: theme.shadows[3],
+  zIndex: 1,
+  maxHeight: "200px",
+  overflowY: "auto",
 }));
-
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -122,6 +100,9 @@ const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [category, setCategory] = useState('all');
+  const [autocompleteResults, setAutocompleteResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const debounceTimeout = useRef(null);
 
   useEffect(() => {
     // Check token status whenever component mounts or auth state changes
@@ -152,6 +133,38 @@ const Header = () => {
     if (searchQuery.trim()) {
       navigate(`/search?search_string=${encodeURIComponent(searchQuery.trim())}`);
     }
+  };
+
+  const fetchAutocompleteResults = async (query) => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get('/products/autocomplete', {
+        params: {
+          query,
+          limit: 10,
+        },
+      });
+      setAutocompleteResults(response.data);
+    } catch (error) {
+      console.error('Error fetching autocomplete results:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+    debounceTimeout.current = setTimeout(() => {
+      if (query.trim()) {
+        fetchAutocompleteResults(query);
+      } else {
+        setAutocompleteResults([]);
+      }
+    }, 300); // Debounce time of 300ms
   };
 
   return (
@@ -188,7 +201,7 @@ const Header = () => {
               />
 
             {/* Category Dropdown */}
-            <FormControl variant="standard">
+            {/* <FormControl variant="standard">
               <CategorySelect
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
@@ -201,7 +214,7 @@ const Header = () => {
                 <MenuItem value="accessories">Accessories</MenuItem>
                 <MenuItem value="electronics">Electronics</MenuItem>
               </CategorySelect>
-            </FormControl>
+            </FormControl> */}
 
             {/* Search Bar */}
             <SearchWrapper>
@@ -210,13 +223,37 @@ const Header = () => {
                   placeholder="Search"
                   inputProps={{ "aria-label": "search" }}
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={handleInputChange}
                 />
                 <SearchIconWrapper>
                   <IconButton type="submit">
                     <SearchIcon />
                   </IconButton>
                 </SearchIconWrapper>
+                {autocompleteResults.length > 0 && (
+                  <AutocompleteResults>
+                    {loading ? (
+                      <Box display="flex" justifyContent="center" p={2}>
+                        <CircularProgress size={24} />
+                      </Box>
+                    ) : (
+                      autocompleteResults.map((result, index) => (
+                        <Box key={index} p={1} onClick={() => navigate(`/search?search_string=${encodeURIComponent(result.value)}`)}>
+                          <Typography variant="body2">
+                            {result.type === "product" && `Product: ${result.value}`}
+                            {result.type === "category" && `Category: ${result.value}`}
+                            {result.type === "subcategory" && `Subcategory: ${result.value}`}
+                          </Typography>
+                        </Box>
+                      ))
+                    )}
+                  </AutocompleteResults>
+                )}
+                {loading && (
+                  <Box display="flex" justifyContent="center" p={2}>
+                    <CircularProgress size={24} />
+                  </Box>
+                )}
               </form>
             </SearchWrapper>
 

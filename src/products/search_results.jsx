@@ -8,11 +8,14 @@ import {
   Alert,
   Grid,
   IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import { Button, Card, CardMedia, CardContent, Rating } from "@mui/material";
 import FilterAltIcon from "@mui/icons-material/FilterAlt"; // Filter icon
 import FilterSidebar from "../components/Filter/filter"; // Import the FilterSidebar component
 import { searchProducts } from "./product";
+import { categories } from "../seller/category";
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
@@ -56,11 +59,50 @@ const ProductCard = ({ product }) => {
 };
 
 const SearchResults = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filterOpen, setFilterOpen] = useState(false); // State for filter popup
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [subcategoryAnchorEl, setSubcategoryAnchorEl] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const handleCategoryClick = (event, category) => {
+    setSelectedCategory(category);
+    setSubcategoryAnchorEl(event.currentTarget);
+  };
+
+  const handleSubcategorySelect = (category, subcategory) => {
+    setSearchParams({
+      ...Object.fromEntries(searchParams.entries()),
+      category,
+      subcategory,
+    });
+    setAnchorEl(null);
+    setSubcategoryAnchorEl(null);
+  };
+
+  const handleFilterApply = (filters) => {
+    const newParams = new URLSearchParams(searchParams);
+    
+    const searchTerm = searchParams.get("search");
+    if (searchTerm) newParams.set("search", searchTerm);
+    
+    if (filters.category) newParams.set('category', filters.category);
+    else newParams.delete('category');
+    
+    if (filters.subcategory) newParams.set('subcategory', filters.subcategory);
+    else newParams.delete('subcategory');
+    
+    if (filters.minPrice) newParams.set('min_price', filters.minPrice);
+    else newParams.delete('min_price');
+    
+    if (filters.maxPrice) newParams.set('max_price', filters.maxPrice);
+    else newParams.delete('max_price');
+    
+    setSearchParams(newParams);
+  };
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -68,11 +110,9 @@ const SearchResults = () => {
       setError(null);
       try {
         const searchQuery = {
-          search_string: searchParams.get("search_string"),
+          search_string: searchParams.get("search"),
           category: searchParams.get("category"),
           subcategory: searchParams.get("subcategory"),
-          min_price: searchParams.get("min_price"),
-          max_price: searchParams.get("max_price"),
         };
 
         const data = await searchProducts(searchQuery);
@@ -117,6 +157,50 @@ const SearchResults = () => {
 
   return (
     <Container maxWidth="lg">
+      {/* Category Dropdown */}
+      <Box sx={{ mb: 2 }}>
+        <Button
+          aria-controls="category-menu"
+          aria-haspopup="true"
+          onClick={(event) => setAnchorEl(event.currentTarget)}
+        >
+          Select Category
+        </Button>
+        <Menu
+          id="category-menu"
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={() => setAnchorEl(null)}
+        >
+          {categories.map((category) => (
+            <MenuItem
+              key={category.name}
+              onClick={(event) => handleCategoryClick(event, category)}
+            >
+              <Typography variant="subtitle1">{category.name}</Typography>
+            </MenuItem>
+          ))}
+        </Menu>
+        <Menu
+          id="subcategory-menu"
+          anchorEl={subcategoryAnchorEl}
+          open={Boolean(subcategoryAnchorEl)}
+          onClose={() => setSubcategoryAnchorEl(null)}
+        >
+          {selectedCategory &&
+            selectedCategory.subcategories.map((subcategory) => (
+              <MenuItem
+                key={subcategory}
+                onClick={() =>
+                  handleSubcategorySelect(selectedCategory.name, subcategory)
+                }
+              >
+                {subcategory}
+              </MenuItem>
+            ))}
+        </Menu>
+      </Box>
+
       {/* Filter Icon */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <IconButton onClick={() => setFilterOpen(true)} sx={{ mr: 1 }}>
@@ -126,7 +210,11 @@ const SearchResults = () => {
       </Box>
 
       {/* Sidebar for Filter Component */}
-      <FilterSidebar open={filterOpen} onClose={() => setFilterOpen(false)} onApply={() => setFilterOpen(false)} />
+      <FilterSidebar
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        onApply={handleFilterApply}
+      />
 
       {products.length === 0 ? (
         <Box

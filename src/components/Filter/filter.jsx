@@ -32,38 +32,24 @@ const categories = {
 
 const FilterSidebar = ({ open, onClose, onApply }) => {
   const [filters, setFilters] = useState({
-    selectedCategory: "",
-    selectedSubcategories: [],
-    priceLow: false,
-    priceHigh: false,
+    category: "",
+    subcategory: "",
     minPrice: "",
     maxPrice: "",
   });
 
-  const handleCategoryClick = (category) => {
+  const handleCategoryChange = (category) => {
     setFilters((prev) => ({
       ...prev,
-      selectedCategory: prev.selectedCategory === category ? "" : category,
-      selectedSubcategories: [],
+      category: prev.category === category ? "" : category,
+      subcategory: "", // Reset subcategory when category changes
     }));
   };
 
-  const handleSubcategoryChange = (event) => {
-    const { name, checked } = event.target;
+  const handleSubcategoryChange = (subcategory) => {
     setFilters((prev) => ({
       ...prev,
-      selectedSubcategories: checked
-        ? [...prev.selectedSubcategories, name]
-        : prev.selectedSubcategories.filter((sub) => sub !== name),
-    }));
-  };
-
-  const handlePriceChange = (event) => {
-    const { name } = event.target;
-    setFilters((prev) => ({
-      ...prev,
-      priceLow: name === "priceLow" ? !prev.priceLow : false,
-      priceHigh: name === "priceHigh" ? !prev.priceHigh : false,
+      subcategory: prev.subcategory === subcategory ? "" : subcategory,
     }));
   };
 
@@ -73,7 +59,12 @@ const FilterSidebar = ({ open, onClose, onApply }) => {
   };
 
   const handleCancel = () => {
-    setFilters({ selectedCategory: "", selectedSubcategories: [], priceLow: false, priceHigh: false, minPrice: "", maxPrice: "" });
+    setFilters({
+      category: "",
+      subcategory: "",
+      minPrice: "",
+      maxPrice: "",
+    });
     onClose();
   };
 
@@ -96,37 +87,59 @@ const FilterSidebar = ({ open, onClose, onApply }) => {
       <List>
         {Object.keys(categories).map((category) => (
           <div key={category}>
-            <ListItem button onClick={() => handleCategoryClick(category)} sx={{ backgroundColor: "#f4f4f4", borderRadius: "5px", mb: 1 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#555" }}>{category}</Typography>
+            <ListItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={filters.category === category}
+                    onChange={() => handleCategoryChange(category)}
+                  />
+                }
+                label={
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#555" }}>
+                    {category}
+                  </Typography>
+                }
+              />
             </ListItem>
-            {filters.selectedCategory === category &&
+            {filters.category === category &&
               categories[category].map((sub) => (
-                <ListItem key={sub} sx={{ pl: 3 }}>
+                <ListItem key={sub}>
                   <FormControlLabel
-                    control={<Checkbox name={sub} checked={filters.selectedSubcategories.includes(sub)} onChange={handleSubcategoryChange} />}
-                    label={sub}
+                    control={
+                      <Checkbox
+                        checked={filters.subcategory === sub}
+                        onChange={() => handleSubcategoryChange(sub)}
+                      />
+                    }
+                    label={<Typography>{sub}</Typography>}
+                    sx={{ pl: 3 }}
                   />
                 </ListItem>
               ))}
           </div>
         ))}
         <Divider sx={{ my: 2 }} />
-        <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#555" }}>Price</Typography>
-        <ListItem>
-          <FormControlLabel
-            control={<Checkbox name="priceLow" checked={filters.priceLow} onChange={handlePriceChange} />}
-            label="Low to High"
-          />
-        </ListItem>
-        <ListItem>
-          <FormControlLabel
-            control={<Checkbox name="priceHigh" checked={filters.priceHigh} onChange={handlePriceChange} />}
-            label="High to Low"
-          />
-        </ListItem>
+        <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#555" }}>Price Range</Typography>
         <Box display="flex" gap={1} mt={1}>
-          <TextField label="Min Price" name="minPrice" value={filters.minPrice} onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })} variant="outlined" size="small" fullWidth sx={{ borderRadius: 2 }} />
-          <TextField label="Max Price" name="maxPrice" value={filters.maxPrice} onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })} variant="outlined" size="small" fullWidth sx={{ borderRadius: 2 }} />
+          <TextField 
+            label="Min Price" 
+            type="number"
+            value={filters.minPrice} 
+            onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })} 
+            variant="outlined" 
+            size="small" 
+            fullWidth 
+          />
+          <TextField 
+            label="Max Price" 
+            type="number"
+            value={filters.maxPrice} 
+            onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })} 
+            variant="outlined" 
+            size="small" 
+            fullWidth 
+          />
         </Box>
       </List>
       <Box display="flex" justifyContent="space-between" mt={3} mb={3}>
