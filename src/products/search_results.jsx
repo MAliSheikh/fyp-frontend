@@ -85,9 +85,9 @@ const SearchResults = () => {
 
   const handleFilterApply = (filters) => {
     const newParams = new URLSearchParams(searchParams);
-    
-    const searchTerm = searchParams.get("search");
-    if (searchTerm) newParams.set("search", searchTerm);
+
+    const searchTerm = searchParams.get("search_string");
+    if (searchTerm) newParams.set("search_string", searchTerm);
     
     if (filters.category) newParams.set('category', filters.category);
     else newParams.delete('category');
@@ -101,6 +101,9 @@ const SearchResults = () => {
     if (filters.maxPrice) newParams.set('max_price', filters.maxPrice);
     else newParams.delete('max_price');
     
+    if (filters.brand) newParams.set('brand', filters.brand);
+    else newParams.delete('brand');
+    
     setSearchParams(newParams);
   };
 
@@ -109,8 +112,9 @@ const SearchResults = () => {
       setLoading(true);
       setError(null);
       try {
+        // Extract search parameters from URL
         const searchQuery = {
-          search_string: searchParams.get("search"),
+          search_string: searchParams.get("search_string"),
           category: searchParams.get("category"),
           subcategory: searchParams.get("subcategory"),
         };
