@@ -74,11 +74,17 @@ const SearchResults = () => {
   };
 
   const handleSubcategorySelect = (category, subcategory) => {
-    setSearchParams({
-      ...Object.fromEntries(searchParams.entries()),
-      category,
-      subcategory,
-    });
+    const updatedSearchParams = new URLSearchParams(searchParams);
+    updatedSearchParams.set('category', category);
+    if (subcategory !== "All") {
+      updatedSearchParams.set('subcategory', subcategory);
+    } else {
+      updatedSearchParams.delete('subcategory');
+    }
+    if (category) {
+      updatedSearchParams.delete('search_string');
+    }
+    setSearchParams(updatedSearchParams);
     setAnchorEl(null);
     setSubcategoryAnchorEl(null);
   };
@@ -89,11 +95,14 @@ const SearchResults = () => {
     const searchTerm = searchParams.get("search_string");
     if (searchTerm) newParams.set("search_string", searchTerm);
     
-    if (filters.category) newParams.set('category', filters.category);
-    else newParams.delete('category');
+    if (filters.category) {
+        newParams.set('category', filters.category);
+        newParams.delete('search_string');
+    } else newParams.delete('category');
     
-    if (filters.subcategory) newParams.set('subcategory', filters.subcategory);
-    else newParams.delete('subcategory');
+    if (filters.subcategory) {
+        newParams.set('subcategory', filters.subcategory);
+    } else newParams.delete('subcategory');
     
     if (filters.minPrice) newParams.set('min_price', filters.minPrice);
     else newParams.delete('min_price');
@@ -191,6 +200,13 @@ const SearchResults = () => {
           open={Boolean(subcategoryAnchorEl)}
           onClose={() => setSubcategoryAnchorEl(null)}
         >
+          <MenuItem
+            onClick={() =>
+              handleSubcategorySelect(selectedCategory.name, "All")
+            }
+          >
+            <Typography variant="subtitle1">All</Typography>
+          </MenuItem>
           {selectedCategory &&
             selectedCategory.subcategories.map((subcategory) => (
               <MenuItem
@@ -199,7 +215,7 @@ const SearchResults = () => {
                   handleSubcategorySelect(selectedCategory.name, subcategory)
                 }
               >
-                {subcategory}
+                <Typography variant="subtitle1">{subcategory}</Typography>
               </MenuItem>
             ))}
         </Menu>
@@ -218,6 +234,7 @@ const SearchResults = () => {
         open={filterOpen}
         onClose={() => setFilterOpen(false)}
         onApply={handleFilterApply}
+        categories={categories.filter(cat => products.some(product => product.category === cat.name))}
       />
 
       {products.length === 0 ? (

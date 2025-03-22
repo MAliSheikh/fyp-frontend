@@ -30,21 +30,13 @@ const categories = {
   Automobiles: ["Cars", "Bikes", "Car Accessories", "Tools", "Spare Parts"],
 };
 
-const FilterSidebar = ({ open, onClose, onApply }) => {
+const FilterSidebar = ({ open, onClose, onApply, categories }) => {
   const [filters, setFilters] = useState({
     category: "",
     subcategory: "",
     minPrice: "",
     maxPrice: "",
   });
-
-  const handleCategoryChange = (category) => {
-    setFilters((prev) => ({
-      ...prev,
-      category: prev.category === category ? "" : category,
-      subcategory: "", // Reset subcategory when category changes
-    }));
-  };
 
   const handleSubcategoryChange = (subcategory) => {
     setFilters((prev) => ({
@@ -85,39 +77,21 @@ const FilterSidebar = ({ open, onClose, onApply }) => {
     >
       <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold", color: "#333" }}>Filters</Typography>
       <List>
-        {Object.keys(categories).map((category) => (
-          <div key={category}>
-            <ListItem>
+        {categories.map((category) => (
+          category.subcategories.map((sub) => (
+            <ListItem key={sub}>
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={filters.category === category}
-                    onChange={() => handleCategoryChange(category)}
+                    checked={filters.subcategory === sub}
+                    onChange={() => handleSubcategoryChange(sub)}
                   />
                 }
-                label={
-                  <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#555" }}>
-                    {category}
-                  </Typography>
-                }
+                label={<Typography>{sub}</Typography>}
+                // sx={{ pl: 3 }}
               />
             </ListItem>
-            {filters.category === category &&
-              categories[category].map((sub) => (
-                <ListItem key={sub}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={filters.subcategory === sub}
-                        onChange={() => handleSubcategoryChange(sub)}
-                      />
-                    }
-                    label={<Typography>{sub}</Typography>}
-                    sx={{ pl: 3 }}
-                  />
-                </ListItem>
-              ))}
-          </div>
+          ))
         ))}
         <Divider sx={{ my: 2 }} />
         <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#555" }}>Price Range</Typography>
