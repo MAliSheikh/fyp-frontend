@@ -91,6 +91,20 @@ const AutocompleteResults = styled("div")(({ theme }) => ({
   overflowY: "auto",
 }));
 
+const AutocompleteResultItem = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(1),
+  cursor: 'pointer',
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.black, 0.1),
+    '& .MuiTypography-root': {
+      color: 'gray',
+    },
+  },
+  '& .MuiTypography-root': {
+    color: 'black',
+  },
+}));
+
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
@@ -234,24 +248,25 @@ const Header = () => {
                   <AutocompleteResults>
                     {loading ? (
                       <Box display="flex" justifyContent="center" p={2}>
-                        <CircularProgress size={24} />
+                        <CircularProgress size={16} />
                       </Box>
                     ) : (
                       autocompleteResults.map((result, index) => (
-                        <Box key={index} p={1} onClick={() => navigate(`/search?search_string=${encodeURIComponent(result.value)}`)}>
+                        <AutocompleteResultItem key={index} onClick={() => navigate(`/search?search_string=${encodeURIComponent(result.value)}`)}>
                           <Typography variant="body2">
                             {result.type === "product" && `Product: ${result.value}`}
                             {result.type === "category" && `Category: ${result.value}`}
                             {result.type === "subcategory" && `Subcategory: ${result.value}`}
+                            {result.type === "brand" && `Brand: ${result.value}`}
                           </Typography>
-                        </Box>
+                        </AutocompleteResultItem>
                       ))
                     )}
                   </AutocompleteResults>
                 )}
                 {loading && (
                   <Box display="flex" justifyContent="center" p={2}>
-                    <CircularProgress size={24} />
+                    <CircularProgress size={16} />
                   </Box>
                 )}
               </form>
