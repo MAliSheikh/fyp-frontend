@@ -40,6 +40,7 @@ import { styled, alpha } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import axiosInstance from "../axiosInstance";
+// import { categories } from "../../seller/category";
 
 // Custom styled components
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -156,19 +157,16 @@ const Header = () => {
     setIsLoggedIn(false);
     navigate("/");
   };
-  const navItems = ["Men", "Women", "Kids", "Beauty", "Others"];
+  // const navItems = ["Men", "Women", "Kids", "Beauty", "Others"];
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Construct the API URL with the search parameters
-      const apiUrl = new URL('http://localhost:8000/products/search');
-      apiUrl.searchParams.append('search_string', searchQuery.trim());
-      if (category) apiUrl.searchParams.append('category', category);
-      if (subcategory) apiUrl.searchParams.append('subcategory', subcategory);
-      // Add any other parameters as needed
-
-      navigate(apiUrl.toString()); // Navigate to the constructed URL
+      // Construct the search URL with category and subcategory
+      const searchUrl = `/search?search_string=${encodeURIComponent(searchQuery.trim())}` +
+        (category ? `&category=${encodeURIComponent(category)}` : "");
+        // (subcategory ? `&subcategory=${encodeURIComponent(subcategory)}` : "");
+      navigate(searchUrl);
       setShowResults(false);
       setSearchDialogOpen(false);
     }
@@ -210,10 +208,13 @@ const Header = () => {
   };
 
   const handleAutocompleteClick = (suggestion) => {
-    setSearchQuery(suggestion.value);
+    const selectedText = suggestion.value;
+    setSearchQuery(selectedText);
     setShowResults(false);
     setSearchDialogOpen(false);
-    navigate(`/search?search_string=${encodeURIComponent(suggestion.value)}`);
+    navigate(`/search?search_string=${encodeURIComponent(selectedText)}` +
+      (category ? `&category=${encodeURIComponent(category)}` : "") +
+      (subcategory ? `&subcategory=${encodeURIComponent(subcategory)}` : ""));
   };
 
   const renderSearchBar = () => (
@@ -232,13 +233,9 @@ const Header = () => {
           inputRef={inputRef}
         />
         <SearchIconWrapper>
-          {loading ? (
-            <CircularProgress size={20} color="inherit" />
-          ) : (
-            <IconButton type="submit" size="small">
-              <SearchIcon />
-            </IconButton>
-          )}
+          <IconButton type="submit" onClick={handleSearch}>
+            <SearchIcon />
+          </IconButton>
         </SearchIconWrapper>
         {showResults && autocompleteResults.length > 0 && (
           <AutocompleteResults>
@@ -247,9 +244,7 @@ const Header = () => {
                 key={index}
                 onClick={() => handleAutocompleteClick(result)}
               >
-                <Typography variant="body2">
-                  {result.value}
-                </Typography>
+                <Typography variant="body2">{result.value}</Typography>
               </AutocompleteItem>
             ))}
           </AutocompleteResults>
@@ -389,7 +384,7 @@ const Header = () => {
           </Toolbar>
         </Container>
 
-        {/* Bottom Navigation */}
+        {/* Bottom Navigation
         {!isMobile && (
           <Box sx={{ bgcolor: "rgba(0, 0, 0, 0.1)" }}>
             <Container maxWidth="xl">
@@ -407,7 +402,7 @@ const Header = () => {
               </Box>
             </Container>
           </Box>
-        )}
+        )} */}
       </StyledAppBar>
 
       {/* Mobile Drawer */}
@@ -428,11 +423,11 @@ const Header = () => {
             Menu
           </Typography>
           <List>
-            {navItems.map((item) => (
+            {/* {navItems.map((item) => (
               <ListItem button key={item}>
                 <ListItemText primary={item} />
               </ListItem>
-            ))}
+            ))} */}
             {isLoggedIn ? (
               <ListItem button onClick={handleLogout}>
                 <ListItemText primary="Logout" />
