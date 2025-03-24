@@ -127,7 +127,10 @@ export const createProduct = async (productData) => {
         stock: productData.stock,
         images: productData.images,
         category: productData.category,
-        subcategory: productData.subcategory
+        subcategory: productData.subcategory,
+        colors: productData.colors,
+        sizes: productData.sizes,
+        brand: productData.brand
       },
       {
         headers: {

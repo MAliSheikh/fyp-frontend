@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -8,11 +8,17 @@ import {
   Alert,
   CircularProgress,
   IconButton,
+  Chip,
+  Paper,
+  Autocomplete,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import { SideBar } from "./sidebar";
 import { categories } from "./category";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import Grid from "@mui/material/Grid2";
 import { createProduct } from "./seller";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -20,14 +26,21 @@ const convertToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     const fileReader = new FileReader();
     fileReader.readAsDataURL(file);
-    fileReader.onload = () => {
-      resolve(fileReader.result);
-    };
-    fileReader.onerror = (error) => {
-      reject(error);
-    };
+    fileReader.onload = () => resolve(fileReader.result);
+    fileReader.onerror = (error) => reject(error);
   });
 };
+
+const commonColors = [
+  "Black", "White", "Red", "Blue", "Green", "Yellow", "Purple", "Pink",
+  "Brown", "Gray", "Orange", "Navy", "Beige", "Maroon", "Teal"
+];
+
+const commonSizes = [
+  "XS", "S", "M", "L", "XL", "XXL", "XXXL",
+  "36", "37", "38", "39", "40", "41", "42", "43", "44", "45",
+  "One Size"
+];
 
 const UploadProduct = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -38,15 +51,32 @@ const UploadProduct = () => {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+  const [colors, setColors] = useState([]);
+  const [sizes, setSizes] = useState([]);
+  const [brand, setBrand] = useState("");
+  const [showSizesField, setShowSizesField] = useState(false);
+  const [newColor, setNewColor] = useState("");
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+
+  // Categories and subcategories that should show size fields
+  const categoriesWithSizes = ["Clothes", "Shoes", "Sports"];
+  const subcategoriesWithSizes = [
+    "Men", "Women", "Kids", "Accessories",
+    "Cricket", "Football", "Badminton", "Fitness"
+  ];
+
+  useEffect(() => {
+    const shouldShowSizes = 
+      categoriesWithSizes.includes(selectedCategory) ||
+      (selectedSubcategory && subcategoriesWithSizes.includes(selectedSubcategory));
+    
+    setShowSizesField(shouldShowSizes);
+    if (!shouldShowSizes) setSizes([]);
+  }, [selectedCategory, selectedSubcategory]);
 
   const handleCategoryChange = (event) => {
     setSelectedCategory(event.target.value);
-    setSelectedSubcategory(""); // Reset subcategory on category change
+    setSelectedSubcategory("");
   };
 
   const handleSubcategoryChange = (event) => {
@@ -54,21 +84,27 @@ const UploadProduct = () => {
   };
 
   const handleImageChange = (event) => {
-    const file = event.target.files[0]; // Get only the first selected file
-    if (file) {
-      setProductImages((prevImages) => [...prevImages, file]); // Add to existing images
-    }
+    const file = event.target.files[0];
+    if (file) setProductImages((prevImages) => [...prevImages, file]);
   };
 
   const handleRemoveImage = (indexToRemove) => {
-    setProductImages((prevImages) =>
-      prevImages.filter((_, index) => index !== indexToRemove)
-    );
+    setProductImages((prevImages) => prevImages.filter((_, index) => index !== indexToRemove));
   };
 
-  const currentSubcategories =
-    categories.find((cat) => cat.name === selectedCategory)?.subcategories ||
-    [];
+  const handleAddColor = () => {
+    if (newColor && !colors.includes(newColor)) {
+      setColors([...colors, newColor]);
+      setNewColor("");
+    }
+  };
+
+  const handleDeleteColor = (colorToDelete) => {
+    setColors(colors.filter((color) => color !== colorToDelete));
+  };
+
+  const currentSubcategories = 
+    categories.find((cat) => cat.name === selectedCategory)?.subcategories || [];
 
   const resetForm = () => {
     setProductImages([]);
@@ -78,67 +114,56 @@ const UploadProduct = () => {
     setStock("");
     setSelectedCategory("");
     setSelectedSubcategory("");
+    setColors([]);
+    setSizes([]);
+    setBrand("");
   };
 
-  // Add snackbar close handler
   const handleSnackbarClose = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // Validate required fields
-    if (
-      productImages.length === 0 ||
-      !productName ||
-      !description ||
-      !price ||
-      !stock ||
-      !selectedCategory
-    ) {
-      setSnackbar({
-        open: true,
-        message: "Please fill in all required fields",
-        severity: "error",
+    if (!productImages.length || !productName || !description || !price || !stock || !selectedCategory) {
+      setSnackbar({ 
+        open: true, 
+        message: "Please fill in all required fields", 
+        severity: "error" 
       });
       return;
     }
-
+    
     setIsLoading(true);
     try {
-      // Convert all images to base64
       const base64Images = await Promise.all(
         productImages.map((image) => convertToBase64(image))
       );
-
+      
       const productData = {
         name: productName,
-        description: description,
+        description,
         price: Number(price),
         stock: Number(stock),
         images: base64Images,
         category: selectedCategory,
         subcategory: selectedSubcategory || "",
+        colors: colors.length > 0 ? colors : [],
+        sizes: sizes.length > 0 ? sizes : [],
+        brand: brand || "No Brand",
       };
-
-      const response = await createProduct(productData);
-      console.log("Product created successfully:", response);
-
-      setSnackbar({
-        open: true,
-        message: "Product created successfully!",
-        severity: "success",
+      
+      await createProduct(productData);
+      setSnackbar({ 
+        open: true, 
+        message: "Product created successfully!", 
+        severity: "success" 
       });
-
       resetForm();
     } catch (error) {
-      console.error("Failed to create product:", error);
-
       setSnackbar({
         open: true,
-        message:
-          error.response?.data?.message ||
-          "Failed to create product. Please try again.",
+        message: error.response?.data?.message || "Failed to create product. Please try again.",
         severity: "error",
       });
     } finally {
@@ -150,246 +175,357 @@ const UploadProduct = () => {
     <Box
       sx={{
         display: "flex",
-        flexDirection: { xs: "column", md: "row" },
+        flexDirection: "column",
         p: 2,
         gap: 3,
         backgroundColor: "#fff",
       }}
     >
-      <Grid container spacing={8}>
-        <Grid item xs={12} sm={4} md={4}>
+      <Grid container spacing={2} disableEqualOverflow>
+        <Grid xs={12} sm={4} md={3} lg={2}>
           <SideBar />
         </Grid>
-        {/* Sidebar */}
-
-        {/* Main Content */}
-        <Grid item xs={12} sm={4} md={8}>
-          <Box sx={{ width: "100%", maxWidth: "1200px" }}>
+        
+        <Grid xs={12} sm={8} md={9} lg={10}>
+          <Box sx={{ width: "100%" }}>
             <Typography variant="h6" sx={{ mb: 3 }}>
               Upload New Product
             </Typography>
 
-            {/* <Box sx={{ wdith: "500px" }}> */}
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                  {/* Left Side: Upload Box */}
+            <Grid container spacing={3} disableEqualOverflow>
+              {/* Left Column */}
+              <Grid xs={12} md={6}>
+                {/* Image Upload Box */}
+                <Box
+                  sx={{
+                    border: "1px solid #e0e0e0",
+                    borderRadius: "4px",
+                    p: 2,
+                    minHeight: "150px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "92%",
+                  }}
+                >
+                  <Typography sx={{ paddingTop: 3, color: "#666", mb: 2 }}>
+                    Upload Product Images
+                  </Typography>
                   <Box
                     sx={{
-                      border: "1px solid #e0e0e0",
-                      borderRadius: "4px",
-                      p: 2,
-                      minHeight: "150px",
                       display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: 1,
+                      mb: 2,
+                      width: "100%",
                       justifyContent: "center",
-                      width: 500,
                     }}
                   >
-                    <Typography sx={{ paddingTop: 5, color: "#666", mb: 2 }}>
-                      Upload Product Images
+                    {productImages.length > 0 &&
+                      productImages.map((image, index) => (
+                        <Box
+                          key={index}
+                          sx={{
+                            width: 40,
+                            height: 60,
+                            border: "1px solid #e0e0e0",
+                            borderRadius: "4px",
+                            overflow: "hidden",
+                            position: "relative",
+                          }}
+                        >
+                          <img
+                            src={URL.createObjectURL(image)}
+                            alt={`Preview ${index}`}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
+                          <IconButton
+                            size="small"
+                            sx={{
+                              position: "absolute",
+                              top: 0,
+                              right: 0,
+                              backgroundColor: "rgba(255,255,255,0.7)",
+                              "&:hover": {
+                                backgroundColor: "rgba(255,255,255,0.9)",
+                              },
+                            }}
+                            onClick={() => handleRemoveImage(index)}
+                          >
+                            <CloseIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      ))}
+                  </Box>
+                  <Button
+                    variant="contained"
+                    component="label"
+                    sx={{
+                      mb: 2,
+                      backgroundColor: "#00897b",
+                      "&:hover": { backgroundColor: "#00796b" },
+                      textTransform: "none",
+                      width: { xs: "100%", sm: "auto" },
+                    }}
+                  >
+                    Add Image
+                    <input
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                  </Button>
+                </Box>
+
+                {/* Product Name */}
+                <TextField
+                  fullWidth
+                  label="Add Product name"
+                  variant="outlined"
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
+                  sx={{ backgroundColor: "#fff", mt: 3 }}
+                />
+
+                {/* Price and Stock */}
+                <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+                  <TextField
+                    label="Price"
+                    variant="outlined"
+                    type="number"
+                    value={price < 0 ? 0 : price}
+                    onChange={(e) => setPrice(e.target.value < 0 ? 0 : e.target.value)}
+                    InputProps={{ inputProps: { min: 0 } }}
+                    sx={{ flex: 1, backgroundColor: "#fff" }}
+                  />
+                  <TextField
+                    label="Available stock"
+                    variant="outlined"
+                    type="number"
+                    value={stock < 0 ? 0 : stock}
+                    onChange={(e) => setStock(e.target.value < 0 ? 0 : e.target.value)}
+                    InputProps={{ inputProps: { min: 0 } }}
+                    sx={{ flex: 1, backgroundColor: "#fff" }}
+                  />
+                </Box>
+
+                {/* Brand */}
+                <TextField
+                  fullWidth
+                  label="Brand (optional)"
+                  variant="outlined"
+                  placeholder="Enter brand name or leave empty for 'No Brand'"
+                  value={brand}
+                  onChange={(e) => setBrand(e.target.value)}
+                  sx={{ backgroundColor: "#fff", mt: 2 }}
+                />
+
+                {/* Categories */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    mt: 2,
+                    flexDirection: { xs: "column", sm: "row" },
+                  }}
+                >
+                  <FormControl fullWidth>
+                    <InputLabel id="category-select-label">Category</InputLabel>
+                    <Select
+                      labelId="category-select-label"
+                      id="category-select"
+                      value={selectedCategory}
+                      onChange={handleCategoryChange}
+                      label="Category"
+                    >
+                      {categories.map((category) => (
+                        <MenuItem key={category.name} value={category.name}>
+                          {category.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <FormControl fullWidth disabled={!selectedCategory}>
+                    <InputLabel id="subcategory-select-label">
+                      Subcategory
+                    </InputLabel>
+                    <Select
+                      labelId="subcategory-select-label"
+                      id="subcategory-select"
+                      value={selectedSubcategory}
+                      onChange={handleSubcategoryChange}
+                      label="Subcategory"
+                    >
+                      {currentSubcategories.map((subcategory) => (
+                        <MenuItem key={subcategory} value={subcategory}>
+                          {subcategory}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+              </Grid>
+
+              {/* Right Column */}
+              <Grid xs={12} md={6}>
+                {/* Description */}
+                <TextField
+                  fullWidth
+                  label="Add Description"
+                  variant="outlined"
+                  multiline
+                  rows={6}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  sx={{ backgroundColor: "#fff" }}
+                />
+
+                {/* Colors Section */}
+                <Box sx={{ mt: 3 }}>
+                  <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                    Colors (optional)
+                  </Typography>
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      listStyle: "none",
+                      p: 0.5,
+                      m: 0,
+                      minHeight: "50px",
+                    }}
+                  >
+                    {colors.map((color) => (
+                      <Chip
+                        key={color}
+                        label={color}
+                        onDelete={() => handleDeleteColor(color)}
+                        sx={{ m: 0.5 }}
+                      />
+                    ))}
+                  </Paper>
+                  <Autocomplete
+                    freeSolo
+                    options={commonColors.filter(color => !colors.includes(color))}
+                    value={newColor}
+                    onChange={(e, value) => {
+                      if (value && !colors.includes(value)) {
+                        setColors([...colors, value]);
+                        setNewColor("");
+                      }
+                    }}
+                    inputValue={newColor}
+                    onInputChange={(e, value) => setNewColor(value)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        variant="outlined"
+                        label="Add color"
+                        size="small"
+                        sx={{ mt: 1 }}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleAddColor();
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                    )}
+                  />
+                </Box>
+                
+                {/* Sizes Section - Only shown for relevant categories */}
+                {showSizesField && (
+                  <Box sx={{ mt: 3 }}>
+                    <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                      Sizes (optional)
                     </Typography>
-                    <Box
+                    <Paper
+                      variant="outlined"
                       sx={{
                         display: "flex",
-                        flexWrap: "nowrap", // Prevent wrapping to the next line
-                        gap: 1,
-                        mb: 2,
-                        height: 40,
-                        width: "100%",
-                        overflowX: "auto", // Enable horizontal scrolling
-                        justifyContent: "center",
+                        flexWrap: "wrap",
+                        listStyle: "none",
+                        p: 0.5,
+                        m: 0,
+                        minHeight: "50px",
                       }}
                     >
-                      {productImages.length > 0 &&
-                        productImages.map((image, index) => (
-                          <Box
-                            key={index}
-                            sx={{
-                              width: 60,
-                              height: 60,
-                              border: "1px solid #e0e0e0",
-                              borderRadius: "4px",
-                              overflow: "hidden",
-                              position: "relative",
-                              flexShrink: 0, // Prevent shrinking
-                            }}
-                          >
-                            <img
-                              src={URL.createObjectURL(image)}
-                              alt={`Preview ${index}`}
-                              style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                              }}
-                            />
-                            <IconButton
-                              size="small"
-                              sx={{
-                                position: "absolute",
-                                top: 0,
-                                right: 0,
-                                backgroundColor: "rgba(255,255,255,0.7)",
-                                "&:hover": {
-                                  backgroundColor: "rgba(255,255,255,0.9)",
-                                },
-                              }}
-                              onClick={() => handleRemoveImage(index)}
-                            >
-                              <CloseIcon fontSize="small" />
-                            </IconButton>
-                          </Box>
-                        ))}
-                    </Box>
-                    <Button
-                      variant="contained"
-                      component="label"
-                      sx={{
-                        marginBottom: 3,
-                        marginTop: -4,
-                        backgroundColor: "#00897b",
-                        "&:hover": { backgroundColor: "#00796b" },
-                        textTransform: "none",
-                        width: { xs: "200%", md: "300px" },
+                      {sizes.map((size) => (
+                        <Chip
+                          key={size}
+                          label={size}
+                          onDelete={() => setSizes(sizes.filter(s => s !== size))}
+                          sx={{ m: 0.5 }}
+                        />
+                      ))}
+                    </Paper>
+                    <Autocomplete
+                      freeSolo
+                      options={commonSizes.filter(size => !sizes.includes(size))}
+                      onChange={(e, value) => {
+                        if (value && !sizes.includes(value)) {
+                          setSizes([...sizes, value]);
+                        }
                       }}
-                    >
-                      Add Image
-                      <input
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        onChange={handleImageChange}
-                      />
-                    </Button>
-                  </Box>
-                  <TextField
-                    fullWidth
-                    label="Add Product name"
-                    variant="outlined"
-                    value={productName}
-                    onChange={(e) => setProductName(e.target.value)}
-                    sx={{ width: 532, backgroundColor: "#fff", mt: 3 }}
-                  />
-                </Grid>
-
-                {/* Right Side: Form Fields */}
-                <Grid item xs={12} md={6}>
-                  <Box
-                    sx={{
-                      gap: 1,
-                      width: { xs: "100%", md: "250px" },
-                      ml: 0,
-                    }}
-                  >
-                    <TextField
-                      fullWidth
-                      label="Add Description"
-                      variant="outlined"
-                      multiline
-                      rows={10.7}
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      sx={{ backgroundColor: "#fff" }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          variant="outlined"
+                          label="Add size"
+                          size="small"
+                          sx={{ mt: 1 }}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter' && e.target.value && !sizes.includes(e.target.value)) {
+                              setSizes([...sizes, e.target.value]);
+                              e.preventDefault();
+                            }
+                          }}
+                        />
+                      )}
                     />
                   </Box>
-                </Grid>
+                )}
               </Grid>
-            </Box>
-            <Box sx={{ width: 532, display: "flex", gap: 2, mt: 2 }}>
-              <TextField
-                label="Price"
-                variant="outlined"
-                value={price < 0 ? 0 : price}
-                type="number"
-                onChange={(e) => setPrice(e.target.value < 0 ? 0 : e.target.value)}
-                sx={{ flex: 1, backgroundColor: "#fff" }}
-              />
-              <TextField
-                label="Available stock"
-                variant="outlined"
-                value={stock < 0 ? 0 : stock}
-                type="number"
-                onChange={(e) => setStock(e.target.value)}
-                sx={{ flex: 1, backgroundColor: "#fff" }}
-              />
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                mt: 2,
-                flexDirection: { xs: "column", sm: "row" },
-              }}
-            >
-              <FormControl fullWidth>
-                <InputLabel id="category-select-label">Category</InputLabel>
-                <Select
-                  labelId="category-select-label"
-                  id="category-select"
-                  value={selectedCategory}
-                  onChange={handleCategoryChange}
-                  label="Category"
-                >
-                  {categories.map((category) => (
-                    <MenuItem key={category.name} value={category.name}>
-                      {category.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth disabled={!selectedCategory}>
-                <InputLabel id="subcategory-select-label">
-                  Subcategory
-                </InputLabel>
-                <Select
-                  labelId="subcategory-select-label"
-                  id="subcategory-select"
-                  value={selectedSubcategory}
-                  onChange={handleSubcategoryChange}
-                  label="Subcategory"
-                >
-                  {currentSubcategories.map((subcategory) => (
-                    <MenuItem key={subcategory} value={subcategory}>
-                      {subcategory}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
+            </Grid>
+            
+            {/* Submit Button */}
             <Button
               variant="contained"
               onClick={handleSubmit}
               disabled={isLoading}
               sx={{
-                width: { xs: "100%", sm: "20%" },
-                mt: 2,
+                mt: 4,
                 backgroundColor: "#00897b",
                 "&:hover": { backgroundColor: "#00796b" },
                 textTransform: "none",
+                width: { xs: "100%", sm: "auto" },
               }}
             >
-              {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Submit"
-              )}
+              {isLoading ? <CircularProgress size={24} color="inherit" /> : "Upload Product"}
             </Button>
-          {/* </Box> */}
+          </Box>
         </Grid>
       </Grid>
-
-      {/* Add Snackbar for notifications */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
+      
+      {/* Snackbar for notifications */}
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={6000} 
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbar.severity}
+        <Alert 
+          onClose={handleSnackbarClose} 
+          severity={snackbar.severity} 
           sx={{ width: "100%" }}
         >
           {snackbar.message}
