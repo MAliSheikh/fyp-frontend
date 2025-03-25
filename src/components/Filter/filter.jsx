@@ -30,12 +30,14 @@ const categories = {
   Automobiles: ["Cars", "Bikes", "Car Accessories", "Tools", "Spare Parts"],
 };
 
-const FilterSidebar = ({ open, onClose, onApply, categories }) => {
+const FilterSidebar = ({ open, onClose, onApply, categories, commonSizes }) => {
+  const [selectedSizes, setSelectedSizes] = useState([]);
   const [filters, setFilters] = useState({
     category: "",
     subcategory: "",
     minPrice: "",
     maxPrice: "",
+    sizes: [],
   });
 
   const handleSubcategoryChange = (subcategory) => {
@@ -45,8 +47,17 @@ const FilterSidebar = ({ open, onClose, onApply, categories }) => {
     }));
   };
 
+  const handleSizeChange = (size) => {
+    setSelectedSizes((prev) => 
+      prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
+    );
+  };
+
   const handleApply = () => {
-    onApply(filters);
+    onApply({ 
+      ...filters, 
+      sizes: selectedSizes.length > 0 ? selectedSizes : undefined
+    });
     onClose();
   };
 
@@ -56,6 +67,7 @@ const FilterSidebar = ({ open, onClose, onApply, categories }) => {
       subcategory: "",
       minPrice: "",
       maxPrice: "",
+      sizes: []
     });
     onClose();
   };
@@ -114,6 +126,21 @@ const FilterSidebar = ({ open, onClose, onApply, categories }) => {
             size="small" 
             fullWidth 
           />
+        </Box>
+        <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#555" }}>Sizes</Typography>
+        <Box>
+          {commonSizes.map((size) => (
+            <FormControlLabel
+              key={size}
+              control={
+                <Checkbox
+                  checked={selectedSizes.includes(size)}
+                  onChange={() => handleSizeChange(size)}
+                />
+              }
+              label={<Typography>{size}</Typography>}
+            />
+          ))}
         </Box>
       </List>
       <Box display="flex" justifyContent="space-between" mt={3} mb={3}>

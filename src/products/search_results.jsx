@@ -16,6 +16,19 @@ import FilterAltIcon from "@mui/icons-material/FilterAlt"; // Filter icon
 import FilterSidebar from "../components/Filter/filter"; // Import the FilterSidebar component
 import { searchProducts } from "./product";
 import { categories } from "../seller/category";
+import { commonSizes } from "../seller/upload_product"; // Import commonSizes
+
+const categoriesWithSizes = ["Clothes", "Shoes", "Sports"];
+const subcategoriesWithSizes = [
+  "Men",
+  "Women",
+  "Kids",
+  "Accessories",
+  "Cricket",
+  "Football",
+  "Badminton",
+  "Fitness",
+];
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
@@ -75,14 +88,14 @@ const SearchResults = () => {
 
   const handleSubcategorySelect = (category, subcategory) => {
     const updatedSearchParams = new URLSearchParams(searchParams);
-    updatedSearchParams.set('category', category);
+    updatedSearchParams.set("category", category);
     if (subcategory !== "All") {
-      updatedSearchParams.set('subcategory', subcategory);
+      updatedSearchParams.set("subcategory", subcategory);
     } else {
-      updatedSearchParams.delete('subcategory');
+      updatedSearchParams.delete("subcategory");
     }
     if (category) {
-      updatedSearchParams.delete('search_string');
+      updatedSearchParams.delete("search_string");
     }
     setSearchParams(updatedSearchParams);
     setAnchorEl(null);
@@ -94,26 +107,34 @@ const SearchResults = () => {
 
     const searchTerm = searchParams.get("search_string");
     if (searchTerm) newParams.set("search_string", searchTerm);
-    
+
     if (filters.category) {
-        newParams.set('category', filters.category);
-        newParams.delete('search_string');
-    } else newParams.delete('category');
-    
+      newParams.set("category", filters.category);
+      newParams.delete("search_string");
+    } else newParams.delete("category");
+
     if (filters.subcategory) {
-        newParams.set('subcategory', filters.subcategory);
-    } else newParams.delete('subcategory');
-    
-    if (filters.minPrice) newParams.set('min_price', filters.minPrice);
-    else newParams.delete('min_price');
-    
-    if (filters.maxPrice) newParams.set('max_price', filters.maxPrice);
-    else newParams.delete('max_price');
-    
-    if (filters.brand) newParams.set('brand', filters.brand);
-    else newParams.delete('brand');
-    
+      newParams.set("subcategory", filters.subcategory);
+    } else newParams.delete("subcategory");
+
+    if (filters.minPrice) newParams.set("min_price", filters.minPrice);
+    else newParams.delete("min_price");
+
+    if (filters.maxPrice) newParams.set("max_price", filters.maxPrice);
+    else newParams.delete("max_price");
+
+    if (filters.brand) newParams.set("brand", filters.brand);
+    else newParams.delete("brand");
+
+    // Add sizes to the search parameters if provided
+    if (filters.sizes && filters.sizes.length > 0) {
+      filters.sizes.forEach((size) => newParams.append("sizes", size)); // Append each size separately
+    } else {
+      newParams.delete("sizes");
+    }
+
     setSearchParams(newParams);
+    console.log("Search Params:", newParams.toString()); // Debugging line to check params
   };
 
   useEffect(() => {
@@ -126,8 +147,15 @@ const SearchResults = () => {
           search_string: searchParams.get("search_string"),
           category: searchParams.get("category"),
           subcategory: searchParams.get("subcategory"),
+          min_price: searchParams.get("min_price"),
+          max_price: searchParams.get("max_price"),
+          brand: searchParams.get("brand"),
         };
-
+        // Get sizes array from URL params if present
+        const sizesParam = searchParams.getAll("sizes");
+        if (sizesParam && sizesParam.length > 0) {
+          searchQuery.sizes = sizesParam;
+        }
         const data = await searchProducts(searchQuery);
         setProducts(data);
       } catch (err) {
@@ -234,7 +262,11 @@ const SearchResults = () => {
         open={filterOpen}
         onClose={() => setFilterOpen(false)}
         onApply={handleFilterApply}
-        categories={categories.filter(cat => products.some(product => product.category === cat.name))}
+        categories={categories.filter((cat) =>
+          products.some((product) => product.category === cat.name)
+        )}
+        commonSizes={commonSizes}
+        categoriesWithSizes={categoriesWithSizes}
       />
 
       {products.length === 0 ? (

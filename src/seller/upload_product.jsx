@@ -36,7 +36,7 @@ const commonColors = [
   "Brown", "Gray", "Orange", "Navy", "Beige", "Maroon", "Teal"
 ];
 
-const commonSizes = [
+export const commonSizes = [
   "XS", "S", "M", "L", "XL", "XXL", "XXXL",
   "36", "37", "38", "39", "40", "41", "42", "43", "44", "45",
   "One Size"
