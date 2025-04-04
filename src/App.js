@@ -36,6 +36,8 @@ import Success from './Success'; // Import the Success page
 import Cancel from './Cancel';
 import UserChatComponent from "./chat/userChat";
 // import SellerChatting from './chat/seller-chatting' 
+import SidebarAdmin from "./admin/sidebar_admin";
+
 
 function App() {
   return (
@@ -61,6 +63,7 @@ function App() {
         <Route path="/buy-now" element={<PrivateRoute roles={["customer"]}><Layout>{<BuyNowPage />}</Layout></PrivateRoute>} />
         <Route path="/add_to_cart" element={<PrivateRoute roles={["customer"]}><Layout>{<AddToCartPage />}</Layout></PrivateRoute>} />
         <Route path="/profile" element={<PrivateRoute roles={["customer"]}><Layout>{<Profile />}</Layout></PrivateRoute>} />
+
         {/* <Route path="/review" element={<Reviews />} /> */}
         <Route path="/review" element={<Layout>{<ReviewHistory />}</Layout>} />
         <Route path="/viewer" element={<Layout>{<Viewer />}</Layout>} />
@@ -153,16 +156,25 @@ function App() {
         />
 
         {/* Admin */}
-        {/* <Route
-          path="/admin_page"
+        <Route
+          path="/sidebar_admin"
           element={
-            <PrivateRoute roles={['admin']}>
+            <Layout>
+              <SidebarAdmin />
+            </Layout>
+          
+          }
+        />
+        {/* <Route
+          path="/admin_dashboard"
+          element={
               <Layout>
-                <AdminPage />
+                <OrdersPage />
               </Layout>
-            </PrivateRoute>
           }
         /> */}
+        
+        
 
         <Route path="/orders" element={<Layout>{<OrdersPage />}</Layout>} />
         <Route path="/manageproducts" element={<Layout>{<ManageProducts />}</Layout>} />

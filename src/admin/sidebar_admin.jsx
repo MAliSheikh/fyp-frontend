@@ -1,9 +1,10 @@
-import React from "react";
-import { Box, Button, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Button } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import authService from "../components/LoginSignup/components/token";
 
-export const SideBarAdmin = () => {
+
+export const SideBarAdmin = ({ onSectionChange }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
@@ -16,6 +17,13 @@ export const SideBarAdmin = () => {
     color: currentPath === path ? "#ffffff" : "grey",
     "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
   });
+
+  const handleNavigation = (path) => {
+    navigate(path);
+    if (onSectionChange) {
+      onSectionChange(path);
+    }
+  };
 
   return (
     <Box
@@ -31,38 +39,35 @@ export const SideBarAdmin = () => {
     >
       <Button
         variant="contained"
-        onClick={() => navigate("/seller/upload-product")}
-        sx={getButtonStyle("/seller/upload-product")}
+        onClick={() => handleNavigation("/admin_dashboard")}
+        sx={getButtonStyle("/admin-dashboard")}
       >
         Dashboard
       </Button>
 
       <Button
         variant="contained"
-        sx={getButtonStyle("/manageproducts")}
-        onClick={() => navigate("/manageproducts")}
+        onClick={() => handleNavigation("/manage-users")}
+        sx={getButtonStyle("/manage-users")}
       >
-        Seller
+        Manage Users
       </Button>
 
       <Button
         variant="contained"
-        sx={getButtonStyle("/orders")}
-        onClick={() => navigate("/orders")}
+        onClick={() => handleNavigation("/manage-products")}
+        sx={getButtonStyle("/manage-products")}
       >
-        Costumer
+        Manage Products
       </Button>
-
 
       <Button
         variant="contained"
-        sx={getButtonStyle("/mall")}
-        onClick={() => navigate("/mall")}
+        onClick={() => handleNavigation("/manage-reviews")}
+        sx={getButtonStyle("/manage-reviews")}
       >
-        Products
+        Manage Reviews
       </Button>
-
-      
 
       <Button
         variant="contained"
@@ -84,3 +89,5 @@ export const SideBarAdmin = () => {
     </Box>
   );
 };
+
+export default SideBarAdmin;
