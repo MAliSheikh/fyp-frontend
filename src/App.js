@@ -35,6 +35,7 @@ import Viewer from './3d_viewer/viewer1'
 import Success from './Success'; // Import the Success page
 import Cancel from './Cancel';
 import UserChatComponent from "./chat/userChat";
+import ChattingPanel from "./chat/chatPanel";
 // import SellerChatting from './chat/seller-chatting' 
 
 function App() {
@@ -61,6 +62,7 @@ function App() {
         <Route path="/buy-now" element={<PrivateRoute roles={["customer"]}><Layout>{<BuyNowPage />}</Layout></PrivateRoute>} />
         <Route path="/add_to_cart" element={<PrivateRoute roles={["customer"]}><Layout>{<AddToCartPage />}</Layout></PrivateRoute>} />
         <Route path="/profile" element={<PrivateRoute roles={["customer"]}><Layout>{<Profile />}</Layout></PrivateRoute>} />
+        <Route path="/chat-interface" element={<PrivateRoute roles={["customer", "seller"]}><Layout>{<ChattingPanel />}</Layout></PrivateRoute>} />
         {/* <Route path="/review" element={<Reviews />} /> */}
         <Route path="/review" element={<Layout>{<ReviewHistory />}</Layout>} />
         <Route path="/viewer" element={<Layout>{<Viewer />}</Layout>} />

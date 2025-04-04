@@ -40,6 +40,10 @@ import { styled, alpha } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import axiosInstance from "../axiosInstance";
+import InsertCommentOutlinedIcon from '@mui/icons-material/InsertCommentOutlined';
+import ChattingPanel from "../../chat/chatPanel";
+import ChatIcon from '@mui/icons-material/Chat';
+
 // import { categories } from "../../seller/category";
 
 // Custom styled components
@@ -342,6 +346,12 @@ const Header = () => {
                 <Badge badgeContent={0} color="error">
                   <CartIcon />
                 </Badge>
+              </IconButton>
+              <IconButton
+                color="inherit"
+                onClick={() => navigate("/chat-interface")}
+              >
+                <InsertCommentOutlinedIcon />
               </IconButton>
               <IconButton color="inherit" onClick={() => navigate("/profile")}>
                 <PersonIcon />
