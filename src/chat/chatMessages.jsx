@@ -4,11 +4,20 @@ import { Box, Paper, Typography } from "@mui/material";
 
 const ChatMessages = ({ messages, loggedInUserId }) => {
   const messageEndRef = React.useRef(null);
+  const userRole = localStorage.getItem("userRole");
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const isMessageFromCurrentUser = (messageRole) => {
+    if (userRole === "seller") {
+      return messageRole === "seller";
+    } else {
+      return messageRole === "customer";
+    }
+  };
 
   return (
     <Box
@@ -22,15 +31,14 @@ const ChatMessages = ({ messages, loggedInUserId }) => {
       }}
     >
       {messages.map((msg, index) => {
-        // Determine if the message is sent by the logged-in user
-        const isSentByUser = msg.role === "seller";
+        const isFromCurrentUser = isMessageFromCurrentUser(msg.role);
 
         return (
           <Box
             key={msg.message_id || index}
             sx={{
               display: "flex",
-              justifyContent: isSentByUser ? "flex-end" : "flex-start",
+              justifyContent: isFromCurrentUser ? "flex-end" : "flex-start",
               mb: 1,
             }}
           >
@@ -40,7 +48,7 @@ const ChatMessages = ({ messages, loggedInUserId }) => {
                 p: 1.5,
                 maxWidth: "70%",
                 borderRadius: 2,
-                bgcolor: isSentByUser ? "#dcf8c6" : "white",
+                bgcolor: isFromCurrentUser ? "#dcf8c6" : "white",
                 position: "relative",
               }}
             >
