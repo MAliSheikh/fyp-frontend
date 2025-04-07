@@ -44,7 +44,7 @@ const ChattingPanel = () => {
   const loggedInUserId = localStorage.getItem("userId");
   const userRole = localStorage.getItem("userRole");
 
-  // Fetch chat data function
+  // Fetch chat data function - only called on initial load and when refresh button is clicked
   const fetchChatData = async () => {
     const user_id = localStorage.getItem("userId");
     setLoading(true);
@@ -76,8 +76,6 @@ const ChattingPanel = () => {
         );
         if (updatedActiveChat) {
           setActiveChat(updatedActiveChat);
-          // Mark messages as read when the chat is active and we get new data
-          markMessagesAsRead(updatedActiveChat);
         }
       }
 
@@ -88,15 +86,15 @@ const ChattingPanel = () => {
     }
   };
 
-  // Mark messages as read
+  // Mark messages as read - implemented locally without API
   const markMessagesAsRead = (chat) => {
-    // Since we don't have an API for marking as read, we'll implement it locally
     if (!chat || !chat.messages) return;
     
+    // Create a new chat object with read messages
     const updatedChat = {
       ...chat,
       messages: chat.messages.map(msg => {
-        // Mark message as read if it's not from the current user
+        // Only mark as read if the message is not from the current user
         if ((userRole === "seller" && msg.role === "customer") ||
             (userRole === "customer" && msg.role === "seller")) {
           return { ...msg, read: true };
@@ -106,18 +104,28 @@ const ChattingPanel = () => {
     };
     
     // Update the chat data with the read messages
-    setChatData(prevData => ({
-      ...prevData,
-      mergedChats: prevData.mergedChats.map(c => 
-        (c.user_id === chat.user_id && c.store_id === chat.store_id) ? updatedChat : c
-      ),
-      customerChats: prevData.customerChats.map(c => 
-        (c.user_id === chat.user_id && c.store_id === chat.store_id) ? updatedChat : c
-      ),
-      sellerChats: prevData.sellerChats.map(c => 
-        (c.user_id === chat.user_id && c.store_id === chat.store_id) ? updatedChat : c
-      )
-    }));
+    setChatData(prevData => {
+      // Create a new object to ensure state update triggers
+      const newData = {
+        ...prevData,
+        mergedChats: prevData.mergedChats.map(c => 
+          (c.user_id === chat.user_id && c.store_id === chat.store_id) ? updatedChat : c
+        )
+      };
+      
+      // Update the appropriate chat list based on user role
+      if (userRole === "customer") {
+        newData.customerChats = prevData.customerChats.map(c => 
+          (c.user_id === chat.user_id && c.store_id === chat.store_id) ? updatedChat : c
+        );
+      } else {
+        newData.sellerChats = prevData.sellerChats.map(c => 
+          (c.user_id === chat.user_id && c.store_id === chat.store_id) ? updatedChat : c
+        );
+      }
+      
+      return newData;
+    });
     
     // Update active chat if it's the current chat
     if (activeChat && activeChat.user_id === chat.user_id && activeChat.store_id === chat.store_id) {
@@ -178,7 +186,8 @@ const ChattingPanel = () => {
           if (chat.user_id === userId && chat.store_id === storeId) {
             return {
               ...chat,
-              messages: [...(chat.messages || []), newMessage]
+              messages: [...(chat.messages || []), newMessage],
+              lastMessageTime: new Date().toISOString() // Add timestamp for sorting
             };
           }
           return chat;
@@ -195,15 +204,16 @@ const ChattingPanel = () => {
       // Update active chat
       setActiveChat(prev => ({
         ...prev,
-        messages: [...(prev.messages || []), newMessage]
+        messages: [...(prev.messages || []), newMessage],
+        lastMessageTime: new Date().toISOString()
       }));
 
       // Send message to server
       const response = await sendMessage(payload);
 
       if (response) {
-        // Fetch latest data to sync with server
-        fetchChatData();
+        // We don't fetch new data after sending a message to avoid unnecessary API calls
+        // The message is already added to the UI optimistically
       }
     } catch (error) {
       console.error("Error sending message:", error);
@@ -213,7 +223,9 @@ const ChattingPanel = () => {
 
   // Check if a chat has unread messages
   const hasUnreadMessages = (chat) => {
-    return chat.messages && chat.messages.some(msg => {
+    if (!chat.messages) return false;
+    
+    return chat.messages.some(msg => {
       // For seller: check if there are unread customer messages
       // For customer: check if there are unread seller messages
       return !msg.read && (
@@ -223,12 +235,25 @@ const ChattingPanel = () => {
     });
   };
 
-  // Fetch data on component mount
+  // Count unread messages for a chat
+  const countUnreadMessages = (chat) => {
+    if (!chat.messages) return 0;
+    
+    return chat.messages.filter(msg => {
+      return !msg.read && (
+        (userRole === "seller" && msg.role === "customer") ||
+        (userRole === "customer" && msg.role === "seller")
+      );
+    }).length;
+  };
+
+  // Fetch data only on component mount
   useEffect(() => {
     fetchChatData();
-  }, []); // Only fetch once when component mounts
+    // No dependencies to ensure it only runs once when component mounts
+  }, []);
 
-  // Effect to mark messages as read when active chat changes
+  // Effect to mark messages as read when viewing a chat
   useEffect(() => {
     if (activeChat) {
       markMessagesAsRead(activeChat);
@@ -292,6 +317,7 @@ const ChattingPanel = () => {
 
                 // Check if there are any unread messages
                 const hasUnread = hasUnreadMessages(chat);
+                const unreadCount = countUnreadMessages(chat);
 
                 return (
                   <React.Fragment
@@ -301,15 +327,16 @@ const ChattingPanel = () => {
                       button
                       onClick={() => handleChatSelect(chat)}
                       sx={{
-                        bgcolor: hasUnread ? 'rgba(0, 0, 0, 0.12)' : 'inherit',
+                        bgcolor: hasUnread 
+                          ? 'rgba(25, 118, 210, 0.12)' // More WhatsApp-like blue tint for unread
+                          : 'inherit',
                         '&:hover': { bgcolor: 'action.hover' }
                       }}
                     >
                       <ListItemAvatar>
                         <Badge
-                          color="secondary"
-                          variant="dot"
-                          invisible={!hasUnread}
+                          badgeContent={unreadCount > 0 ? unreadCount : null}
+                          color="primary"
                         >
                           <Avatar>
                             {(chat.username ||
@@ -326,10 +353,10 @@ const ChattingPanel = () => {
                             : latestMessage
                         }
                         primaryTypographyProps={{
-                          fontWeight: hasUnread ? "bold" : "normal",
+                          fontWeight: hasUnread ? 600 : 400,
                         }}
                         secondaryTypographyProps={{
-                          fontWeight: hasUnread ? "bold" : "normal",
+                          fontWeight: hasUnread ? 500 : 400,
                           color: hasUnread ? 'text.primary' : 'text.secondary'
                         }}
                       />
