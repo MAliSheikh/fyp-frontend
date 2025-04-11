@@ -1,51 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Container, Box, Typography, Grid, CircularProgress, Button } from '@mui/material';
-import ProductSlider from './ProductSlider';
 import ProductCard from './productCard';
 import { fetchRecommendations } from './product';
 
 const RecommendationsPage = () => {
   const [recommendedProducts, setRecommendedProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [totalFetched, setTotalFetched] = useState(0);
   const basePageSize = 10; // Fixed initial page size
-  const dataFetchedRef = useRef(false);
-
-  // Load initial data from localStorage
-  useEffect(() => {
-    const loadInitialData = () => {
-      if (dataFetchedRef.current) return; // Skip if already fetched
-      
-      setLoading(true);
-      
-      // Get stored products and page
-      const storedProducts = localStorage.getItem('recommendedProducts');
-      const storedPage = parseInt(localStorage.getItem('recommendationsPage') || '0');
-      const totalCount = parseInt(localStorage.getItem('recommendationsTotal') || '0');
-      
-      if (storedProducts) {
-        const parsedProducts = JSON.parse(storedProducts);
-        setRecommendedProducts(parsedProducts);
-        setPage(storedPage);
-        setTotalFetched(parsedProducts.length);
-        
-        // Check if we have more products to load
-        setHasMore(parsedProducts.length < totalCount || totalCount === 0);
-        dataFetchedRef.current = true;
-      } else {
-        // If no stored data, fetch from API
-        getRecommendedProducts(0, false);
-        dataFetchedRef.current = true;
-      }
-      
-      setLoading(false);
-    };
-    
-    loadInitialData();
-  }, []);
 
   const getRecommendedProducts = async (pageNumber = 0, shouldAppend = false) => {
     try {
@@ -76,21 +40,15 @@ const RecommendationsPage = () => {
               newProducts.push(newProduct);
             }
           });
-          
-          setTotalFetched(newProducts.length);
           return newProducts;
         });
       } else {
         // Set new products for the first load
         setRecommendedProducts(response);
-        setTotalFetched(response.length);
-        // Store in localStorage for future use
-        localStorage.setItem('recommendedProducts', JSON.stringify(response));
       }
       
       // Check if we have more products to load - if we received fewer than requested, there are no more
       setHasMore(response.length === basePageSize);
-      localStorage.setItem('recommendationsTotal', (totalFetched + response.length).toString());
       
       // Update the page in localStorage
       localStorage.setItem('recommendationsPage', pageNumber.toString());
@@ -108,13 +66,22 @@ const RecommendationsPage = () => {
     getRecommendedProducts(nextPage, true); // Load more products
   };
 
+  // Fetch initial data when the component mounts
+  const fetchInitialData = () => {
+    getRecommendedProducts(0, false); // Load initial products
+  };
+
+  // Call fetchInitialData when the component is first rendered
+  React.useEffect(() => {
+    fetchInitialData();
+  }, []);
+
   return (
     <Container maxWidth="lg">
       <Box sx={{ py: 4 }}>
         <Typography variant="h4" component="h1" sx={{ mb: 4, fontWeight: 'bold' }}>
           Recommended Products
         </Typography>
-
 
         {/* Product Grid */}
         {loading ? (
