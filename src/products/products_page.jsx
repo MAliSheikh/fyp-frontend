@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Slider from 'react-slick';
 import { useNavigate } from 'react-router-dom';
-import { Container, Box, Typography, Card, CardMedia, CardContent, Rating, CircularProgress } from '@mui/material';
+import { Container, Box, Typography, Card, CardMedia, CardContent, Rating, CircularProgress, Button } from '@mui/material';
 import Grid2 from '@mui/material/Grid2';
 //import banner1 from '../components/Logos/banner2.jpg'
 //import banner2 from '../components/Logos/banner3.jpg'
@@ -98,26 +98,47 @@ const ProductCard = ({ product }) => {
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const dataFetchedRef = useRef(false); // Ref to track if data has been fetched
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 10;
 
-  const getProducts = async () => {
-    if (!dataFetchedRef.current) { // Only fetch if data hasn't been fetched yet
-      try {
+  const getProducts = async (pageNumber = 0, shouldAppend = false) => {
+    try {
+      if (pageNumber === 0) {
         setLoading(true);
-        const data = await fetchProducts();
-        setProducts(data);
-        dataFetchedRef.current = true; // Mark data as fetched
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      } finally {
-        setLoading(false);
+      } else {
+        setLoadingMore(true);
       }
+      
+      const data = await fetchProducts(pageNumber * limit, limit);
+      
+      if (data.length < limit) {
+        setHasMore(false);
+      }
+
+      if (shouldAppend) {
+        setProducts(prevProducts => [...prevProducts, ...data]);
+      } else {
+        setProducts(data);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
     }
+  };
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    getProducts(nextPage, true);
   };
 
   // Call getProducts when the component is mounted
   useEffect(() => {
-    getProducts(); // Fetch data when the component is mounted
+    getProducts(0, false);
   }, []); // Empty dependency array ensures this runs only once
 
   return (
@@ -127,26 +148,46 @@ const Products = () => {
         <BannerSlider />
       </Box>
 
-      {/* Categories Heading
-      <Typography variant="h5" gutterBottom>
-        Categories
-      </Typography> */}
-        {/* Top Rated Products
-      </Typography> */}
-
       {/* Loading Indicator or Product Grid */}
       {loading ? (
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
           <CircularProgress />
         </Box>
       ) : (
-        <Grid2 container spacing={3}>
-          {products.map((product, index) => (
-            <Grid2 item size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product.product_id}>
-              <ProductCard product={product} />
-            </Grid2>
-          ))}
-        </Grid2>
+        <>
+          <Grid2 container spacing={3}>
+            {products.map((product, index) => (
+              <Grid2 item size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={`${product.product_id}-${index}`}>
+                <ProductCard product={product} />
+              </Grid2>
+            ))}
+          </Grid2>
+          
+          {hasMore && (
+            <Box display="flex" justifyContent="center" mt={4} mb={4}>
+              <Button 
+                variant="contained" 
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                sx={{
+                  height: 45,
+                  textTransform: "none",
+                  bgcolor: "#26A69A",
+                  minWidth: 200,
+                  "&:hover": {
+                    bgcolor: "#219688",
+                  },
+                }}
+              >
+                {loadingMore ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  'Load More'
+                )}
+              </Button>
+            </Box>
+          )}
+        </>
       )}
     </Container>
   );
