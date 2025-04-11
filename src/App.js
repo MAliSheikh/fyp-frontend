@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Products from "./products/products_page";
+import RecommendationsPage from "./products/RecommendationsPage";
 import SignUp from "./components/LoginSignup/signup";
 import Login from "./components/LoginSignup/login";
 import Layout from "./layout";
@@ -70,6 +71,8 @@ function App() {
         <Route path="/cancel" element={<Cancel />} />
         <Route path="/chat" element={<UserChatComponent />} />
         <Route path="/chat/:userId/:storeId" element={<UserChatComponent />} />
+        <Route path="/recommendations" element={<Layout><RecommendationsPage /></Layout>} />
+
         {/* <Route path="/chat-seller" element={<SellerChatting />} /> */}
         {/* <Route path="/viewer_360" element={<Layout>{<ThreeSixtyVieww />}</Layout>} /> */}
         <Route

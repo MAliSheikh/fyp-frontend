@@ -12,8 +12,8 @@ import banner7 from '../components/Logos/banner7.jpg'
 import banner8 from '../components/Logos/banner8.jpg'
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import { fetchProducts } from './product';
-
+import { fetchProducts, fetchRecommendations } from './product';
+import ProductSlider from './ProductSlider'
 
 
 // Slider component for the banner
@@ -97,11 +97,13 @@ const ProductCard = ({ product }) => {
 
 const Products = () => {
   const [products, setProducts] = useState([]);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
+  const dataFetchedRef = useRef(false);
 
   const getProducts = async (pageNumber = 0, shouldAppend = false) => {
     try {
@@ -130,15 +132,44 @@ const Products = () => {
     }
   };
 
+  const getRecommendedProducts = async () => {
+    try {
+      // Get search history from localStorage
+      const searchHistory = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+      
+      // Fetch more data initially to have enough for both pages
+      const response = await fetchRecommendations({
+        productnames: searchHistory,
+        limit: 10,
+        skip: 0,
+        page_size: 30 // Fetch more data initially
+      });
+      
+      // Store the recommendations data
+      setRecommendedProducts(response);
+      
+      // Store in localStorage for the recommendations page
+      localStorage.setItem('recommendedProducts', JSON.stringify(response));
+      localStorage.setItem('recommendationsPage', '0'); // Track current page
+      localStorage.setItem('recommendationsTotal', response.length.toString()); // Store total count
+    } catch (error) {
+      console.error('Error fetching recommended products:', error);
+    }
+  };
+
   const handleLoadMore = () => {
     const nextPage = page + 1;
     setPage(nextPage);
     getProducts(nextPage, true);
   };
 
-  // Call getProducts when the component is mounted
+  // Call getProducts and getRecommendedProducts when the component is mounted
   useEffect(() => {
-    getProducts(0, false);
+    if (!dataFetchedRef.current) {
+      getProducts(0, false);
+      getRecommendedProducts();
+      dataFetchedRef.current = true;
+    }
   }, []); // Empty dependency array ensures this runs only once
 
   return (
@@ -147,6 +178,16 @@ const Products = () => {
       <Box sx={{ mt: 1, mb: 4 }}>
         <BannerSlider />
       </Box>
+
+      {/* Recommended Products Slider */}
+      {recommendedProducts.length > 0 && (
+        <Box sx={{ mb: 4 }}>
+          <ProductSlider 
+            products={recommendedProducts.slice(0, 5)} 
+            title="Recommended For You" 
+          />
+        </Box>
+      )}
 
       {/* Loading Indicator or Product Grid */}
       {loading ? (

@@ -120,6 +120,27 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+const updateSearchHistory = (searchString) => {
+  try {
+    // Get existing search history
+    const searchHistory = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+    
+    // Add new search string to the beginning
+    searchHistory.unshift(searchString);
+    
+    // Keep only the last 5 searches
+    const updatedHistory = searchHistory.slice(0, 5);
+    
+    // Save back to localStorage
+    localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
+    
+    return updatedHistory;
+  } catch (error) {
+    console.error('Error updating search history:', error);
+    return [];
+  }
+};
+
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchDialogOpen, setSearchDialogOpen] = useState(false);
@@ -166,10 +187,12 @@ const Header = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
+      // Update search history
+      updateSearchHistory(searchQuery.trim());
+
       // Construct the search URL with category and subcategory
       const searchUrl = `/search?search_string=${encodeURIComponent(searchQuery.trim())}` +
         (category ? `&category=${encodeURIComponent(category)}` : "");
-        // (subcategory ? `&subcategory=${encodeURIComponent(subcategory)}` : "");
       navigate(searchUrl);
       setShowResults(false);
       setSearchDialogOpen(false);
@@ -216,6 +239,10 @@ const Header = () => {
     setSearchQuery(selectedText);
     setShowResults(false);
     setSearchDialogOpen(false);
+
+    // Update search history
+    updateSearchHistory(selectedText);
+
     navigate(`/search?search_string=${encodeURIComponent(selectedText)}` +
       (category ? `&category=${encodeURIComponent(category)}` : "") +
       (subcategory ? `&subcategory=${encodeURIComponent(subcategory)}` : ""));

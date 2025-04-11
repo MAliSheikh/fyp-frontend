@@ -72,3 +72,51 @@ export const searchProducts = async (searchParams) => {
     throw error;
   }
 };
+
+export const fetchRecommendations = async ({ productnames, skip = 0, limit = 10, page_size = 10 }) => {
+  try {
+    // Build the URL with proper parameters
+    let url = `${base_URL}/recommendations/?skip=${skip}&limit=${limit}&page_size=${page_size}`;
+    
+    // Add productnames if provided
+    if (productnames && productnames.length > 0) {
+      productnames.forEach((name, index) => {
+        url += `&product_names=${encodeURIComponent(name)}`;
+      });
+    }
+    
+    const response = await axios.get(url, {
+      headers: {
+        'accept': 'application/json'
+      }
+    });
+    
+    // Return the recommendations array from the response
+    return response.data.recommendations || [];
+  } catch (error) {
+    console.error('Error fetching recommendations:', error);
+    throw error;
+  }
+};
+
+// Utility function to manage search history
+export const updateSearchHistory = (searchString) => {
+  try {
+    // Get existing search history
+    const searchHistory = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+    
+    // Add new search string to the beginning
+    searchHistory.unshift(searchString);
+    
+    // Keep only the last 5 searches
+    const updatedHistory = searchHistory.slice(0, 5);
+    
+    // Save back to localStorage
+    localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
+    
+    return updatedHistory;
+  } catch (error) {
+    console.error('Error updating search history:', error);
+    return [];
+  }
+}; 
