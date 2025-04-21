@@ -16,6 +16,7 @@ const ProductSlider = ({ products, title = "Featured Products" }) => {
     speed: 500,
     slidesToShow: 4,
     slidesToScroll: 4,
+    draggable: true, // Enable dragging with pointer
     responsive: [
       {
         breakpoint: 1024,
@@ -91,7 +92,7 @@ const ProductSlider = ({ products, title = "Featured Products" }) => {
       {/* Product Slider */}
       <Slider {...settings}>
         {products.map((product) => (
-          <Box key={product.product_id} sx={{ px: 1}}>
+          <Box key={product.product_id} sx={{ px: 2,py: 1, gap: 2, display: "flex", }} gap={2}>
             <Card 
               sx={{ 
                 height: '100%',
