@@ -65,6 +65,7 @@ const UploadProduct = () => {
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [isAILoading, setIsAILoading] = useState(false);
   const [aiError, setAiError] = useState("");
+  const [aiSuccess, setAiSuccess] = useState("");
 
   // Categories and subcategories that should show size fields
   const categoriesWithSizes = ["Clothes", "Shoes", "Sports"];
@@ -134,11 +135,13 @@ const UploadProduct = () => {
   const handleAIPrediction = async () => {
     if (productImages.length === 0) {
       setAiError("Please upload an image first");
+      setAiSuccess("");
       return;
     }
 
     setIsAILoading(true);
     setAiError("");
+    setAiSuccess("");
     try {
       const prediction = await predictShoeCategoryAndColor(productImages[0]);
       
@@ -157,6 +160,8 @@ const UploadProduct = () => {
       if (!colors.includes(formattedColor)) {
         setColors([...colors, formattedColor]);
       }
+
+      setAiSuccess("Sucessfuly Predicted Image Color and Category");
     } catch (error) {
       setAiError("Failed to get AI prediction. Please try again.");
     } finally {
@@ -233,7 +238,7 @@ const UploadProduct = () => {
               Upload New Product
             </Typography>
 
-            <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1 }}>
               <Button
                 variant="contained"
                 onClick={handleAIPrediction}
@@ -251,6 +256,11 @@ const UploadProduct = () => {
             {aiError && (
               <Typography color="error" sx={{ mb: 2 }}>
                 {aiError}
+              </Typography>
+            )}
+            {aiSuccess && (
+              <Typography color="success.main" sx={{ mb: 2 }}>
+                {aiSuccess}
               </Typography>
             )}
 
