@@ -19,8 +19,9 @@ import {
 import Grid from "@mui/material/Grid2";
 import { SideBar } from "./sidebar";
 import { categories } from "./category";
-import { createProduct } from "./seller";
+import { createProduct, predictShoeCategoryAndColor } from "./seller";
 import CloseIcon from "@mui/icons-material/Close";
+import SmartToyIcon from '@mui/icons-material/SmartToy';
 
 const convertToBase64 = (file) => {
   return new Promise((resolve, reject) => {
@@ -33,7 +34,12 @@ const convertToBase64 = (file) => {
 
 const commonColors = [
   "Black", "White", "Red", "Blue", "Green", "Yellow", "Purple", "Pink",
-  "Brown", "Gray", "Orange", "Navy", "Beige", "Maroon", "Teal"
+  "Brown", "Gray", "Orange", "Navy", "Beige", "Maroon", "Teal",
+  "Light Gray", "Dark Gray", "Dark Red", "Burgundy", "Hot Pink",
+  "Olive", "Lime", "Forest Green", "Sky Blue", "Turquoise",
+  "Dark Brown", "Chocolate", "Tan", "Cream", "Khaki",
+  "Gold", "Coral", "Violet", "Lavender", "Silver",
+  "Charcoal", "Mint", "Indigo", "Slate", "Copper", "Bronze"
 ];
 
 export const commonSizes = [
@@ -57,6 +63,8 @@ const UploadProduct = () => {
   const [showSizesField, setShowSizesField] = useState(false);
   const [newColor, setNewColor] = useState("");
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [isAILoading, setIsAILoading] = useState(false);
+  const [aiError, setAiError] = useState("");
 
   // Categories and subcategories that should show size fields
   const categoriesWithSizes = ["Clothes", "Shoes", "Sports"];
@@ -121,6 +129,39 @@ const UploadProduct = () => {
 
   const handleSnackbarClose = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
+  const handleAIPrediction = async () => {
+    if (productImages.length === 0) {
+      setAiError("Please upload an image first");
+      return;
+    }
+
+    setIsAILoading(true);
+    setAiError("");
+    try {
+      const prediction = await predictShoeCategoryAndColor(productImages[0]);
+      
+      // Set category to Shoes
+      setSelectedCategory("Shoes");
+      
+      // Format and set subcategory (capitalize first letter)
+      const formattedSubcategory = prediction.category.charAt(0).toUpperCase() + prediction.category.slice(1);
+      setSelectedSubcategory(formattedSubcategory);
+      
+      // Add the predicted color
+      const formattedColor = prediction.color.split('_').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1)
+      ).join(' ');
+      
+      if (!colors.includes(formattedColor)) {
+        setColors([...colors, formattedColor]);
+      }
+    } catch (error) {
+      setAiError("Failed to get AI prediction. Please try again.");
+    } finally {
+      setIsAILoading(false);
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -191,6 +232,27 @@ const UploadProduct = () => {
             <Typography variant="h6" sx={{ mb: 3 }}>
               Upload New Product
             </Typography>
+
+            <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 3 }}>
+              <Button
+                variant="contained"
+                onClick={handleAIPrediction}
+                disabled={isAILoading}
+                startIcon={isAILoading ? <CircularProgress size={20} /> : <SmartToyIcon />}
+                sx={{
+                  backgroundColor: "#00897b",
+                  "&:hover": { backgroundColor: "#00796b" },
+                  textTransform: "none",
+                }}
+              >
+                AI Prediction
+              </Button>
+            </Box>
+            {aiError && (
+              <Typography color="error" sx={{ mb: 2 }}>
+                {aiError}
+              </Typography>
+            )}
 
             <Grid container spacing={3} disableEqualOverflow>
               {/* Left Column */}

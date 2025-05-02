@@ -167,3 +167,31 @@ export const fetchMallOptions = async () => {
     throw error;
   }
 };
+
+export const predictShoeCategoryAndColor = async (imageFile) => {
+  try {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      throw new Error("No access token found");
+    }
+
+    const formData = new FormData();
+    formData.append('file', imageFile);
+
+    const response = await axios.post(
+      `${base_URL}/shoe-prediction/category-color`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error predicting shoe category and color:", error);
+    throw error;
+  }
+};
