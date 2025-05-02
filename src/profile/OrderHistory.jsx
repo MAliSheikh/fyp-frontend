@@ -1,10 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Button, IconButton, Stack, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  IconButton,
+  Stack,
+  Modal,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  CircularProgress,
+} from "@mui/material";
 import axiosInstance from "../components/axiosInstance";
-import Reviews from './Reviews';
-import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
-import { useNavigate } from "react-router-dom"
+import Reviews from "./Reviews";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import CommentOutlinedIcon from "@mui/icons-material/CommentOutlined";
+import { useNavigate } from "react-router-dom";
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -14,7 +29,6 @@ const OrderHistory = () => {
   const [selectedStoreId, setSelectedStoreId] = useState(null);
   const [loading, setLoading] = useState(true); // Added loading state
   const navigate = useNavigate();
-  
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -24,8 +38,12 @@ const OrderHistory = () => {
         setOrders(response.data);
 
         // Fetch reviewed products
-        const reviewsResponse = await axiosInstance.get(`/reviews/user/${user_id}`);
-        const reviewedProductIds = new Set(reviewsResponse.data.map(review => review.product_id));
+        const reviewsResponse = await axiosInstance.get(
+          `/reviews/user/${user_id}`
+        );
+        const reviewedProductIds = new Set(
+          reviewsResponse.data.map((review) => review.product_id)
+        );
         setReviewedProducts(reviewedProductIds);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -65,16 +83,17 @@ const OrderHistory = () => {
     const message = `Order ID: ${orderId}\nProduct ID: ${productId}\nProduct Name: ${productName}\nImage: ${image}\nPrice: Rs.${price}\nStore ID: ${storeId}\nStatus: ${status}\nOrder Date: ${orderDate}\nCategory: ${category}\nSubcategory: ${subcategory}`;
 
     // Correct WhatsApp Web URL
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+      message
+    )}`;
     // const whatsappUrl = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
 
     window.open(whatsappUrl, "_blank");
   };
 
-
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
         <CircularProgress />
       </Box>
     ); // Loader while fetching orders
@@ -90,6 +109,8 @@ const OrderHistory = () => {
           <TableHead>
             <TableRow>
               <TableCell>Product Name</TableCell>
+              <TableCell align="center">Colors</TableCell>
+              <TableCell align="center">Sizes</TableCell>
               <TableCell align="right">Quantity</TableCell>
               <TableCell align="center">Price</TableCell>
               {/* <TableCell align="right">Store Phone</TableCell> */}
@@ -98,18 +119,64 @@ const OrderHistory = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.flatMap(order =>
-              Object.values(order.order_items).map(item => {
+            {orders.flatMap((order) =>
+              Object.values(order.order_items).map((item) => {
                 const isReviewed = reviewedProducts.has(item.product_id); // Check if the product has been reviewed
                 // console.log('isReviewed', isReviewed)
                 return (
                   <TableRow
                     key={item.product_id}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
-                      <img src={item.product.images[0]} alt={item.product_name} style={{ width: '50px', height: '50px' }} />
+                      <img
+                        src={item.product.images[0]}
+                        alt={item.product_name}
+                        style={{ width: "50px", height: "50px" }}
+                      />
                       {item.product_name}
+                    </TableCell>
+                    {/* Colors cell */}
+                    <TableCell align="center">
+                      {item.colors && item.colors.length > 0 ? (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          sx={{
+                            fontSize: "0.75rem",
+                            pointerEvents: "none",
+                            textTransform: "uppercase",
+                            borderColor: "#26A69A",
+                            color: "#26A69A",
+                            "&:hover": { borderColor: "#26A69A" },
+                          }}
+                        >
+                          {item.colors.join(", ")}
+                        </Button>
+                      ) : (
+                        "--"
+                      )}
+                    </TableCell>
+                    {/* Sizes cell */}
+                    <TableCell align="center">
+                      {item.sizes && item.sizes.length > 0 ? (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          sx={{
+                            fontSize: "0.75rem",
+                            pointerEvents: "none",
+                            textTransform: "uppercase",
+                            borderColor: "#26A69A",
+                            color: "#26A69A",
+                            "&:hover": { borderColor: "#26A69A" },
+                          }}
+                        >
+                          {item.sizes.join(", ")}
+                        </Button>
+                      ) : (
+                        "--"
+                      )}
                     </TableCell>
                     <TableCell align="right">{item.quantity}</TableCell>
                     <TableCell align="right">Rs.{item.price}</TableCell>
@@ -126,7 +193,9 @@ const OrderHistory = () => {
                                 "&:hover": { bgcolor: "#00796b" },
                               }}
                               variant="contained"
-                              onClick={() => handleReview(item.product_id, item.store_id)}
+                              onClick={() =>
+                                handleReview(item.product_id, item.store_id)
+                              }
                             >
                               Review
                             </Button>
@@ -134,54 +203,59 @@ const OrderHistory = () => {
                         </>
                       )}
                       {item.status !== "delivered" && (
-                        <Typography sx={{ textTransform: 'capitalize' }}>{item.status}</Typography>
-
+                        <Typography sx={{ textTransform: "capitalize" }}>
+                          {item.status}
+                        </Typography>
                       )}
                     </TableCell>
                     <TableCell align="right">
                       <Box display="flex" alignItems="center" gap={1}>
                         <Button
-                          onClick={() => openWhatsApp(
-                            order.order_id,
-                            item.product_id,
-                            item.product_name,
-                            item.product.images[0],
-                            item.price,
-                            item.store_id,
-                            item.status,
-                            order.order_date,
-                            item.product.category,
-                            item.product.subcategory,
-                            item.store.phone_number
-                          )}
+                          onClick={() =>
+                            openWhatsApp(
+                              order.order_id,
+                              item.product_id,
+                              item.product_name,
+                              item.product.images[0],
+                              item.price,
+                              item.store_id,
+                              item.status,
+                              order.order_date,
+                              item.product.category,
+                              item.product.subcategory,
+                              item.store.phone_number
+                            )
+                          }
                         >
                           <WhatsAppIcon />
                         </Button>
-                      <IconButton
-                        onClick={() => {
-                          navigate(`/chat/${order.user_id}/${item.store_id}`, { 
-                            state: {
-                              orderId: order.order_id,
-                              productId: item.product_id,
-                              productName: item.product_name,
-                              image: item.product.images[0],
-                              price: item.price,
-                              storeId: item.store_id,
-                              userId: item.user_id,
-                              status: item.status,
-                              orderDate: order.order_date,
-                              category: item.product.category,
-                              subcategory: item.product.subcategory,
-                              phoneNumber: item.store.phone_number
-                            }
-                          });
-                        }}
-                      >
-                        <CommentOutlinedIcon />
-                      </IconButton>
+                        <IconButton
+                          onClick={() => {
+                            navigate(
+                              `/chat/${order.user_id}/${item.store_id}`,
+                              {
+                                state: {
+                                  orderId: order.order_id,
+                                  productId: item.product_id,
+                                  productName: item.product_name,
+                                  image: item.product.images[0],
+                                  price: item.price,
+                                  storeId: item.store_id,
+                                  userId: item.user_id,
+                                  status: item.status,
+                                  orderDate: order.order_date,
+                                  category: item.product.category,
+                                  subcategory: item.product.subcategory,
+                                  phoneNumber: item.store.phone_number,
+                                },
+                              }
+                            );
+                          }}
+                        >
+                          <CommentOutlinedIcon />
+                        </IconButton>
                       </Box>
                     </TableCell>
-
                   </TableRow>
                 );
               })
@@ -196,27 +270,33 @@ const OrderHistory = () => {
         aria-labelledby="review-modal"
         aria-describedby="review-modal-description"
       >
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '80%',
-          maxWidth: 800,
-          bgcolor: 'background.paper',
-          boxShadow: 24,
-          p: 4,
-          maxHeight: '90vh',
-          overflow: 'auto'
-        }}>
-          <Reviews productId={selectedProductId} storeId={selectedStoreId} reviews={orders.flatMap(order =>
-            Object.values(order.order_items)
-              .filter(item => item.product_id === selectedProductId)
-              .map(item => ({
-                product_id: item.product_id,
-                store_id: item.store_id,
-              }))
-          )} />
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "80%",
+            maxWidth: 800,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            maxHeight: "90vh",
+            overflow: "auto",
+          }}
+        >
+          <Reviews
+            productId={selectedProductId}
+            storeId={selectedStoreId}
+            reviews={orders.flatMap((order) =>
+              Object.values(order.order_items)
+                .filter((item) => item.product_id === selectedProductId)
+                .map((item) => ({
+                  product_id: item.product_id,
+                  store_id: item.store_id,
+                }))
+            )}
+          />
           <Button
             variant="contained"
             onClick={handleCloseReviewModal}

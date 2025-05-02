@@ -21,7 +21,6 @@ import Add_to_cart from "../Add_to_cart/add_to_cart";
 import ReviewHistory from './review_history'
 import OrderHistory from './OrderHistory';
 
-
 const CustomerProfile = () => {
   const [user, setUser] = useState("");
   const [activeTab, setActiveTab] = useState(0);
@@ -141,6 +140,10 @@ const CustomerProfile = () => {
             icon={<LocationOnIcon sx={{ fontSize: 40 }} />} // Increase icon size
             label="Address"
           />
+          {/* <Tab
+            icon={<InsertCommentOutlinedIcon sx={{ fontSize: 40 }} />} // Increase icon size
+            label="Chat"
+          /> */}
         </Tabs>
       </Box>
 

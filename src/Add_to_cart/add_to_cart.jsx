@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -15,17 +15,15 @@ import axios from "axios";
 const Loader = () => (
   <Box
     sx={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh'
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100vh",
     }}
   >
-    <CircularProgress sx={{ color: '#009688' }} />
+    <CircularProgress sx={{ color: "#009688" }} />
   </Box>
 );
-
-
 
 const AddToCartPage = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -34,7 +32,7 @@ const AddToCartPage = () => {
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
-    severity: "success"
+    severity: "success",
   });
   const navigate = useNavigate();
   // const location = useLocation();
@@ -133,27 +131,25 @@ const AddToCartPage = () => {
         }
       );
 
-      setCartItems((prev) => prev.filter((cartItem) => cartItem.item_id !== item.item_id));
+      setCartItems((prev) =>
+        prev.filter((cartItem) => cartItem.item_id !== item.item_id)
+      );
       setSelectedItems((prev) =>
         prev.filter((selected) => selected.item_id !== item.item_id)
       );
       setSnackbar({
         open: true,
         message: "Item deleted successfully",
-        severity: "success"
+        severity: "success",
       });
     } catch (error) {
       console.error("Error deleting item:", error);
       setSnackbar({
         open: true,
         message: "Error deleting item",
-        severity: "error"
+        severity: "error",
       });
     }
-  };
-
-  const calculateSubtotal = () => {
-    return cartItems.reduce((total, item) => total + item.price, 0);
   };
 
   const calculateSelectedSubtotal = () => {
@@ -166,11 +162,11 @@ const AddToCartPage = () => {
       return;
     }
     const totalAmount = calculateSelectedSubtotal();
-    navigate("/order-now", { 
-      state: { 
+    navigate("/order-now", {
+      state: {
         orderItems: selectedItems,
-        totalAmount: totalAmount
-      } 
+        totalAmount: totalAmount,
+      },
     });
   };
 
@@ -194,8 +190,12 @@ const AddToCartPage = () => {
 
       {cartItems.length === 0 ? (
         <Typography variant="h6" sx={{ textAlign: "center", my: 4 }}>
-          Add products 
-          <Button onClick={() => window.location.href = 'http://localhost:3000'}>Go to Home Page</Button>
+          Add products
+          <Button
+            onClick={() => (window.location.href = "http://localhost:3000")}
+          >
+            Go to Home Page
+          </Button>
         </Typography>
       ) : (
         <>
@@ -241,6 +241,69 @@ const AddToCartPage = () => {
                 </Typography>
                 <Typography color="gray">Price: Rs. {item.price}</Typography>
 
+                {/* Display brand if available */}
+                {item.brand && (
+                  <Box sx={{ mt: 1 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{
+                        mr: 1,
+                        fontSize: "0.75rem",
+                        pointerEvents: "none",
+                        textTransform: "uppercase",
+                        borderColor: "#26A69A",
+                        color: "#26A69A",
+                        "&:hover": { borderColor: "#26A69A" },
+                      }}
+                    >
+                      BRAND: {item.brand}
+                    </Button>
+                  </Box>
+                )}
+
+                {/* Display colors if available */}
+                {item.colors && item.colors.length > 0 && (
+                  <Box sx={{ mt: 1 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{
+                        mr: 1,
+                        fontSize: "0.75rem",
+                        pointerEvents: "none",
+                        textTransform: "uppercase",
+                        borderColor: "#26A69A",
+                        color: "#26A69A",
+                        "&:hover": { borderColor: "#26A69A" },
+                      }}
+                    >
+                      COLOR: {item.colors.join(", ")}
+                    </Button>
+                  </Box>
+                )}
+
+                {/* Display sizes if available */}
+                {item.sizes && item.sizes.length > 0 && (
+                  <Box sx={{ mt: 1 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{
+                        mr: 1,
+                        fontSize: "0.75rem",
+                        pointerEvents: "none",
+                        textTransform: "uppercase",
+                        borderColor: "#26A69A",
+                        color: "#26A69A",
+                        "&:hover": { borderColor: "#26A69A" },
+                      }}
+                    >
+                      SIZE: {item.sizes.join(", ")}
+                    </Button>
+                  </Box>
+                )}
+
                 {/* Quantity controls */}
                 <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
                   <IconButton
@@ -260,10 +323,7 @@ const AddToCartPage = () => {
               </Box>
 
               {/* Delete button */}
-              <IconButton
-                onClick={() => handleDeleteItem(item)}
-                color="error"
-              >
+              <IconButton onClick={() => handleDeleteItem(item)} color="error">
                 <DeleteIcon />
               </IconButton>
             </Box>
@@ -300,15 +360,15 @@ const AddToCartPage = () => {
         </>
       )}
 
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={3000} 
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
         onClose={handleCloseSnackbar}
       >
-        <Alert 
-          onClose={handleCloseSnackbar} 
+        <Alert
+          onClose={handleCloseSnackbar}
           severity={snackbar.severity}
-          sx={{ width: '100%' }}
+          sx={{ width: "100%" }}
         >
           {snackbar.message}
         </Alert>

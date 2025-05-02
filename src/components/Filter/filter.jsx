@@ -30,21 +30,15 @@ const categories = {
   Automobiles: ["Cars", "Bikes", "Car Accessories", "Tools", "Spare Parts"],
 };
 
-const FilterSidebar = ({ open, onClose, onApply }) => {
+const FilterSidebar = ({ open, onClose, onApply, categories, commonSizes }) => {
+  const [selectedSizes, setSelectedSizes] = useState([]);
   const [filters, setFilters] = useState({
     category: "",
     subcategory: "",
     minPrice: "",
     maxPrice: "",
+    sizes: [],
   });
-
-  const handleCategoryChange = (category) => {
-    setFilters((prev) => ({
-      ...prev,
-      category: prev.category === category ? "" : category,
-      subcategory: "", // Reset subcategory when category changes
-    }));
-  };
 
   const handleSubcategoryChange = (subcategory) => {
     setFilters((prev) => ({
@@ -53,8 +47,17 @@ const FilterSidebar = ({ open, onClose, onApply }) => {
     }));
   };
 
+  const handleSizeChange = (size) => {
+    setSelectedSizes((prev) => 
+      prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
+    );
+  };
+
   const handleApply = () => {
-    onApply(filters);
+    onApply({ 
+      ...filters, 
+      sizes: selectedSizes.length > 0 ? selectedSizes : undefined
+    });
     onClose();
   };
 
@@ -64,6 +67,7 @@ const FilterSidebar = ({ open, onClose, onApply }) => {
       subcategory: "",
       minPrice: "",
       maxPrice: "",
+      sizes: []
     });
     onClose();
   };
@@ -85,39 +89,21 @@ const FilterSidebar = ({ open, onClose, onApply }) => {
     >
       <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold", color: "#333" }}>Filters</Typography>
       <List>
-        {Object.keys(categories).map((category) => (
-          <div key={category}>
-            <ListItem>
+        {categories.map((category) => (
+          category.subcategories.map((sub) => (
+            <ListItem key={sub}>
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={filters.category === category}
-                    onChange={() => handleCategoryChange(category)}
+                    checked={filters.subcategory === sub}
+                    onChange={() => handleSubcategoryChange(sub)}
                   />
                 }
-                label={
-                  <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#555" }}>
-                    {category}
-                  </Typography>
-                }
+                label={<Typography>{sub}</Typography>}
+                // sx={{ pl: 3 }}
               />
             </ListItem>
-            {filters.category === category &&
-              categories[category].map((sub) => (
-                <ListItem key={sub}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={filters.subcategory === sub}
-                        onChange={() => handleSubcategoryChange(sub)}
-                      />
-                    }
-                    label={<Typography>{sub}</Typography>}
-                    sx={{ pl: 3 }}
-                  />
-                </ListItem>
-              ))}
-          </div>
+          ))
         ))}
         <Divider sx={{ my: 2 }} />
         <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#555" }}>Price Range</Typography>
@@ -140,6 +126,21 @@ const FilterSidebar = ({ open, onClose, onApply }) => {
             size="small" 
             fullWidth 
           />
+        </Box>
+        <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#555" }}>Sizes</Typography>
+        <Box>
+          {commonSizes.map((size) => (
+            <FormControlLabel
+              key={size}
+              control={
+                <Checkbox
+                  checked={selectedSizes.includes(size)}
+                  onChange={() => handleSizeChange(size)}
+                />
+              }
+              label={<Typography>{size}</Typography>}
+            />
+          ))}
         </Box>
       </List>
       <Box display="flex" justifyContent="space-between" mt={3} mb={3}>
