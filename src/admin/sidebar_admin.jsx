@@ -1,92 +1,210 @@
-import React, { useState } from "react";
-import { Box, Button } from "@mui/material";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Box, Button, Grid, IconButton, Drawer, useMediaQuery, useTheme } from "@mui/material";
 import authService from "../components/LoginSignup/components/token";
+import { useNavigate, useLocation } from "react-router-dom";
+import AdminDashboard from "./admin_dashboard";
+import ManageUsers from "./manage_users";
+import ManageProducts from "./manage_products";
+import ManageReviews from "./manage_reviews";
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import CloseIcon from '@mui/icons-material/Close';
 
-
-export const SideBarAdmin = ({ onSectionChange }) => {
+export const SideBarAdmin = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const currentPath = location.pathname;
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [selectedSection, setSelectedSection] = useState("dashboard");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    // Get the current section from URL
+    const path = location.pathname;
+    if (path.includes("manage-users")) {
+      setSelectedSection("manage-users");
+    } else if (path.includes("manage-products")) {
+      setSelectedSection("manage-products");
+    } else if (path.includes("manage-reviews")) {
+      setSelectedSection("manage-reviews");
+    } else {
+      setSelectedSection("dashboard");
+    }
+  }, [location]);
 
   const getButtonStyle = (path) => ({
     height: 45,
     mb: 2,
-    width: "100%",
-    backgroundColor: currentPath === path ? "#119994" : "#ffffff",
-    color: currentPath === path ? "#ffffff" : "grey",
+    width: isMobile ? "80%" : "100%",
+    backgroundColor: selectedSection === path ? "#119994" : "#ffffff",
+    color: selectedSection === path ? "#ffffff" : "grey",
     "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
   });
 
-  const handleNavigation = (path) => {
-    navigate(path);
-    if (onSectionChange) {
-      onSectionChange(path);
+  const handleSelection = (path) => {
+    setSelectedSection(path);
+    navigate(`/admin/${path}`, { replace: true });
+    if (isMobile) {
+      setDrawerOpen(false);
     }
   };
 
-  return (
+  const renderContent = () => {
+    switch (selectedSection) {
+      case "dashboard":
+        return <AdminDashboard />;
+      case "manage-users":
+        return <ManageUsers />;
+      case "manage-products":
+        return <ManageProducts />;
+      case "manage-reviews":
+        return <ManageReviews />;
+      default:
+        return <AdminDashboard />;
+    }
+  };
+
+  const renderSidebar = () => (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        position: { sm: "sticky" },
-        top: { sm: 16 },
-        width: "250px",
-        mt: 5,
+        width: "100%",
+        mt: isMobile ? 0 : 5,
+        p: isMobile ? 0 : 0,
+        position: 'relative',
       }}
     >
-      <Button
-        variant="contained"
-        onClick={() => handleNavigation("/admin_dashboard")}
-        sx={getButtonStyle("/admin-dashboard")}
-      >
-        Dashboard
-      </Button>
+      {isMobile && (
+        <Box
+          sx={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'flex-start',
+            mb: 2,
+            pl: 2,
+            
+          }}
+        >
+          <IconButton
+            onClick={() => setDrawerOpen(false)}
+            sx={{
+              border: '1px solid #119994',
+              mt: 1,
+              color: '#119994',
+              '&:hover': {
+                color: '#0d7b76',
+              },
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      )}
 
-      <Button
-        variant="contained"
-        onClick={() => handleNavigation("/manage-users")}
-        sx={getButtonStyle("/manage-users")}
-      >
-        Manage Users
-      </Button>
-
-      <Button
-        variant="contained"
-        onClick={() => handleNavigation("/manage-products")}
-        sx={getButtonStyle("/manage-products")}
-      >
-        Manage Products
-      </Button>
-
-      <Button
-        variant="contained"
-        onClick={() => handleNavigation("/manage-reviews")}
-        sx={getButtonStyle("/manage-reviews")}
-      >
-        Manage Reviews
-      </Button>
-
-      <Button
-        variant="contained"
+      <Box
         sx={{
-          height: 45,
-          mb: 2,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
           width: "100%",
-          backgroundColor: "#ffffff",
-          color: "grey",
-          "&:hover": { backgroundColor: "red", color: "#ffffff" },
-        }}
-        onClick={() => {
-          authService.logout();
-          navigate("/");
         }}
       >
-        Sign Out
-      </Button>
+        <Button
+          variant="contained"
+          onClick={() => handleSelection("dashboard")}
+          sx={getButtonStyle("dashboard")}
+        >
+          Dashboard
+        </Button>
+
+        <Button
+          variant="contained"
+          onClick={() => handleSelection("manage-users")}
+          sx={getButtonStyle("manage-users")}
+        >
+          Manage Users
+        </Button>
+
+        <Button
+          variant="contained"
+          onClick={() => handleSelection("manage-products")}
+          sx={getButtonStyle("manage-products")}
+        >
+          Manage Products
+        </Button>
+
+        <Button
+          variant="contained"
+          onClick={() => handleSelection("manage-reviews")}
+          sx={getButtonStyle("manage-reviews")}
+        >
+          Manage Reviews
+        </Button>
+
+        <Button
+          variant="contained"
+          sx={{
+            height: 45,
+            mb: 2,
+            width: isMobile ? "80%" : "100%",
+            backgroundColor: "#ffffff",
+            color: "grey",
+            "&:hover": { backgroundColor: "red", color: "#ffffff" },
+          }}
+          onClick={() => {
+            authService.logout();
+          }}
+        >
+          Sign Out
+        </Button>
+      </Box>
     </Box>
+  );
+
+  return (
+    <Grid container>
+      {isMobile ? (
+        <>
+          <IconButton
+            onClick={() => setDrawerOpen(true)}
+            sx={{
+              position: 'fixed',
+              top: 16,
+              right: 16,
+              zIndex: 1200,
+              backgroundColor: '#119994',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: '#0d7b76',
+              },
+            }}
+          >
+            <MenuOpenIcon />
+          </IconButton>
+          <Drawer
+            anchor="right"
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            sx={{
+              '& .MuiDrawer-paper': {
+                width: 250,
+                boxSizing: 'border-box',
+              },
+            }}
+          >
+            {renderSidebar()}
+          </Drawer>
+        </>
+      ) : (
+        <Grid item xs={12} md={3}>
+          {renderSidebar()}
+        </Grid>
+      )}
+      <Grid item xs={12} md={isMobile ? 12 : 9}>
+        {renderContent()}
+      </Grid>
+    </Grid>
   );
 };
 

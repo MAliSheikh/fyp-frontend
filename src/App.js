@@ -41,6 +41,7 @@ import ChattingPanel from "./chat/chatPanel";
 import SidebarAdmin from "./admin/sidebar_admin";
 
 
+
 function App() {
   return (
     <Router>
@@ -161,22 +162,55 @@ function App() {
 
         {/* Admin */}
         <Route
-          path="/sidebar_admin"
+          path="/admin"
           element={
-            <Layout>
-              <SidebarAdmin />
-            </Layout>
-          
+            <PrivateRoute roles={["admin"]}>
+              <Layout>
+                <SidebarAdmin />
+              </Layout>
+            </PrivateRoute>
           }
         />
-        {/* <Route
-          path="/admin_dashboard"
+        <Route
+          path="/admin/dashboard"
           element={
+            <PrivateRoute roles={["admin"]}>
               <Layout>
-                <OrdersPage />
+                <SidebarAdmin />
               </Layout>
+            </PrivateRoute>
           }
-        /> */}
+        />
+        <Route
+          path="/admin/manage-users"
+          element={
+            <PrivateRoute roles={["admin"]}>
+              <Layout>
+                <SidebarAdmin />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-products"
+          element={
+            <PrivateRoute roles={["admin"]}>
+              <Layout>
+                <SidebarAdmin />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-reviews"
+          element={
+            <PrivateRoute roles={["admin"]}>
+              <Layout>
+                <SidebarAdmin />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
         
         
 
