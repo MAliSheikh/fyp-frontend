@@ -70,7 +70,7 @@ export const SideBarAdmin = () => {
         flexDirection: "column",
         alignItems: "center",
         width: "100%",
-        mt: isMobile ? 0 : 2, // Reduced margin from top
+        mt: 13, // Added margin from top
         p: isMobile ? 0 : 0,
         position: 'relative',
       }}
@@ -150,7 +150,7 @@ export const SideBarAdmin = () => {
             width: isMobile ? "80%" : "100%",
             backgroundColor: "#ffffff",
             color: "grey",
-            "&:hover": { backgroundColor: "red", color: "#ffffff" },
+            "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
           }}
           onClick={() => {
             authService.logout();
