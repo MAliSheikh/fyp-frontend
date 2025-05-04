@@ -57,24 +57,25 @@ const SearchWrapper = styled("div")(({ theme }) => ({
   borderRadius: "4px",
   backgroundColor: "#fff",
   flexGrow: 1,
-  minWidth: { xs: "120px", sm: "180px" },
+  minWidth: "180px",
   maxWidth: "580px",
   margin: "0 8px",
   display: "flex",
   alignItems: "center",
   [theme.breakpoints.down("sm")]: {
     margin: "0 4px",
+    minWidth: "120px",
   },
 }));
 
-const SearchIconWrapper = styled("div")({
+const SearchIconWrapper = styled("div")(({ theme }) => ({
   position: "absolute",
   right: "10px",
-  top: "52%",
+  top: "50%",
   transform: "translateY(-50%)",
   color: "#119994",
   padding: "2px",
-});
+}));
 
 const StyledInputBase = styled(InputBase)({
   width: "100%",
@@ -150,6 +151,12 @@ const Header = () => {
   const navigate = useNavigate();
   const searchRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Check if current path is admin or seller dashboard
+  const isAdminOrSellerPath = () => {
+    const path = window.location.pathname;
+    return path.includes('/admin') || path.includes('/seller');
+  };
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -290,7 +297,7 @@ const Header = () => {
       <StyledAppBar position="static">
         <Container maxWidth="xl">
           <Toolbar sx={{ padding: { xs: "4px 0", sm: "8px 0" }, flexWrap: isSmallMobile ? "wrap" : "nowrap" }}>
-            {isMobile && (
+            {isMobile && !isAdminOrSellerPath() && (
               <IconButton
                 color="inherit"
                 edge="start"
@@ -334,17 +341,8 @@ const Header = () => {
                 <MenuItem value="electronics">Electronics</MenuItem>
               </CategorySelect>
             </FormControl> */}
-            {isSmallMobile ? (
-              <IconButton
-                color="inherit"
-                onClick={() => setSearchDialogOpen(true)}
-                sx={{ padding: { xs: 0.5, sm: 1 } }}
-              >
-                <SearchIcon />
-              </IconButton>
-            ) : (
-              renderSearchBar()
-            )}
+            {/* Search Bar - Only show on larger screens and not in admin/seller */}
+            {!isSmallMobile && !isAdminOrSellerPath() && renderSearchBar()}
 
             {/* Right Side Menu */}
             <Box
@@ -360,63 +358,77 @@ const Header = () => {
                   {isLoggedIn ? (
                     <NavButton onClick={handleLogout}>Logout</NavButton>
                   ) : (
-                    <NavButton onClick={() => navigate("/login")}>
-                      Login
-                    </NavButton>
+                    !isAdminOrSellerPath() && (
+                      <NavButton onClick={() => navigate("/login")}>
+                        Login
+                      </NavButton>
+                    )
                   )}
                 </>
               )}
-              <IconButton
-                color="inherit"
-                onClick={() => navigate("/add_to_cart")}
-              >
-                <Badge badgeContent={0} color="error">
-                  <CartIcon />
-                </Badge>
-              </IconButton>
-              <IconButton
-                color="inherit"
-                onClick={() => navigate("/chat-interface")}
-              >
-                <InsertCommentOutlinedIcon />
-              </IconButton>
-              <IconButton color="inherit" onClick={() => navigate("/profile")}>
-                <PersonIcon />
-              </IconButton>
-              <Button
-                variant="contained"
-                sx={{
-                  backgroundColor: "#fff",
-                  color: "#009688",
-                  "&:hover": {
-                    backgroundColor: "#e0e0e0",
-                  },
-                  textTransform: "none",
-                  fontWeight: "medium",
-                  fontSize: "14px",
-                  padding: "6px 16px",
-                }}
-                onClick={() => navigate("/mall_lists")}
-              >
-                Malls
-              </Button>
-              <Button
-                variant="contained"
-                sx={{
-                  backgroundColor: "#fff",
-                  color: "#009688",
-                  "&:hover": {
-                    backgroundColor: "#e0e0e0",
-                  },
-                  textTransform: "none",
-                  fontWeight: "medium",
-                  fontSize: "14px",
-                  padding: "6px 16px",
-                }}
-                onClick={() => navigate("/store_lists")}
-              >
-                Stores
-              </Button>
+              {!isMobile && (
+                <>
+                  {!isAdminOrSellerPath() && (
+                    <IconButton
+                      color="inherit"
+                      onClick={() => navigate("/add_to_cart")}
+                    >
+                      <Badge badgeContent={0} color="error">
+                        <CartIcon />
+                      </Badge>
+                    </IconButton>
+                  )}
+                  <IconButton
+                    color="inherit"
+                    onClick={() => navigate("/chat")}
+                  >
+                    <InsertCommentOutlinedIcon />
+                  </IconButton>
+                  {!isAdminOrSellerPath() && (
+                    <IconButton color="inherit" onClick={() => navigate("/profile")}>
+                      <PersonIcon />
+                    </IconButton>
+                  )}
+                  {!isAdminOrSellerPath() && (
+                    <>
+                      <Button
+                        variant="contained"
+                        sx={{
+                          backgroundColor: "#fff",
+                          color: "#009688",
+                          "&:hover": {
+                            backgroundColor: "#e0e0e0",
+                          },
+                          textTransform: "none",
+                          fontWeight: "medium",
+                          fontSize: "14px",
+                          padding: "6px 16px",
+                        }}
+                        onClick={() => navigate("/mall_lists")}
+                      >
+                        Malls
+                      </Button>
+                      <Button
+                        variant="contained"
+                        sx={{
+                          backgroundColor: "#fff",
+                          color: "#009688",
+                          "&:hover": {
+                            backgroundColor: "#e0e0e0",
+                          },
+                          textTransform: "none",
+                          fontWeight: "medium",
+                          fontSize: "14px",
+                          padding: "6px 16px",
+                        }}
+                        onClick={() => navigate("/store_lists")}
+                      >
+                        Stores
+                      </Button>
+                    </>
+                  )}
+                </>
+              )}
             </Box>
           </Toolbar>
         </Container>
@@ -442,72 +454,64 @@ const Header = () => {
         )} */}
       </StyledAppBar>
 
-      {/* Mobile Drawer */}
-      <Drawer
-        anchor="left"
-        open={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-        sx={{
-          "& .MuiDrawer-paper": {
-            width: 280,
-            bgcolor: "#009688",
-            color: "#fff",
-          },
-        }}
-      >
-        <Box sx={{ p: 2 }}>
-          <Typography variant="h6" sx={{ mb: 2, color: "#fff" }}>
-            Menu
-          </Typography>
-          <List>
-            {/* {navItems.map((item) => (
-              <ListItem button key={item}>
-                <ListItemText primary={item} />
-              </ListItem>
-            ))} */}
-            {isLoggedIn ? (
-              <ListItem button onClick={handleLogout}>
-                <ListItemText primary="Logout" />
-              </ListItem>
-            ) : (
-              <ListItem button onClick={() => navigate("/login")}>
-                <ListItemText primary="Login" />
-              </ListItem>
-            )}
-            {/* <ListItem button onClick={() => navigate("/login")}>
-              <ListItemText primary="Login" />
-            </ListItem> */}
-            <ListItem button>
-              <ListItemText primary="Order & Returns" />
-            </ListItem>
-          </List>
-        </Box>
-      </Drawer>
+      {/* Mobile Drawer - Only show if not in admin/seller */}
+      {!isAdminOrSellerPath() && (
+        <Drawer
+          anchor="left"
+          open={mobileOpen}
+          onClose={() => setMobileOpen(false)}
+          sx={{
+            "& .MuiDrawer-paper": {
+              width: 280,
+              bgcolor: "#009688",
+              color: "#fff",
+            },
+          }}
+        >
+          <Box sx={{ p: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" sx={{ color: "#fff" }}>
+                Menu
+              </Typography>
+              <IconButton onClick={() => setMobileOpen(false)} sx={{ color: '#fff' }}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
 
-      {/* Mobile Search Dialog */}
-      <Dialog
-        fullWidth
-        open={searchDialogOpen}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={() => setSearchDialogOpen(false)}
-        sx={{
-          "& .MuiDialog-paper": {
-            margin: 1,
-            width: "100%",
-            maxWidth: "none",
-          },
-        }}
-      >
-        <DialogContent sx={{ p: 1 }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            {renderSearchBar()}
-            <IconButton onClick={() => setSearchDialogOpen(false)}>
-              <CloseIcon />
-            </IconButton>
+            {/* Search Bar in Mobile Drawer */}
+            <Box sx={{ mb: 2 }}>
+              {renderSearchBar()}
+            </Box>
+
+            <List>
+              <ListItem button onClick={() => { navigate("/mall_lists"); setMobileOpen(false); }}>
+                <ListItemText primary="Malls" />
+              </ListItem>
+              <ListItem button onClick={() => { navigate("/store_lists"); setMobileOpen(false); }}>
+                <ListItemText primary="Stores" />
+              </ListItem>
+              <ListItem button onClick={() => { navigate("/chat"); setMobileOpen(false); }}>
+                <ListItemText primary="Messages" />
+              </ListItem>
+              <ListItem button onClick={() => { navigate("/add_to_cart"); setMobileOpen(false); }}>
+                <ListItemText primary="Cart" />
+              </ListItem>
+              <ListItem button onClick={() => { navigate("/profile"); setMobileOpen(false); }}>
+                <ListItemText primary="Profile" />
+              </ListItem>
+              {isLoggedIn ? (
+                <ListItem button onClick={() => { handleLogout(); setMobileOpen(false); }}>
+                  <ListItemText primary="Logout" />
+                </ListItem>
+              ) : (
+                <ListItem button onClick={() => { navigate("/login"); setMobileOpen(false); }}>
+                  <ListItemText primary="Login" />
+                </ListItem>
+              )}
+            </List>
           </Box>
-        </DialogContent>
-      </Dialog>
+        </Drawer>
+      )}
     </Box>
   );
 };
