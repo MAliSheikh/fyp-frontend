@@ -70,7 +70,7 @@ export const SideBarAdmin = () => {
         flexDirection: "column",
         alignItems: "center",
         width: "100%",
-        mt: isMobile ? 0 : 5,
+        mt: isMobile ? 0 : 2, // Reduced margin from top
         p: isMobile ? 0 : 0,
         position: 'relative',
       }}

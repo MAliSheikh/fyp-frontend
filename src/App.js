@@ -38,7 +38,8 @@ import Cancel from './Cancel';
 import UserChatComponent from "./chat/userChat";
 import ChattingPanel from "./chat/chatPanel";
 // import SellerChatting from './chat/seller-chatting' 
-import SidebarAdmin from "./admin/sidebar_admin";
+import SideBarAdmin from "./admin/sidebar_admin";
+import AdminDashboard from "./admin/admin_dashboard";
 
 
 
@@ -88,7 +89,60 @@ function App() {
         />
 
         <Route path="/search" element={<Layout>{<SearchResults />}</Layout>} />
-        {/* Seller */}
+
+        {/* Admin Routes - Should be before other routes to prevent conflicts */}
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute roles={["admin"]}>
+              <Layout>
+                <SideBarAdmin />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <PrivateRoute roles={["admin"]}>
+              <Layout>
+                <SideBarAdmin />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-users"
+          element={
+            <PrivateRoute roles={["admin"]}>
+              <Layout>
+                <SideBarAdmin />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-products"
+          element={
+            <PrivateRoute roles={["admin"]}>
+              <Layout>
+                <SideBarAdmin />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-reviews"
+          element={
+            <PrivateRoute roles={["admin"]}>
+              <Layout>
+                <SideBarAdmin />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+
+        {/* Seller Routes */}
         <Route
           path="/store_info"
           element={
@@ -159,60 +213,6 @@ function App() {
             </PrivateRoute>
           }
         />
-
-        {/* Admin */}
-        <Route
-          path="/admin"
-          element={
-            <PrivateRoute roles={["admin"]}>
-              <Layout>
-                <SidebarAdmin />
-              </Layout>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin/dashboard"
-          element={
-            <PrivateRoute roles={["admin"]}>
-              <Layout>
-                <SidebarAdmin />
-              </Layout>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin/manage-users"
-          element={
-            <PrivateRoute roles={["admin"]}>
-              <Layout>
-                <SidebarAdmin />
-              </Layout>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin/manage-products"
-          element={
-            <PrivateRoute roles={["admin"]}>
-              <Layout>
-                <SidebarAdmin />
-              </Layout>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin/manage-reviews"
-          element={
-            <PrivateRoute roles={["admin"]}>
-              <Layout>
-                <SidebarAdmin />
-              </Layout>
-            </PrivateRoute>
-          }
-        />
-        
-        
 
         <Route path="/orders" element={<Layout>{<OrdersPage />}</Layout>} />
         <Route path="/manageproducts" element={<Layout>{<ManageProducts />}</Layout>} />
