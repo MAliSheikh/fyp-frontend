@@ -10,7 +10,8 @@ import {
   Line,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  LabelList
 } from "recharts";
 import { Paper, Typography, Box, Grid } from "@mui/material";
 import axios from "axios";
@@ -34,7 +35,6 @@ const AdminDashboard = () => {
           console.error("No authentication token found");
           return;
         }
-        console.log("Making API request with token:", token);
 
         const response = await axios.get("http://localhost:8000/admin/adminDashboard", {
           headers: {
@@ -43,23 +43,10 @@ const AdminDashboard = () => {
             'Accept': 'application/json'
           }
         });
-        console.log("API Response:", response.data);
+
         setDashboardData(response.data);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.error("Error response:", error.response.data);
-          console.error("Error status:", error.response.status);
-          console.error("Error headers:", error.response.headers);
-        } else if (error.request) {
-          // The request was made but no response was received
-          console.error("No response received:", error.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.error("Error setting up request:", error.message);
-        }
       }
     };
 
@@ -70,23 +57,12 @@ const AdminDashboard = () => {
   const formatChartData = (data) => {
     return Object.entries(data).map(([name, value]) => {
       if (typeof value === 'object' && value !== null) {
-        // Handle weekly_sales which has total_items and total_sales
         if (value.total_sales !== undefined) {
-          return {
-            name,
-            value: value.total_sales
-          };
+          return { name, value: value.total_sales };
         }
-        // Handle other object cases
-        return {
-          name,
-          value: value.total_items || value
-        };
+        return { name, value: value.total_items || value };
       }
-      return {
-        name,
-        value
-      };
+      return { name, value };
     });
   };
 
@@ -95,27 +71,14 @@ const AdminDashboard = () => {
   return (
     <Box sx={{ p: 1.5 }}>
       <Grid container spacing={1.5}>
-        {/* Summary Cards at Top */}
+        {/* Summary Cards */}
         <Grid item xs={12}>
           <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
-            <Paper elevation={3} sx={{
-              p: '12px 16px 8px 16px',
-              borderRadius: 2,
-              textAlign: "center",
-              flex: 1,
-              maxWidth: '200px'
-            }}>
+            <Paper elevation={3} sx={{ p: '12px 16px 8px 16px', borderRadius: 2, textAlign: "center", flex: 1, maxWidth: '200px' }}>
               <Typography variant="subtitle2" sx={{ fontSize: '0.9rem' }}>Total Users</Typography>
               <Typography variant="h6" sx={{ fontSize: '1.2rem' }}>{dashboardData.total_users}</Typography>
             </Paper>
-
-            <Paper elevation={3} sx={{
-              p: '12px 16px 8px 16px',
-              borderRadius: 2,
-              textAlign: "center",
-              flex: 1,
-              maxWidth: '200px'
-            }}>
+            <Paper elevation={3} sx={{ p: '12px 16px 8px 16px', borderRadius: 2, textAlign: "center", flex: 1, maxWidth: '200px' }}>
               <Typography variant="subtitle2" sx={{ fontSize: '0.9rem' }}>Total Orders</Typography>
               <Typography variant="h6" sx={{ fontSize: '1.2rem' }}>{dashboardData.total_orders}</Typography>
             </Paper>
@@ -125,91 +88,79 @@ const AdminDashboard = () => {
         {/* Charts Grid */}
         <Grid item xs={12}>
           <Grid container spacing={3}>
-            {/* First Row */}
-            <Grid item xs={12} md={6}>
+            {/* Monthly Users */}
+            <Grid item xs={12} md={4}>
               <Paper elevation={3} sx={{ p: 1, borderRadius: 3, height: "100%" }}>
                 <Typography variant="subtitle1" sx={{ textAlign: "center", mb: 1 }}>
                   Monthly Users
                 </Typography>
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={formatChartData(dashboardData.month_wise_users)}>
-                    <XAxis
-                      dataKey="name"
-                      axisLine={false}
-                      tickLine={false}
-                      stroke="black"
-                      fontSize={12}
-                    />
+                    <XAxis dataKey="name" axisLine={false} tick={false} />
                     <YAxis hide={true} />
                     <Tooltip />
-                    <Bar
-                      dataKey="value"
-                      fill="#FF6B6B"
-                      radius={[5, 5, 0, 0]}
-                      barSize="4%"
-                    />
+                    <Bar dataKey="value" fill="#FF6B6B" radius={[5, 5, 0, 0]} barSize="4%">
+                      <LabelList
+                        dataKey="value"
+                        position="bottom"
+                        offset={5}
+                        style={{ fill: "#333", fontSize: 12 }}
+                      />
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </Paper>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            {/* Weekly Sales */}
+            <Grid item xs={12} md={4}>
               <Paper elevation={3} sx={{ p: 1, borderRadius: 3, height: "100%" }}>
                 <Typography variant="subtitle1" sx={{ textAlign: "center", mb: 1 }}>
                   Weekly Sales
                 </Typography>
                 <ResponsiveContainer width="100%" height={180}>
-                  <LineChart data={formatChartData(dashboardData.weekly_sales)}>
-                    <XAxis
-                      dataKey="name"
-                      axisLine={false}
-                      tickLine={false}
-                      stroke="black"
-                      fontSize={12}
-                    />
+                  <BarChart data={formatChartData(dashboardData.weekly_sales)}>
+                    <XAxis dataKey="name" axisLine={false} tick={false} />
                     <YAxis hide={true} />
-                    <Tooltip
-                      formatter={(value) => [`₹${value}`, 'Sales']}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke="#4CAF50"
-                      strokeWidth={2}
-                    />
-                  </LineChart>
+                    <Tooltip />
+                    <Bar dataKey="value" fill="#4CAF50" radius={[5, 5, 0, 0]} barSize="4%">
+                      <LabelList
+                        dataKey="value"
+                        position="bottom"
+                        offset={5}
+                        style={{ fill: "#333", fontSize: 12 }}
+                      />
+                    </Bar>
+                  </BarChart>
                 </ResponsiveContainer>
               </Paper>
             </Grid>
 
-            {/* Second Row */}
-            <Grid item xs={12} md={6}>
+            {/* Weekly Orders */}
+            <Grid item xs={12} md={4}>
               <Paper elevation={3} sx={{ p: 1, borderRadius: 3, height: "100%" }}>
                 <Typography variant="subtitle1" sx={{ textAlign: "center", mb: 1 }}>
                   Weekly Orders
                 </Typography>
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={formatChartData(dashboardData.weekly_orders)}>
-                    <XAxis
-                      dataKey="name"
-                      axisLine={false}
-                      tickLine={false}
-                      stroke="black"
-                      fontSize={12}
-                    />
+                    <XAxis dataKey="name" axisLine={false} tick={false} />
                     <YAxis hide={true} />
                     <Tooltip />
-                    <Bar
-                      dataKey="value"
-                      fill="#FFD166"
-                      radius={[5, 5, 0, 0]}
-                      barSize="4%"
-                    />
+                    <Bar dataKey="value" fill="#FFD166" radius={[5, 5, 0, 0]} barSize="4%">
+                      <LabelList
+                        dataKey="value"
+                        position="bottom"
+                        offset={5}
+                        style={{ fill: "#333", fontSize: 12 }}
+                      />
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </Paper>
             </Grid>
 
+            {/* Monthly Sales Line Chart */}
             <Grid item xs={12} md={6}>
               <Paper elevation={3} sx={{ p: 1, borderRadius: 3, height: "100%" }}>
                 <Typography variant="subtitle1" sx={{ textAlign: "center", mb: 1 }}>
@@ -217,45 +168,31 @@ const AdminDashboard = () => {
                 </Typography>
                 <ResponsiveContainer width="100%" height={180}>
                   <LineChart data={formatChartData(dashboardData.monthly_sales)}>
-                    <XAxis
-                      dataKey="name"
-                      axisLine={false}
-                      tickLine={false}
-                      stroke="black"
-                      fontSize={12}
-                    />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} stroke="black" fontSize={12} />
                     <YAxis hide={true} />
-                    <Tooltip
-                      formatter={(value) => [`₹${value}`, 'Sales']}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke="#9C27B0"
-                      strokeWidth={2}
-                    />
+                    <Tooltip formatter={(value) => [`₹${value}`, 'Sales']} />
+                    <Line type="monotone" dataKey="value" stroke="#9C27B0" strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
               </Paper>
             </Grid>
 
-            {/* Third Row - Pie Chart */}
+            {/* Total Sales Pie Chart */}
             <Grid item xs={12} md={6}>
               <Paper elevation={3} sx={{ p: 1, borderRadius: 3, height: "100%" }}>
                 <Typography variant="subtitle1" sx={{ textAlign: "center", mb: 1 }}>
                   Total Sales
                 </Typography>
-
                 {formatChartData(dashboardData.total_sales_last_4_months).length > 0 &&
-                  formatChartData(dashboardData.total_sales_last_4_months).some(item => item.value > 0) ? (
+                formatChartData(dashboardData.total_sales_last_4_months).some(item => item.value > 0) ? (
                   <ResponsiveContainer width="100%" height={180}>
                     <PieChart>
                       <Pie
                         data={formatChartData(dashboardData.total_sales_last_4_months)}
                         cx="50%"
-                        cy="50%"
+                        cy="55%"
                         labelLine={false}
-                        outerRadius={80}
+                        outerRadius={60}
                         fill="#8884d8"
                         dataKey="value"
                         label={({ name, value }) => `${name}: PKR ${value}`}
@@ -274,15 +211,11 @@ const AdminDashboard = () => {
                 )}
               </Paper>
             </Grid>
+          </Grid>
+        </Grid>
       </Grid>
-    </Grid>
-      </Grid >
-    </Box >
+    </Box>
   );
 };
 
 export default AdminDashboard;
-
-
-
-
