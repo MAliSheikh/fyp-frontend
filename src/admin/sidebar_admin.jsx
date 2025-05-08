@@ -70,7 +70,7 @@ export const SideBarAdmin = () => {
         flexDirection: "column",
         alignItems: "center",
         width: "100%",
-        mt: 13, // Added margin from top
+        mt: 13.4, // Added margin from top
         p: isMobile ? 0 : 0,
         position: 'relative',
       }}
@@ -154,6 +154,7 @@ export const SideBarAdmin = () => {
           }}
           onClick={() => {
             authService.logout();
+            navigate('/login');
           }}
         >
           Sign Out
