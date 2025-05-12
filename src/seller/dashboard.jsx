@@ -18,7 +18,7 @@ const COLORS = ["#FD8744", "#FFB95A", "#D05759", "#0B8FD9"];
 const SalesChart = () => {
   const [salesData, setSalesData] = useState([]);
   const [ordersData, setOrdersData] = useState([]);
-  const [totalSalesData, setTotalSalesData] = useState([]);
+  // const [totalSalesData, setTotalSalesData] = useState([]);
   const [monthlySalesData, setMonthlySalesData] = useState([]);
 
   useEffect(() => {
@@ -34,13 +34,13 @@ const SalesChart = () => {
         const monthlyResponse = await axios.get(
           `http://localhost:8000/sales/sales/monthly?store_id=${storeId}`
         );
-        const totalResponse = await axios.get(
-          `http://localhost:8000/sales/sales/total?store_id=${storeId}`
-        );
+        // const totalResponse = await axios.get(
+        //   `http://localhost:8000/sales/sales/total?store_id=${storeId}`
+        // );
 
         setSalesData(weeklyResponse.data.weekly_sales);
         setOrdersData(weeklyResponse.data.weekly_orders);
-        setTotalSalesData(totalResponse.data.total_sales);
+        // setTotalSalesData(totalResponse.data.total_sales);
         setMonthlySalesData(monthlyResponse.data.monthly_sales);
       } catch (error) {
         console.error("Error fetching sales data:", error);
@@ -135,9 +135,8 @@ const SalesChart = () => {
             </Paper>
           </Box>
         </Box>
-
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt :3, gap:2 }}>
-          <Paper elevation={3} sx={{ p: 2, borderRadius: 5 }}>
+        {/* 
+<Paper elevation={3} sx={{ p: 2, borderRadius: 5 }}>
             <Typography variant="h5" sx={{ textAlign: "center", mb: 1, mt: 0.5 }}>
               Total Sales
             </Typography>
@@ -145,7 +144,8 @@ const SalesChart = () => {
               <PieChart>
                 <Tooltip />
                 <Pie
-                  data={totalSalesData}
+                  data={monthlySalesData}
+                  // data={totalSalesData}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
@@ -154,7 +154,8 @@ const SalesChart = () => {
                   dataKey="value"
                   isAnimationActive={false}
                 >
-                  {totalSalesData.map((entry, index) => (
+                  {monthlySalesData.map((entry, index) => (
+                  // {totalSalesData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={COLORS[index % COLORS.length]}
@@ -164,34 +165,76 @@ const SalesChart = () => {
               </PieChart>
             </ResponsiveContainer>
           </Paper>
-            <Paper
-              elevation={3}
-              style={{ padding: "16px", textAlign: "center", borderRadius: 15,  }}
+           */}
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 3, gap: 2 }}>
+          <Paper elevation={3} sx={{ p: 2, borderRadius: 5 }}>
+            <Typography
+              variant="h5"
+              sx={{ textAlign: "center", mb: 1, mt: 0.5 }}
             >
-              <Typography variant="h5">Monthly Sales</Typography>
-              <ResponsiveContainer width={480} height={270}>
-                <BarChart data={monthlySalesData}>
-                  <XAxis
-                    dataKey="month"
-                    axisLine={false}
-                    tickLine={false}
-                    stroke="black"
-                  />
-                  <YAxis hide={true} />
-                  <Tooltip />
-                  <Bar
-                    dataKey="sales"
-                    fill="#FFA726"
-                    barSize="7%"
-                    radius={[10, 10, 0, 0]}
-                    minPointSize={3}
-                  />
-                </BarChart>
-                {/* {monthlySalesData.map((item) => (
-                  <Typography>{item.sales}</Typography>
-                ))} */}
-              </ResponsiveContainer>
-            </Paper>
+              Total Sales
+            </Typography>
+            <ResponsiveContainer width={300} height={270}>
+              <PieChart>
+                <Tooltip
+                  formatter={(value, name) => [`Rs. ${value}`, name]}
+                  contentStyle={{
+                    backgroundColor: "rgba(255, 255, 255, 0.9)",
+                    borderRadius: "4px",
+                    padding: "8px",
+                  }}
+                />
+                <Pie
+                  data={monthlySalesData.map((item) => ({
+                    name: item.month,
+                    value: item.sales,
+                  }))}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  // Remove the label prop to hide permanent labels
+                  outerRadius={100}
+                  dataKey="value"
+                  isAnimationActive={false}
+                >
+                  {monthlySalesData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </Paper>
+          <Paper
+            elevation={3}
+            style={{ padding: "16px", textAlign: "center", borderRadius: 15 }}
+          >
+            <Typography variant="h5">Monthly Sales</Typography>
+            <ResponsiveContainer width={480} height={270}>
+              <BarChart data={monthlySalesData}>
+                <XAxis
+                  dataKey="month"
+                  axisLine={false}
+                  tickLine={false}
+                  stroke="black"
+                />
+                <YAxis hide={true} />
+                <Tooltip />
+                <Bar
+                  dataKey="sales"
+                  fill="#FFA726"
+                  barSize="7%"
+                  radius={[10, 10, 0, 0]}
+                  minPointSize={3}
+                />
+              </BarChart>
+              {/* {monthlySalesData.map((item) => (
+                    <Typography>{item.sales}</Typography>
+                  ))} */}
+            </ResponsiveContainer>
+          </Paper>
         </Box>
       </Box>
     </Box>
