@@ -72,13 +72,13 @@ const SalesChart = () => {
           px: { xs: 2, sm: 3 },
         }}
       >
-        <Box sx={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
           <Box>
             <Paper elevation={3} sx={{ p: 2, borderRadius: 5 }}>
               <Typography variant="h5" sx={{ textAlign: "center", mt: 2 }}>
                 Weekly Sales
               </Typography>
-              <ResponsiveContainer width={300} height={200}>
+              <ResponsiveContainer width={390} height={200}>
                 <BarChart data={salesData}>
                   <XAxis
                     dataKey="name"
@@ -96,6 +96,7 @@ const SalesChart = () => {
                     strokeWidth={1}
                     radius={[10, 10, 0, 0]}
                     barSize="8%"
+                    minPointSize={3}
                     // label={{ position: 'top' }}
                   />
                 </BarChart>
@@ -108,7 +109,7 @@ const SalesChart = () => {
               <Typography variant="h5" sx={{ textAlign: "center", mt: 2 }}>
                 Purchase Orders
               </Typography>
-              <ResponsiveContainer width={300} height={200}>
+              <ResponsiveContainer width={390} height={200}>
                 <BarChart data={ordersData}>
                   <XAxis
                     dataKey="name"
@@ -127,13 +128,16 @@ const SalesChart = () => {
                     radius={[10, 10, 0, 0]}
                     barSize="8%"
                     tickFormatter={(value) => value.replace("Week", "w")}
+                    minPointSize={3}
                   />
                 </BarChart>
               </ResponsiveContainer>
             </Paper>
           </Box>
         </Box>
-          {/* <Paper elevation={3} sx={{ p: 2, borderRadius: 5 }}>
+
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt :3, gap:2 }}>
+          <Paper elevation={3} sx={{ p: 2, borderRadius: 5 }}>
             <Typography variant="h5" sx={{ textAlign: "center", mb: 1, mt: 0.5 }}>
               Total Sales
             </Typography>
@@ -159,9 +163,7 @@ const SalesChart = () => {
                 </Pie>
               </PieChart>
             </ResponsiveContainer>
-          </Paper> */}
-
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt :3 }}>
+          </Paper>
             <Paper
               elevation={3}
               style={{ padding: "16px", textAlign: "center", borderRadius: 15,  }}
@@ -182,6 +184,7 @@ const SalesChart = () => {
                     fill="#FFA726"
                     barSize="7%"
                     radius={[10, 10, 0, 0]}
+                    minPointSize={3}
                   />
                 </BarChart>
                 {/* {monthlySalesData.map((item) => (
