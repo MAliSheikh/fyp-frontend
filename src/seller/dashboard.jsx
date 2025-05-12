@@ -13,7 +13,21 @@ import { SideBar } from "./sidebar";
 import { PieChart, Pie, Cell } from "recharts";
 import axios from "axios";
 
-const COLORS = ["#FD8744", "#FFB95A", "#D05759", "#0B8FD9"];
+const COLORS = [
+  "#FF6B6B",  // Coral Red
+  "#FFD166",  // Soft Yellow
+  "#06D6A0",  // Mint Green
+  "#118AB2",  // Deep Sky Blue
+  "#EF476F",  // Vivid Pink
+  "#073B4C",  // Navy Blue
+  "#F4A261",  // Sandy Orange
+  "#2A9D8F",  // Teal
+  "#E76F51",  // Terracotta
+  "#A8DADC",  // Powder Blue
+  "#1D3557",  // Prussian Blue
+  "#B5838D"   // Dusty Mauve
+];
+
 
 const SalesChart = () => {
   const [salesData, setSalesData] = useState([]);
@@ -191,8 +205,8 @@ const SalesChart = () => {
                   }))}
                   cx="50%"
                   cy="50%"
-                  labelLine={false}
-                  // Remove the label prop to hide permanent labels
+                  labelLine={true}
+                  label={({ value }) => value}
                   outerRadius={100}
                   dataKey="value"
                   isAnimationActive={false}
