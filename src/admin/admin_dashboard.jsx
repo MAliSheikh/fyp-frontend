@@ -104,6 +104,7 @@ const AdminDashboard = () => {
                         dataKey="value"
                         position="bottom"
                         offset={5}
+                        // formatter={(value) => value.substring(0, 3)}
                         style={{ fill: "#333", fontSize: 12 }}
                       />
                     </Bar>
@@ -125,10 +126,13 @@ const AdminDashboard = () => {
                     <Tooltip />
                     <Bar dataKey="value" fill="#4CAF50" radius={[5, 5, 0, 0]} barSize="4%">
                       <LabelList
-                        dataKey="value"
+                        dataKey="name"
                         position="bottom"
                         offset={5}
                         style={{ fill: "#333", fontSize: 12 }}
+                        formatter={(value) => value.substring(0, 3)}
+                    minPointSize={3}
+
                       />
                     </Bar>
                   </BarChart>
@@ -170,7 +174,7 @@ const AdminDashboard = () => {
                   <LineChart data={formatChartData(dashboardData.monthly_sales)}>
                     <XAxis dataKey="name" axisLine={false} tickLine={false} stroke="black" fontSize={12} />
                     <YAxis hide={true} />
-                    <Tooltip formatter={(value) => [`₹${value}`, 'Sales']} />
+                    <Tooltip formatter={(value) => [`PKR ${value}`, 'Sales']} />
                     <Line type="monotone" dataKey="value" stroke="#9C27B0" strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
