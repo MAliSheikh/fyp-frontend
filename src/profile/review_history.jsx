@@ -5,7 +5,7 @@ import axiosInstance from "../components/axiosInstance";
 const ReviewHistory = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState(null); // State for selected image
+  const [selectedImage, setSelectedImage] = useState(null);
   const userId = localStorage.getItem("userId");
 
   useEffect(() => {
@@ -15,6 +15,7 @@ const ReviewHistory = () => {
         setReviews(response.data);
       } catch (error) {
         console.error("Error fetching reviews:", error);
+        setReviews([]); // Set empty array on error
       } finally {
         setLoading(false);
       }
@@ -24,7 +25,9 @@ const ReviewHistory = () => {
   }, [userId]);
 
   const handleOpenImage = (image) => {
-    setSelectedImage(image);
+    if (image) {
+      setSelectedImage(image);
+    }
   };
 
   const handleCloseImage = () => {
@@ -49,42 +52,65 @@ const ReviewHistory = () => {
           <Grid item xs={12} sm={6} md={4} key={review.review_id}>
             <Card sx={{ p: 2, cursor: 'pointer', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <CardMedia
-                  component="img"
-                  height="60"
-                  image={review.product_details.images[0]} // Assuming the first image is the product image
-                  alt={review.product_details.name}
-                  sx={{ borderRadius: '50%', width: 60, height: 60, marginRight: 2, cursor: 'pointer' }} // Round image
-                  onClick={() => handleOpenImage(review.product_details.images[0])} // Open image in modal
-                />
+                {review.product_details?.images?.[0] ? (
+                  <CardMedia
+                    component="img"
+                    height="60"
+                    image={review.product_details.images[0]}
+                    alt={review.product_details?.name || 'Product image'}
+                    sx={{ borderRadius: '50%', width: 60, height: 60, marginRight: 2, cursor: 'pointer' }}
+                    onClick={() => handleOpenImage(review.product_details.images[0])}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      width: 60,
+                      height: 60,
+                      borderRadius: '50%',
+                      bgcolor: '#e0e0e0',
+                      marginRight: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <Typography variant="caption" color="text.secondary">
+                      No Image
+                    </Typography>
+                  </Box>
+                )}
                 <Typography variant="h6" sx={{ flex: 1 }}>
-                  {review.product_details.name}
+                  {review.product_details?.name || 'Product Name Not Available'}
                 </Typography>
               </Box>
               <Box sx={{ mt: 1, textAlign: 'left' }}>
-                <Rating value={review.rating} readOnly />
+                <Rating value={review.rating || 0} readOnly />
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  {review.comment}
+                  {review.comment || 'No comment provided'}
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-                  {new Date(review.created_at).toLocaleDateString()}
+                  {review.created_at ? new Date(review.created_at).toLocaleDateString() : 'Date not available'}
                 </Typography>
               </Box>
               <Typography variant="caption" color="text.secondary" sx={{ mt: 1, textAlign: 'left' }}>
-                  View Details
-                </Typography>
+                View Details
+              </Typography>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                <Link href={`/products/${review.product_details.product_id}`} variant="body2" color="primary">
-                  View Product
-                </Link>
-                <Link href={`/store/${review.store_id}/products`} variant="body2" color="primary">
-                  View Store
-                </Link>
+                {review.product_details?.product_id && (
+                  <Link href={`/products/${review.product_details.product_id}`} variant="body2" color="primary">
+                    View Product
+                  </Link>
+                )}
+                {review.store_id && (
+                  <Link href={`/store/${review.store_id}/products`} variant="body2" color="primary">
+                    View Store
+                  </Link>
+                )}
               </Box>
             </Card>
           </Grid>
         ))}
-        {reviews.length === 0 && (
+        {(!reviews || reviews.length === 0) && (
           <Grid item xs={12}>
             <Typography variant="body1" color="text.secondary" align="center">
               You have not submitted any reviews yet.
