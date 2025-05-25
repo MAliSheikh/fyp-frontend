@@ -7,7 +7,7 @@ const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const userId = localStorage.getItem("user_id"); // Assuming user_id is stored in localStorage
+  const userId = localStorage.getItem("userId"); // Assuming user_id is stored in localStorage
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -36,7 +36,9 @@ const OrdersPage = () => {
       price: item.price,
       total: order.total_amount,
       product_name: item.product_name,
-      product_id: item.product_id // Added product_id for generic handling
+      product_id: item.product_id,
+      user_id: order.user_id,
+      status: item.status,
     }))
   );
 
@@ -46,9 +48,9 @@ const OrdersPage = () => {
   );
   const store_id = localStorage.getItem("store_id");
   
-  const handleApprove = async (order_id, product_id) => {
+  const handleApprove = async (order_id,user_id, product_id) => {
     try {
-      const response = await axiosInstance.put(`/orders/${order_id}/user/${userId}/item/${product_id}/status?status=approved`);
+      const response = await axiosInstance.put(`/orders/${order_id}/user/${user_id}/item/${product_id}/status?status=approved`);
       
       // Update the local state to reflect the change
       setOrders(prevOrders => 
@@ -70,9 +72,9 @@ const OrdersPage = () => {
     }
   };
 
-  const handleDecline = async (order_id, product_id) => {
+  const handleDecline = async (order_id, user_id, product_id) => {
     try {
-      const response = await axiosInstance.put(`/orders/${order_id}/store/${store_id}/item/${product_id}/status?status=cancelled`);
+      const response = await axiosInstance.put(`/orders/${order_id}/user/${user_id}/item/${product_id}/status?status=cancelled`);
       
       // Update the local state to reflect the change
       setOrders(prevOrders => 
@@ -174,7 +176,7 @@ const OrdersPage = () => {
           >
             {filteredOrders.map((order, index) => (
               <Box
-                key={`${order.order_id}-${index}`}
+                key={`${order.order_id}-${order.item_id}-${index}`}
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -193,7 +195,18 @@ const OrdersPage = () => {
               >
                 <Typography sx={{ flex: 0.8, textAlign: "left" }}>{order.order_id}</Typography>
                 <Typography sx={{ flex: 1, textAlign: "left" }}>{order.product_name}</Typography>
-                <Typography sx={{ flex: 1, textAlign: "left", }}>{order.status}</Typography>
+                <Typography 
+                  sx={{ 
+                    flex: 1, 
+                    textAlign: "left",
+                    textTransform: 'capitalize',
+                    color: order.status === 'approved' ? '#009688' : 
+                           order.status === 'delivered' ? '#4CAF50' :
+                           order.status === 'cancelled' ? '#f44336' : '#666'
+                  }}
+                >
+                  {order.status}
+                </Typography>
                 <Typography sx={{ flex: 1, textAlign: "left" }}>{order.order_date}</Typography>
                 <Typography sx={{ flex: 1, textAlign: "left", ml:6 }}>{order.quantity}</Typography>
                 <Typography sx={{ flex: 1, textAlign: "left" }}>{order.price}</Typography>
@@ -205,34 +218,48 @@ const OrdersPage = () => {
                     gap: 2
                   }}
                 >
-                  <Box
-                    sx={{
-                      color: "white",
-                      p: 1,
-                      borderRadius: 2,
-                      cursor: "pointer",
-                      textAlign: "center",
-                      bgcolor: "#009688",
-                      "&:hover": { bgcolor: "#00796b" },
-                    }}
-                    onClick={() => handleApprove(order.order_id, order.product_id)}
-                  >
-                    Approve
-                  </Box>
-                  <Box
-                    sx={{
-                      backgroundColor: "#f44336",
-                      color: "white",
-                      p: 1,
-                      borderRadius: 2,
-                      cursor: "pointer",
-                      textAlign: "center",
-                      "&:hover": { backgroundColor: "#d32f2f" },
-                    }}
-                    onClick={() => handleDecline(order.order_id, order.product_id)}
-                  >
-                    Decline
-                  </Box>
+                  {order.status === "pending" ? (
+                    <>
+                      <Box
+                        sx={{
+                          color: "white",
+                          p: 1,
+                          borderRadius: 2,
+                          cursor: "pointer",
+                          textAlign: "center",
+                          bgcolor: "#009688",
+                          "&:hover": { bgcolor: "#00796b" },
+                        }}
+                        onClick={() => handleApprove(order.order_id, order.user_id, order.product_id)}
+                      >
+                        Approve
+                      </Box>
+                      <Box
+                        sx={{
+                          backgroundColor: "#f44336",
+                          color: "white",
+                          p: 1,
+                          borderRadius: 2,
+                          cursor: "pointer",
+                          textAlign: "center",
+                          "&:hover": { backgroundColor: "#d32f2f" },
+                        }}
+                        onClick={() => handleDecline(order.order_id, order.user_id, order.product_id)}
+                      >
+                        Decline
+                      </Box>
+                    </>
+                  ) : (
+                    <Typography
+                      sx={{
+                        color: "#666",
+                        fontStyle: "italic",
+                        fontSize: "0.9rem"
+                      }}
+                    >
+                      No action to perform
+                    </Typography>
+                  )}
                 </Box>
               </Box>
             ))}

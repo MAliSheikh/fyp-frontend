@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, TextField, Typography, Grid2 } from "@mui/material";
+import { Box, TextField, Typography, Grid2, CircularProgress } from "@mui/material";
 import axiosInstance from "../components/axiosInstance";
 import { SideBar } from "../seller/sidebar";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -132,60 +132,66 @@ const ManageProducts = () => {
             gap: 2,
           }}
         >
-          {filteredProducts.map((product) => (
-            <Box
-              key={product.product_id}
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                backgroundColor: "white",
-                p: 2,
-                borderRadius: 3, // Rounded corners
-                boxShadow: 2,
-                cursor: "pointer",
-                transition: "all 0.3s ease-in-out",
-                "&:hover": {
-                  boxShadow: 4,
-                  backgroundColor: "#f5f5f5",
-                },
-              }}
-              onClick={() => console.log(`Clicked on product ${product.name}`)}
-            >
-              <Typography sx={{ flex: 0.8, textAlign: "left" }}>
-                {product.product_id}
-              </Typography>
-              <Typography sx={{ flex: 1, textAlign: "left" }}>
-                {product.name}
-              </Typography>
-              <Typography sx={{ flex: 1, textAlign: "left" }}>
-                {product.category}
-              </Typography>
-              <Typography sx={{ flex: 1, textAlign: "left" }}>
-                {product.stock}
-              </Typography>
-              <Box
-                sx={{
-                  flex: 0.5,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <DeleteIcon
-                  color="error"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(product.product_id);
-                  }}
-                  sx={{
-                    cursor: "pointer",
-                    "&:hover": { opacity: 0.8 },
-                  }}
-                />
-              </Box>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', p: 4 }}>
+              <CircularProgress />
             </Box>
-          ))}
+          ) : (
+            filteredProducts.map((product) => (
+              <Box
+                key={product.product_id}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  backgroundColor: "white",
+                  p: 2,
+                  borderRadius: 3, // Rounded corners
+                  boxShadow: 2,
+                  cursor: "pointer",
+                  transition: "all 0.3s ease-in-out",
+                  "&:hover": {
+                    boxShadow: 4,
+                    backgroundColor: "#f5f5f5",
+                  },
+                }}
+                onClick={() => console.log(`Clicked on product ${product.name}`)}
+              >
+                <Typography sx={{ flex: 0.8, textAlign: "left" }}>
+                  {product.product_id}
+                </Typography>
+                <Typography sx={{ flex: 1, textAlign: "left" }}>
+                  {product.name}
+                </Typography>
+                <Typography sx={{ flex: 1, textAlign: "left" }}>
+                  {product.category}
+                </Typography>
+                <Typography sx={{ flex: 1, textAlign: "left" }}>
+                  {product.stock}
+                </Typography>
+                <Box
+                  sx={{
+                    flex: 0.5,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <DeleteIcon
+                    color="error"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(product.product_id);
+                    }}
+                    sx={{
+                      cursor: "pointer",
+                      "&:hover": { opacity: 0.8 },
+                    }}
+                  />
+                </Box>
+              </Box>
+            ))
+          )}
         </Box>
       </Grid2>
     </Grid2>
