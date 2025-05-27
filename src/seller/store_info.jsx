@@ -144,7 +144,7 @@ const StoreInfo = () => {
 
   const handleUpdateStore = async (e) => {
     e.preventDefault();
-    const store_id = localStorage.getItem('store_id') // Assuming storeData has an id property
+    const store_id = localStorage.getItem('store_id');
     const user_id = localStorage.getItem("userId");
     if (!user_id) {
       setSnackbar({
@@ -158,7 +158,12 @@ const StoreInfo = () => {
     setLoading(true);
 
     try {
-      const base64Image = await convertToBase64(image);
+      // Only convert to base64 if it's a new file (Blob)
+      let base64Image = image;
+      if (image instanceof Blob) {
+        base64Image = await convertToBase64(image);
+      }
+
       const response = await axios.put(
         `http://localhost:8000/store/stores/${store_id}`,
         {
@@ -171,6 +176,16 @@ const StoreInfo = () => {
         }
       );
 
+      // Update local state with the response data
+      if (response.data) {
+        setStoreData(response.data);
+        setShopName(response.data.name);
+        setShopType(response.data.shop_type);
+        setDescription(response.data.description);
+        setPhoneNumber(response.data.phone_number);
+        setImage(response.data.image);
+      }
+
       setSnackbar({
         open: true,
         message: "Store updated successfully!",
@@ -178,6 +193,7 @@ const StoreInfo = () => {
       });
       handleModalClose();
     } catch (error) {
+      console.error("Error updating store:", error);
       setSnackbar({
         open: true,
         message: error.response?.data?.message || "Failed to update store",
@@ -311,8 +327,24 @@ const StoreInfo = () => {
                 width: { xs: "100%", md: "350px" },
                 cursor: "pointer",
                 flexShrink: 0,
+                position: "relative",
+                overflow: "hidden"
               }}
             >
+              {image && typeof image === 'string' && (
+                <img
+                  src={image}
+                  alt="Store"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0
+                  }}
+                />
+              )}
               <input
                 type="file"
                 accept="image/*"
@@ -327,31 +359,34 @@ const StoreInfo = () => {
                   sx={{
                     backgroundColor: "#119994",
                     "&:hover": { backgroundColor: "#0d7b76" },
+                    position: "relative",
+                    zIndex: 1
                   }}
                 >
-                  {image ? image.name : "Upload Image"}
+                  {image ? (typeof image === 'string' ? 'Change Image' : image.name) : "Upload Image"}
                 </Button>
               </label>
             </Box>
 
-            <Button
-              type="submit"
-              onClick={handleSubmit}
-              variant="contained"
-              sx={{
-                width: { xs: "100%", sm: "80%", md: "100%" },
-                maxWidth: "350px",
-                backgroundColor: "#119994",
-                color: "#ffffff",
-                mt: { xs: 2, md: 0 },
-                "&:hover": {
-                  backgroundColor: "#0d7b76",
-                },
-              }}
-              // disabled={loading || isEditing}
-            >
-              {loading ? <CircularProgress size={24} /> : "Submit"}
-            </Button>
+            {!storeData && (
+              <Button
+                type="submit"
+                onClick={handleSubmit}
+                variant="contained"
+                sx={{
+                  width: { xs: "100%", sm: "80%", md: "100%" },
+                  maxWidth: "350px",
+                  backgroundColor: "#119994",
+                  color: "#ffffff",
+                  mt: { xs: 2, md: 0 },
+                  "&:hover": {
+                    backgroundColor: "#0d7b76",
+                  },
+                }}
+              >
+                {loading ? <CircularProgress size={24} /> : "Submit"}
+              </Button>
+            )}
           </Box>
         </Box>
 
@@ -417,8 +452,24 @@ const StoreInfo = () => {
                   cursor: "pointer",
                   flexShrink: 0,
                   mb: 2,
+                  position: "relative",
+                  overflow: "hidden"
                 }}
               >
+                {image && typeof image === 'string' && (
+                  <img
+                    src={image}
+                    alt="Store"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0
+                    }}
+                  />
+                )}
                 <input
                   type="file"
                   accept="image/*"
@@ -433,9 +484,11 @@ const StoreInfo = () => {
                     sx={{
                       backgroundColor: "#119994",
                       "&:hover": { backgroundColor: "#0d7b76" },
+                      position: "relative",
+                      zIndex: 1
                     }}
                   >
-                    {image ? image.name : "Upload New Image"}
+                    {image ? (typeof image === 'string' ? 'Change Image' : image.name) : "Upload Image"}
                   </Button>
                 </label>
               </Box>
