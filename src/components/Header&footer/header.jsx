@@ -312,7 +312,10 @@ const Header = () => {
             <Box
               component="img"
               onClick={() => {
-                navigate("/");
+                const userRole = authService.getUserRole();
+                if (userRole !== 'seller' && userRole !== 'admin') {
+                  navigate("/");
+                }
               }}
               src={BNLOGO2}
               alt="Bazaar Nest logo"

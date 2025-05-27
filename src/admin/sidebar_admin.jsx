@@ -70,7 +70,7 @@ export const SideBarAdmin = () => {
         flexDirection: "column",
         alignItems: "center",
         width: "100%",
-        mt: 13.4, // Added margin from top
+        mt: 1.3,
         p: isMobile ? 0 : 0,
         position: 'relative',
       }}
@@ -82,8 +82,7 @@ export const SideBarAdmin = () => {
             display: 'flex',
             justifyContent: 'flex-start',
             mb: 2,
-            pl: 2,
-            
+            // pl: 2,
           }}
         >
           <IconButton
