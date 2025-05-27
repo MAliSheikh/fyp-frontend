@@ -166,6 +166,7 @@ const Header = () => {
   const [showResults, setShowResults] = useState(false);
   const [loading, setLoading] = useState(false);
   const debounceTimeout = useRef(null);
+  const userRole = authService.getUserRole();
 
   useEffect(() => {
     // Check token status whenever component mounts or auth state changes
@@ -345,7 +346,7 @@ const Header = () => {
               </CategorySelect>
             </FormControl> */}
             {/* Search Bar - Only show on larger screens and not in admin/seller */}
-            {!isSmallMobile && !isAdminOrSellerPath() && renderSearchBar()}
+            {!isSmallMobile && !isAdminOrSellerPath() && userRole !== 'seller' && renderSearchBar()}
 
             {/* Right Side Menu */}
             <Box
@@ -361,7 +362,7 @@ const Header = () => {
                   {isLoggedIn ? (
                     <NavButton onClick={handleLogout}>Logout</NavButton>
                   ) : (
-                    !isAdminOrSellerPath() && (
+                    !isAdminOrSellerPath() && userRole !== 'seller' && (
                       <NavButton onClick={() => navigate("/login")}>
                         Login
                       </NavButton>
@@ -371,7 +372,7 @@ const Header = () => {
               )}
               {!isMobile && (
                 <>
-                  {!isAdminOrSellerPath() && (
+                  {!isAdminOrSellerPath() && userRole !== 'seller' && (
                     <IconButton
                       color="inherit"
                       onClick={() => navigate("/add_to_cart")}
@@ -387,12 +388,12 @@ const Header = () => {
                   >
                     <InsertCommentOutlinedIcon />
                   </IconButton>
-                  {!isAdminOrSellerPath() && (
+                  {!isAdminOrSellerPath() && userRole !== 'seller' && (
                     <IconButton color="inherit" onClick={() => navigate("/profile")}>
                       <PersonIcon />
                     </IconButton>
                   )}
-                  {!isAdminOrSellerPath() && (
+                  {!isAdminOrSellerPath() && userRole !== 'seller' && (
                     <>
                       <Button
                         variant="contained"
@@ -482,34 +483,47 @@ const Header = () => {
             </Box>
 
             {/* Search Bar in Mobile Drawer */}
-            <Box sx={{ mb: 2 }}>
-              {renderSearchBar()}
-            </Box>
+            {userRole !== 'seller' && (
+              <Box sx={{ mb: 2 }}>
+                {renderSearchBar()}
+              </Box>
+            )}
 
             <List>
-              <ListItem button onClick={() => { navigate("/mall_lists"); setMobileOpen(false); }}>
-                <ListItemText primary="Malls" />
-              </ListItem>
-              <ListItem button onClick={() => { navigate("/store_lists"); setMobileOpen(false); }}>
-                <ListItemText primary="Stores" />
-              </ListItem>
+              {userRole !== 'seller' && (
+                <>
+                  <ListItem button onClick={() => { navigate("/mall_lists"); setMobileOpen(false); }}>
+                    <ListItemText primary="Malls" />
+                  </ListItem>
+                  <ListItem button onClick={() => { navigate("/store_lists"); setMobileOpen(false); }}>
+                    <ListItemText primary="Stores" />
+                  </ListItem>
+                  <ListItem button onClick={() => { navigate("/add_to_cart"); setMobileOpen(false); }}>
+                    <ListItemText primary="Cart" />
+                  </ListItem>
+                  <ListItem button onClick={() => { navigate("/profile"); setMobileOpen(false); }}>
+                    <ListItemText primary="Profile" />
+                  </ListItem>
+                </>
+              )}
+              {userRole === 'seller' && (
+                <ListItem button onClick={() => { navigate("/dashboard"); setMobileOpen(false); }}>
+                  <ListItemText primary="Dashboard" />
+                </ListItem>
+              )}
               <ListItem button onClick={() => { navigate("/chat"); setMobileOpen(false); }}>
-                <ListItemText primary="Messages" />
-              </ListItem>
-              <ListItem button onClick={() => { navigate("/add_to_cart"); setMobileOpen(false); }}>
-                <ListItemText primary="Cart" />
-              </ListItem>
-              <ListItem button onClick={() => { navigate("/profile"); setMobileOpen(false); }}>
-                <ListItemText primary="Profile" />
+                <ListItemText primary="Chats" />
               </ListItem>
               {isLoggedIn ? (
                 <ListItem button onClick={() => { handleLogout(); setMobileOpen(false); }}>
                   <ListItemText primary="Logout" />
                 </ListItem>
               ) : (
-                <ListItem button onClick={() => { navigate("/login"); setMobileOpen(false); }}>
-                  <ListItemText primary="Login" />
-                </ListItem>
+                userRole !== 'seller' && (
+                  <ListItem button onClick={() => { navigate("/login"); setMobileOpen(false); }}>
+                    <ListItemText primary="Login" />
+                  </ListItem>
+                )
               )}
             </List>
           </Box>

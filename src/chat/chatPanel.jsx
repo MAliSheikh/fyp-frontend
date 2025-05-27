@@ -24,11 +24,13 @@ import { useTheme } from "@mui/material/styles";
 import { fetchUserChatData, sendMessage } from "./chatApi";
 import MessageInput from "./messageInput";
 import ChatMessages from "./chatMessages";
+import { useNavigate } from "react-router-dom";
 
 // Main Chat Component
 const ChattingPanel = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
   const [mobileView, setMobileView] = useState("list"); // 'list' or 'chat'
@@ -278,9 +280,18 @@ const ChattingPanel = () => {
           >
             {/* Chat List Header */}
             <Box sx={{ p: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
-              <Typography variant="h6" sx={{ mb: 2 }}>
-                Chats
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <IconButton 
+                  edge="start" 
+                  onClick={() => navigate(-1)}
+                  sx={{ mr: 1 }}
+                >
+                  <ArrowBack />
+                </IconButton>
+                <Typography variant="h6">
+                  Chats
+                </Typography>
+              </Box>
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <TextField
                   fullWidth
