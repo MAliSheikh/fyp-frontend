@@ -213,9 +213,18 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/manageproducts"
+          element={
+            <PrivateRoute roles={["seller"]}>
+              <Layout>
+                <ManageProducts />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
 
         <Route path="/orders" element={<Layout>{<OrdersPage />}</Layout>} />
-        <Route path="/manageproducts" element={<Layout>{<ManageProducts />}</Layout>} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/unauthorized" element={<Unauthorized />} />

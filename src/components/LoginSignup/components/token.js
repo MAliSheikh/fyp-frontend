@@ -18,11 +18,9 @@ axiosInstance.interceptors.response.use(
 
 const login = async (email, password) => {
   try {
-    // console.log('email', email, 'password', password);
-    const response = await axiosInstance.post("/users/token", {
-      username: email,
-      password: password,
-    });
+    const response = await axiosInstance.post("/users/token", 
+      `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+    );
 
     if (response.data.access_token) {
       localStorage.setItem("access_token", response.data.access_token);
