@@ -9,6 +9,11 @@ import {
   Alert,
   Modal,
   Scrollbar,
+  Paper,
+  Grid,
+  IconButton,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { createStore } from "./seller";
 import { SideBar } from "./sidebar";
@@ -16,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 import authService from "../components/LoginSignup/components/token";
 import axiosInstance from "../components/axiosInstance";
 import axios from "axios";
-
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 
 const StoreInfo = () => {
   const [shopName, setShopName] = useState("");
@@ -34,6 +39,12 @@ const StoreInfo = () => {
   const [storeData, setStoreData] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
+  const [stores, setStores] = useState([]);
+  const [selectedStore, setSelectedStore] = useState("");
+  const [floorNumber, setFloorNumber] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleSnackbarClose = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
@@ -205,25 +216,61 @@ const StoreInfo = () => {
   };
 
   return (
+    <Box display="flex" sx={{ p: 2 }}>
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <IconButton
+          onClick={() => setIsSidebarOpen(true)}
+          sx={{
+            position: 'fixed',
+            top: 16,
+            right: 16,
+            zIndex: 1200,
+            bgcolor: '#119994',
+            color: 'white',
+            '&:hover': {
+              bgcolor: '#0d7b76',
+            },
+          }}
+        >
+          <MenuOpenIcon />
+        </IconButton>
+      )}
+
+      {/* Sidebar */}
+      {isMobile ? (
+        isSidebarOpen && (
+          <SideBar 
+            isMobile={true} 
+            onClose={() => setIsSidebarOpen(false)} 
+          />
+        )
+      ) : (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: { xs: "column", md: "row" },
-        p: { xs: 1, sm: 2 },
-        gap: { xs: 2, sm: 3 },
-      }}
-    >
-      <Box sx={{ width: { xs: "100%", md: "auto" } }}>
-        <SideBar />
+            width: "250px",
+            display: { xs: "none", md: "block" }
+          }}
+        >
+          <SideBar isMobile={false} />
       </Box>
+      )}
 
+      {/* Main Content */}
       <Box
         sx={{
-          width: "100%",
-          maxWidth: { md: "1200px" },
-          px: { xs: 2, sm: 3 },
+          flex: 1,
+          p: { xs: 2, md: 3 },
+          width: { xs: "100%", md: "75%" },
+          ml: { xs: 0, md: 1 },
+          maxWidth: "1200px",
+          overflow: { xs: "auto", md: "hidden" }
         }}
       >
+        <Paper elevation={3} sx={{ p: 5, borderRadius: 2 }}>
+         
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
         <Typography
           variant="h5"
           gutterBottom
@@ -234,8 +281,10 @@ const StoreInfo = () => {
         >
           Add Store Information
         </Typography>
+            </Grid>
 
         {storeData && (
+              <Grid item xs={12}>
           <Button
             variant="outlined"
             onClick={handleEditClick}
@@ -243,8 +292,10 @@ const StoreInfo = () => {
           >
             Edit
           </Button>
+              </Grid>
         )}
 
+            <Grid item xs={12}>
         <Box
           component="form"
           onSubmit={handleSubmit}
@@ -308,6 +359,7 @@ const StoreInfo = () => {
             />
           </Box>
 
+                <Grid item xs={12}>
           <Box
             sx={{
               display: "flex",
@@ -327,24 +379,24 @@ const StoreInfo = () => {
                 width: { xs: "100%", md: "350px" },
                 cursor: "pointer",
                 flexShrink: 0,
-                position: "relative",
-                overflow: "hidden"
-              }}
-            >
-              {image && typeof image === 'string' && (
-                <img
-                  src={image}
-                  alt="Store"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0
-                  }}
-                />
-              )}
+                        position: "relative",
+                        overflow: "hidden"
+                      }}
+                    >
+                      {image && typeof image === 'string' && (
+                        <img
+                          src={image}
+                          alt="Store"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0
+                          }}
+                        />
+                      )}
               <input
                 type="file"
                 accept="image/*"
@@ -359,11 +411,11 @@ const StoreInfo = () => {
                   sx={{
                     backgroundColor: "#119994",
                     "&:hover": { backgroundColor: "#0d7b76" },
-                    position: "relative",
-                    zIndex: 1
+                            position: "relative",
+                            zIndex: 1
                   }}
                 >
-                  {image ? (typeof image === 'string' ? 'Change Image' : image.name) : "Upload Image"}
+                          {image ? (typeof image === 'string' ? 'Change Image' : image.name) : "Upload Image"}
                 </Button>
               </label>
             </Box>
@@ -388,8 +440,11 @@ const StoreInfo = () => {
               </Button>
             )}
           </Box>
+                </Grid>
         </Box>
+            </Grid>
 
+            <Grid item xs={12}>
         <Modal open={modalOpen} onClose={handleModalClose}>
           <Box sx={{
             position: 'absolute',
@@ -452,24 +507,24 @@ const StoreInfo = () => {
                   cursor: "pointer",
                   flexShrink: 0,
                   mb: 2,
-                  position: "relative",
-                  overflow: "hidden"
-                }}
-              >
-                {image && typeof image === 'string' && (
-                  <img
-                    src={image}
-                    alt="Store"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0
-                    }}
-                  />
-                )}
+                        position: "relative",
+                        overflow: "hidden"
+                      }}
+                    >
+                      {image && typeof image === 'string' && (
+                        <img
+                          src={image}
+                          alt="Store"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0
+                          }}
+                        />
+                      )}
                 <input
                   type="file"
                   accept="image/*"
@@ -484,11 +539,11 @@ const StoreInfo = () => {
                     sx={{
                       backgroundColor: "#119994",
                       "&:hover": { backgroundColor: "#0d7b76" },
-                      position: "relative",
-                      zIndex: 1
+                            position: "relative",
+                            zIndex: 1
                     }}
                   >
-                    {image ? (typeof image === 'string' ? 'Change Image' : image.name) : "Upload Image"}
+                          {image ? (typeof image === 'string' ? 'Change Image' : image.name) : "Upload Image"}
                   </Button>
                 </label>
               </Box>
@@ -505,7 +560,9 @@ const StoreInfo = () => {
             </Box>
           </Box>
         </Modal>
+            </Grid>
 
+            <Grid item xs={12}>
         <Snackbar
           open={snackbar.open}
           autoHideDuration={6000}
@@ -519,6 +576,9 @@ const StoreInfo = () => {
             {snackbar.message}
           </Alert>
         </Snackbar>
+            </Grid>
+          </Grid>
+        </Paper>
       </Box>
     </Box>
   );

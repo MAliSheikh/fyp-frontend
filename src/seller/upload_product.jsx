@@ -15,6 +15,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { SideBar } from "./sidebar";
@@ -22,6 +24,8 @@ import { categories } from "./category";
 import { createProduct, predictShoeCategoryAndColor } from "./seller";
 import CloseIcon from "@mui/icons-material/Close";
 import SmartToyIcon from '@mui/icons-material/SmartToy';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import axios from "axios";
 
 const convertToBase64 = (file) => {
   return new Promise((resolve, reject) => {
@@ -66,6 +70,11 @@ const UploadProduct = () => {
   const [isAILoading, setIsAILoading] = useState(false);
   const [aiError, setAiError] = useState("");
   const [aiSuccess, setAiSuccess] = useState("");
+  const [stores, setStores] = useState([]);
+  const [selectedStore, setSelectedStore] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   // Categories and subcategories that should show size fields
   const categoriesWithSizes = ["Clothes", "Shoes", "Sports"];
@@ -218,391 +227,432 @@ const UploadProduct = () => {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        p: 2,
-        gap: 3,
-        backgroundColor: "#fff",
-      }}
-    >
-      <Grid container spacing={2} disableEqualOverflow>
-        <Grid xs={12} sm={4} md={3} lg={2}>
-          <SideBar />
-        </Grid>
-        
-        <Grid xs={12} sm={8} md={9} lg={10}>
-          <Box sx={{ width: "100%" }}>
-            <Typography variant="h6" sx={{ mb: 3 }}>
-              Upload New Product
-            </Typography>
+    <Box display="flex" sx={{ p: 2 }}>
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <IconButton
+          onClick={() => setIsSidebarOpen(true)}
+          sx={{
+            position: 'fixed',
+            top: 16,
+            right: 16,
+            zIndex: 1200,
+            bgcolor: '#119994',
+            color: 'white',
+            '&:hover': {
+              bgcolor: '#0d7b76',
+            },
+          }}
+        >
+          <MenuOpenIcon />
+        </IconButton>
+      )}
 
-            <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1 }}>
-              <Button
-                variant="contained"
-                onClick={handleAIPrediction}
-                disabled={isAILoading}
-                startIcon={isAILoading ? <CircularProgress size={20} /> : <SmartToyIcon />}
-                sx={{
-                  backgroundColor: "#00897b",
-                  "&:hover": { backgroundColor: "#00796b" },
-                  textTransform: "none",
-                }}
-              >
-                AI Prediction
-              </Button>
-            </Box>
-            {aiError && (
-              <Typography color="error" sx={{ mb: 2 }}>
-                {aiError}
-              </Typography>
-            )}
-            {aiSuccess && (
-              <Typography color="success.main" sx={{ mb: 2 }}>
-                {aiSuccess}
-              </Typography>
-            )}
+      {/* Sidebar */}
+      {isMobile ? (
+        isSidebarOpen && (
+          <SideBar 
+            isMobile={true} 
+            onClose={() => setIsSidebarOpen(false)} 
+          />
+        )
+      ) : (
+        <Box
+          sx={{
+            width: "250px",
+            display: { xs: "none", md: "block" }
+          }}
+        >
+          <SideBar isMobile={false} />
+        </Box>
+      )}
 
-            <Grid container spacing={3} disableEqualOverflow>
-              {/* Left Column */}
-              <Grid xs={12} md={6}>
-                {/* Image Upload Box */}
-                <Box
-                  sx={{
-                    border: "1px solid #e0e0e0",
-                    borderRadius: "4px",
-                    p: 2,
-                    minHeight: "150px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "92%",
-                  }}
-                >
-                  <Typography sx={{ paddingTop: 3, color: "#666", mb: 2 }}>
-                    Upload Product Images
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: 1,
-                      mb: 2,
-                      width: "100%",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {productImages.length > 0 &&
-                      productImages.map((image, index) => (
-                        <Box
-                          key={index}
-                          sx={{
-                            width: 40,
-                            height: 60,
-                            border: "1px solid #e0e0e0",
-                            borderRadius: "4px",
-                            overflow: "hidden",
-                            position: "relative",
-                          }}
-                        >
-                          <img
-                            src={URL.createObjectURL(image)}
-                            alt={`Preview ${index}`}
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
-                            }}
-                          />
-                          <IconButton
-                            size="small"
-                            sx={{
-                              position: "absolute",
-                              top: 0,
-                              right: 0,
-                              backgroundColor: "rgba(255,255,255,0.7)",
-                              "&:hover": {
-                                backgroundColor: "rgba(255,255,255,0.9)",
-                              },
-                            }}
-                            onClick={() => handleRemoveImage(index)}
-                          >
-                            <CloseIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      ))}
-                  </Box>
+      {/* Main Content */}
+      <Box
+        sx={{
+          flex: 1,
+          p: { xs: 2, md: 3 },
+          width: { xs: "100%", md: "75%" },
+          ml: { xs: 0, md: 1 },
+          maxWidth: "1200px",
+          overflow: { xs: "auto", md: "hidden" }
+        }}
+      >
+        <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+          <Typography variant="h5" gutterBottom>
+            Upload Product
+          </Typography>
+          <Grid container spacing={3}>
+            <Grid xs={12} sm={8} md={9} lg={10}>
+              <Box sx={{ width: "100%" }}>
+                
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1 }}>
                   <Button
                     variant="contained"
-                    component="label"
+                    onClick={handleAIPrediction}
+                    disabled={isAILoading}
+                    startIcon={isAILoading ? <CircularProgress size={20} /> : <SmartToyIcon />}
                     sx={{
-                      mb: 2,
                       backgroundColor: "#00897b",
                       "&:hover": { backgroundColor: "#00796b" },
                       textTransform: "none",
-                      width: { xs: "100%", sm: "auto" },
                     }}
                   >
-                    Add Image
-                    <input
-                      type="file"
-                      hidden
-                      accept="image/*"
-                      onChange={handleImageChange}
-                    />
+                    AI Prediction
                   </Button>
                 </Box>
-
-                {/* Product Name */}
-                <TextField
-                  fullWidth
-                  label="Add Product name"
-                  variant="outlined"
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
-                  sx={{ backgroundColor: "#fff", mt: 3 }}
-                />
-
-                {/* Price and Stock */}
-                <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-                  <TextField
-                    label="Price"
-                    variant="outlined"
-                    type="number"
-                    value={price < 0 ? 0 : price}
-                    onChange={(e) => setPrice(e.target.value < 0 ? 0 : e.target.value)}
-                    InputProps={{ inputProps: { min: 0 } }}
-                    sx={{ flex: 1, backgroundColor: "#fff" }}
-                  />
-                  <TextField
-                    label="Available stock"
-                    variant="outlined"
-                    type="number"
-                    value={stock < 0 ? 0 : stock}
-                    onChange={(e) => setStock(e.target.value < 0 ? 0 : e.target.value)}
-                    InputProps={{ inputProps: { min: 0 } }}
-                    sx={{ flex: 1, backgroundColor: "#fff" }}
-                  />
-                </Box>
-
-                {/* Brand */}
-                <TextField
-                  fullWidth
-                  label="Brand (optional)"
-                  variant="outlined"
-                  placeholder="Enter brand name or leave empty for 'No Brand'"
-                  value={brand}
-                  onChange={(e) => setBrand(e.target.value)}
-                  sx={{ backgroundColor: "#fff", mt: 2 }}
-                />
-
-                {/* Categories */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    gap: 2,
-                    mt: 2,
-                    flexDirection: { xs: "column", sm: "row" },
-                  }}
-                >
-                  <FormControl fullWidth>
-                    <InputLabel id="category-select-label">Category</InputLabel>
-                    <Select
-                      labelId="category-select-label"
-                      id="category-select"
-                      value={selectedCategory}
-                      onChange={handleCategoryChange}
-                      label="Category"
-                    >
-                      {categories.map((category) => (
-                        <MenuItem key={category.name} value={category.name}>
-                          {category.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  <FormControl fullWidth disabled={!selectedCategory}>
-                    <InputLabel id="subcategory-select-label">
-                      Subcategory
-                    </InputLabel>
-                    <Select
-                      labelId="subcategory-select-label"
-                      id="subcategory-select"
-                      value={selectedSubcategory}
-                      onChange={handleSubcategoryChange}
-                      label="Subcategory"
-                    >
-                      {currentSubcategories.map((subcategory) => (
-                        <MenuItem key={subcategory} value={subcategory}>
-                          {subcategory}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Box>
-              </Grid>
-
-              {/* Right Column */}
-              <Grid xs={12} md={6}>
-                {/* Description */}
-                <TextField
-                  fullWidth
-                  label="Add Description"
-                  variant="outlined"
-                  multiline
-                  rows={6}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  sx={{ backgroundColor: "#fff" }}
-                />
-
-                {/* Colors Section */}
-                <Box sx={{ mt: 3 }}>
-                  <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                    Colors (optional)
+                {aiError && (
+                  <Typography color="error" sx={{ mb: 2 }}>
+                    {aiError}
                   </Typography>
-                  <Paper
-                    variant="outlined"
-                    sx={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      listStyle: "none",
-                      p: 0.5,
-                      m: 0,
-                      minHeight: "50px",
-                    }}
-                  >
-                    {colors.map((color) => (
-                      <Chip
-                        key={color}
-                        label={color}
-                        onDelete={() => handleDeleteColor(color)}
-                        sx={{ m: 0.5 }}
-                      />
-                    ))}
-                  </Paper>
-                  <Autocomplete
-                    freeSolo
-                    options={commonColors.filter(color => !colors.includes(color))}
-                    value={newColor}
-                    onChange={(e, value) => {
-                      if (value && !colors.includes(value)) {
-                        setColors([...colors, value]);
-                        setNewColor("");
-                      }
-                    }}
-                    inputValue={newColor}
-                    onInputChange={(e, value) => setNewColor(value)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        label="Add color"
-                        size="small"
-                        sx={{ mt: 1 }}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            handleAddColor();
-                            e.preventDefault();
-                          }
+                )}
+                {aiSuccess && (
+                  <Typography color="success.main" sx={{ mb: 2 }}>
+                    {aiSuccess}
+                  </Typography>
+                )}
+
+                <Grid container spacing={3} disableEqualOverflow>
+                  {/* Left Column */}
+                  <Grid xs={12} md={6}>
+                    {/* Image Upload Box */}
+                    <Box
+                      sx={{
+                        border: "1px solid #e0e0e0",
+                        borderRadius: "4px",
+                        p: 2,
+                        minHeight: "150px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "92%",
+                      }}
+                    >
+                      <Typography sx={{ paddingTop: 3, color: "#666", mb: 2 }}>
+                        Upload Product Images
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 1,
+                          mb: 2,
+                          width: "100%",
+                          justifyContent: "center",
                         }}
-                      />
-                    )}
-                  />
-                </Box>
-                
-                {/* Sizes Section - Only shown for relevant categories */}
-                {showSizesField && (
-                  <Box sx={{ mt: 3 }}>
-                    <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                      Sizes (optional)
-                    </Typography>
-                    <Paper
+                      >
+                        {productImages.length > 0 &&
+                          productImages.map((image, index) => (
+                            <Box
+                              key={index}
+                              sx={{
+                                width: 40,
+                                height: 60,
+                                border: "1px solid #e0e0e0",
+                                borderRadius: "4px",
+                                overflow: "hidden",
+                                position: "relative",
+                              }}
+                            >
+                              <img
+                                src={URL.createObjectURL(image)}
+                                alt={`Preview ${index}`}
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                }}
+                              />
+                              <IconButton
+                                size="small"
+                                sx={{
+                                  position: "absolute",
+                                  top: 0,
+                                  right: 0,
+                                  backgroundColor: "rgba(255,255,255,0.7)",
+                                  "&:hover": {
+                                    backgroundColor: "rgba(255,255,255,0.9)",
+                                  },
+                                }}
+                                onClick={() => handleRemoveImage(index)}
+                              >
+                                <CloseIcon fontSize="small" />
+                              </IconButton>
+                            </Box>
+                          ))}
+                      </Box>
+                      <Button
+                        variant="contained"
+                        component="label"
+                        sx={{
+                          mb: 2,
+                          backgroundColor: "#00897b",
+                          "&:hover": { backgroundColor: "#00796b" },
+                          textTransform: "none",
+                          width: { xs: "100%", sm: "auto" },
+                        }}
+                      >
+                        Add Image
+                        <input
+                          type="file"
+                          hidden
+                          accept="image/*"
+                          onChange={handleImageChange}
+                        />
+                      </Button>
+                    </Box>
+
+                    {/* Product Name */}
+                    <TextField
+                      fullWidth
+                      label="Add Product name"
                       variant="outlined"
+                      value={productName}
+                      onChange={(e) => setProductName(e.target.value)}
+                      sx={{ backgroundColor: "#fff", mt: 3 }}
+                    />
+
+                    {/* Price and Stock */}
+                    <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+                      <TextField
+                        label="Price"
+                        variant="outlined"
+                        type="number"
+                        value={price < 0 ? 0 : price}
+                        onChange={(e) => setPrice(e.target.value < 0 ? 0 : e.target.value)}
+                        InputProps={{ inputProps: { min: 0 } }}
+                        sx={{ flex: 1, backgroundColor: "#fff" }}
+                      />
+                      <TextField
+                        label="Available stock"
+                        variant="outlined"
+                        type="number"
+                        value={stock < 0 ? 0 : stock}
+                        onChange={(e) => setStock(e.target.value < 0 ? 0 : e.target.value)}
+                        InputProps={{ inputProps: { min: 0 } }}
+                        sx={{ flex: 1, backgroundColor: "#fff" }}
+                      />
+                    </Box>
+
+                    {/* Brand */}
+                    <TextField
+                      fullWidth
+                      label="Brand (optional)"
+                      variant="outlined"
+                      placeholder="Enter brand name or leave empty for 'No Brand'"
+                      value={brand}
+                      onChange={(e) => setBrand(e.target.value)}
+                      sx={{ backgroundColor: "#fff", mt: 2 }}
+                    />
+
+                    {/* Categories */}
+                    <Box
                       sx={{
                         display: "flex",
-                        flexWrap: "wrap",
-                        listStyle: "none",
-                        p: 0.5,
-                        m: 0,
-                        minHeight: "50px",
+                        gap: 2,
+                        mt: 2,
+                        flexDirection: { xs: "column", sm: "row" },
                       }}
                     >
-                      {sizes.map((size) => (
-                        <Chip
-                          key={size}
-                          label={size}
-                          onDelete={() => setSizes(sizes.filter(s => s !== size))}
-                          sx={{ m: 0.5 }}
-                        />
-                      ))}
-                    </Paper>
-                    <Autocomplete
-                      freeSolo
-                      options={commonSizes.filter(size => !sizes.includes(size))}
-                      onChange={(e, value) => {
-                        if (value && !sizes.includes(value)) {
-                          setSizes([...sizes, value]);
-                        }
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
+                      <FormControl fullWidth>
+                        <InputLabel id="category-select-label">Category</InputLabel>
+                        <Select
+                          labelId="category-select-label"
+                          id="category-select"
+                          value={selectedCategory}
+                          onChange={handleCategoryChange}
+                          label="Category"
+                        >
+                          {categories.map((category) => (
+                            <MenuItem key={category.name} value={category.name}>
+                              {category.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+
+                      <FormControl fullWidth disabled={!selectedCategory}>
+                        <InputLabel id="subcategory-select-label">
+                          Subcategory
+                        </InputLabel>
+                        <Select
+                          labelId="subcategory-select-label"
+                          id="subcategory-select"
+                          value={selectedSubcategory}
+                          onChange={handleSubcategoryChange}
+                          label="Subcategory"
+                        >
+                          {currentSubcategories.map((subcategory) => (
+                            <MenuItem key={subcategory} value={subcategory}>
+                              {subcategory}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Grid>
+
+                  {/* Right Column */}
+                  <Grid xs={12} md={6}>
+                    {/* Description */}
+                    <TextField
+                      fullWidth
+                      label="Add Description"
+                      variant="outlined"
+                      multiline
+                      rows={6}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      sx={{ backgroundColor: "#fff" }}
+                    />
+
+                    {/* Colors Section */}
+                    <Box sx={{ mt: 3 }}>
+                      <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                        Colors (optional)
+                      </Typography>
+                      <Paper
+                        variant="outlined"
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          listStyle: "none",
+                          p: 0.5,
+                          m: 0,
+                          minHeight: "50px",
+                        }}
+                      >
+                        {colors.map((color) => (
+                          <Chip
+                            key={color}
+                            label={color}
+                            onDelete={() => handleDeleteColor(color)}
+                            sx={{ m: 0.5 }}
+                          />
+                        ))}
+                      </Paper>
+                      <Autocomplete
+                        freeSolo
+                        options={commonColors.filter(color => !colors.includes(color))}
+                        value={newColor}
+                        onChange={(e, value) => {
+                          if (value && !colors.includes(value)) {
+                            setColors([...colors, value]);
+                            setNewColor("");
+                          }
+                        }}
+                        inputValue={newColor}
+                        onInputChange={(e, value) => setNewColor(value)}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            variant="outlined"
+                            label="Add color"
+                            size="small"
+                            sx={{ mt: 1 }}
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                handleAddColor();
+                                e.preventDefault();
+                              }
+                            }}
+                          />
+                        )}
+                      />
+                    </Box>
+                    
+                    {/* Sizes Section - Only shown for relevant categories */}
+                    {showSizesField && (
+                      <Box sx={{ mt: 3 }}>
+                        <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                          Sizes (optional)
+                        </Typography>
+                        <Paper
                           variant="outlined"
-                          label="Add size"
-                          size="small"
-                          sx={{ mt: 1 }}
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter' && e.target.value && !sizes.includes(e.target.value)) {
-                              setSizes([...sizes, e.target.value]);
-                              e.preventDefault();
+                          sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            listStyle: "none",
+                            p: 0.5,
+                            m: 0,
+                            minHeight: "50px",
+                          }}
+                        >
+                          {sizes.map((size) => (
+                            <Chip
+                              key={size}
+                              label={size}
+                              onDelete={() => setSizes(sizes.filter(s => s !== size))}
+                              sx={{ m: 0.5 }}
+                            />
+                          ))}
+                        </Paper>
+                        <Autocomplete
+                          freeSolo
+                          options={commonSizes.filter(size => !sizes.includes(size))}
+                          onChange={(e, value) => {
+                            if (value && !sizes.includes(value)) {
+                              setSizes([...sizes, value]);
                             }
                           }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              variant="outlined"
+                              label="Add size"
+                              size="small"
+                              sx={{ mt: 1 }}
+                              onKeyPress={(e) => {
+                                if (e.key === 'Enter' && e.target.value && !sizes.includes(e.target.value)) {
+                                  setSizes([...sizes, e.target.value]);
+                                  e.preventDefault();
+                                }
+                              }}
+                            />
+                          )}
                         />
-                      )}
-                    />
-                  </Box>
-                )}
-              </Grid>
+                      </Box>
+                    )}
+                  </Grid>
+                </Grid>
+                
+                {/* Submit Button */}
+                <Button
+                  variant="contained"
+                  onClick={handleSubmit}
+                  disabled={isLoading}
+                  sx={{
+                    mt: 4,
+                    backgroundColor: "#00897b",
+                    "&:hover": { backgroundColor: "#00796b" },
+                    textTransform: "none",
+                    width: { xs: "100%", sm: "auto" },
+                  }}
+                >
+                  {isLoading ? <CircularProgress size={24} color="inherit" /> : "Upload Product"}
+                </Button>
+              </Box>
             </Grid>
-            
-            {/* Submit Button */}
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              disabled={isLoading}
-              sx={{
-                mt: 4,
-                backgroundColor: "#00897b",
-                "&:hover": { backgroundColor: "#00796b" },
-                textTransform: "none",
-                width: { xs: "100%", sm: "auto" },
-              }}
+          </Grid>
+          
+          {/* Snackbar for notifications */}
+          <Snackbar 
+            open={snackbar.open} 
+            autoHideDuration={6000} 
+            onClose={handleSnackbarClose}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          >
+            <Alert 
+              onClose={handleSnackbarClose} 
+              severity={snackbar.severity} 
+              sx={{ width: "100%" }}
             >
-              {isLoading ? <CircularProgress size={24} color="inherit" /> : "Upload Product"}
-            </Button>
-          </Box>
-        </Grid>
-      </Grid>
-      
-      {/* Snackbar for notifications */}
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={6000} 
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity={snackbar.severity} 
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
+        </Paper>
+      </Box>
     </Box>
   );
 };

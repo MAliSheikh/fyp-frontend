@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Box, TextField, Typography } from "@mui/material";
+import { Box, TextField, Typography, IconButton, useTheme, useMediaQuery } from "@mui/material";
 import { SideBar } from "../seller/sidebar";
 import axiosInstance from "../components/axiosInstance";
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const userId = localStorage.getItem("userId"); // Assuming user_id is stored in localStorage
 
   useEffect(() => {
@@ -96,29 +100,56 @@ const OrdersPage = () => {
     }
   };
 
-
-
   return (
-    <Box display="flex" sx={{ height: "100vh",p:2 }}>
+    <Box display="flex" sx={{ height: "100vh", p: 2 }}>
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <IconButton
+          onClick={() => setIsSidebarOpen(true)}
+          sx={{
+            position: 'fixed',
+            top: 16,
+            right: 16,
+            zIndex: 1200,
+            bgcolor: '#119994',
+            color: 'white',
+            '&:hover': {
+              bgcolor: '#0d7b76',
+            },
+          }}
+        >
+          <MenuOpenIcon />
+        </IconButton>
+      )}
+
       {/* Sidebar */}
-      <Box
-        sx={{
-          width: { xs: "0", md: "20%" },
-          display: { xs: "none", md: "block" }
-        }}
-      >
-        <SideBar />
-      </Box>
+      {isMobile ? (
+        isSidebarOpen && (
+          <SideBar 
+            isMobile={true} 
+            onClose={() => setIsSidebarOpen(false)} 
+          />
+        )
+      ) : (
+        <Box
+          sx={{
+            width: "250px",
+            display: { xs: "none", md: "block" }
+          }}
+        >
+          <SideBar isMobile={false} />
+        </Box>
+      )}
 
       {/* Main Content */}
       <Box
         sx={{
           flex: 1,
           p: { xs: 2, md: 3 },
-          width: "75%",
-          ml:1,
+          width: { xs: "100%", md: "75%" },
+          ml: { xs: 0, md: 1 },
           maxWidth: "1200px",
-          overflow: { xs: "auto", md: "hidden" } // Only enable scrolling on small screens
+          overflow: { xs: "auto", md: "hidden" }
         }}
       >
         <Typography variant="h6" sx={{ mb: 3 }}>

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, IconButton, Drawer } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import authService from "../components/LoginSignup/components/token";
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 
-export const SideBar = () => {
+export const SideBar = ({ isMobile, onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
@@ -35,21 +37,31 @@ export const SideBar = () => {
     "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
   });
 
-  return (
+  const SidebarContent = () => (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        position: { sm: "sticky" },
-        top: { sm: 16 },
         width: "250px",
-        mt: 5,
+        mt: isMobile ? 0 : 5,
+        p: isMobile ? 2 : 0,
       }}
     >
+      {isMobile && (
+        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+          <IconButton onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      )}
+
       <Button
         variant="contained"
-        onClick={() => navigate("/dashboard")}
+        onClick={() => {
+          navigate("/dashboard");
+          if (isMobile) onClose();
+        }}
         sx={getButtonStyle("/dashboard")}
       >
         Dashboard
@@ -57,7 +69,10 @@ export const SideBar = () => {
 
       <Button
         variant="contained"
-        onClick={() => navigate("/seller/upload-product")}
+        onClick={() => {
+          navigate("/seller/upload-product");
+          if (isMobile) onClose();
+        }}
         sx={getButtonStyle("/seller/upload-product")}
       >
         Upload Product
@@ -66,7 +81,10 @@ export const SideBar = () => {
       <Button
         variant="contained"
         sx={getButtonStyle("/manageproducts")}
-        onClick={() => navigate("/manageproducts")}
+        onClick={() => {
+          navigate("/manageproducts");
+          if (isMobile) onClose();
+        }}
       >
         Manage Products
       </Button>
@@ -74,7 +92,10 @@ export const SideBar = () => {
       <Button
         variant="contained"
         sx={getButtonStyle("/orders")}
-        onClick={() => navigate("/orders")}
+        onClick={() => {
+          navigate("/orders");
+          if (isMobile) onClose();
+        }}
       >
         Orders
       </Button>
@@ -102,12 +123,18 @@ export const SideBar = () => {
             <Button
               variant="contained"
               sx={getButtonStyle("/mall")}
-              onClick={() => navigate("/mall")}
+              onClick={() => {
+                navigate("/mall");
+                if (isMobile) onClose();
+              }}
             >
               Mall
             </Button>
             <Button
-              onClick={() => navigate("/store_info")}
+              onClick={() => {
+                navigate("/store_info");
+                if (isMobile) onClose();
+              }}
               variant="contained"
               sx={getButtonStyle("/store_info")}
             >
@@ -120,7 +147,10 @@ export const SideBar = () => {
         <Button
           variant="contained"
           sx={getButtonStyle("/mall")}
-          onClick={() => navigate("/mall")}
+          onClick={() => {
+            navigate("/mall");
+            if (isMobile) onClose();
+          }}
         >
           Mall
         </Button>
@@ -128,7 +158,10 @@ export const SideBar = () => {
 
       {localStorage.getItem("store_id")!=='null' && localStorage.getItem("mall_id")==="null" && (
         <Button
-          onClick={() => navigate("/store_info")}
+          onClick={() => {
+            navigate("/store_info");
+            if (isMobile) onClose();
+          }}
           variant="contained"
           sx={getButtonStyle("/store_info")}
         >
@@ -149,10 +182,31 @@ export const SideBar = () => {
         onClick={() => {
           authService.logout();
           navigate("/");
+          if (isMobile) onClose();
         }}
       >
         Sign Out
       </Button>
     </Box>
   );
+
+  if (isMobile) {
+    return (
+      <Drawer
+        anchor="right"
+        open={true}
+        onClose={onClose}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: '280px',
+            boxSizing: 'border-box',
+          },
+        }}
+      >
+        <SidebarContent />
+      </Drawer>
+    );
+  }
+
+  return <SidebarContent />;
 };

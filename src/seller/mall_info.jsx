@@ -11,8 +11,12 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Paper,
+  Grid,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
-import Grid from "@mui/material/Grid2"; // Import Grid2
+import Grid2 from "@mui/material/Grid2"; // Import Grid2
 import { SideBar } from "./sidebar";
 import { createStoreAndMall, fetchMallOptions } from "./seller";
 import { MenuItem as MuiMenuItem } from "@mui/material";
@@ -20,6 +24,7 @@ import authService from "../components/LoginSignup/components/token";
 import { useNavigate } from "react-router-dom";
 import axios from "axios"; // Ensure axios is imported
 import CloseIcon from '@mui/icons-material/Close'; // Import CloseIcon
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 
 const MallInfo = () => {
   const [mallName, setMallName] = useState("");
@@ -39,6 +44,11 @@ const MallInfo = () => {
   const [modalOpen, setModalOpen] = useState(false); // State for modal visibility
   const [currentStoreData, setCurrentStoreData] = useState(null); // State for current store data
   const [phoneNumber, setPhoneNumber] = useState(""); // New state for phone number
+  const [selectedMall, setSelectedMall] = useState("");
+  const [totalFloors, setTotalFloors] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const navigate = useNavigate();
 
@@ -279,32 +289,62 @@ const MallInfo = () => {
   const isDataAvailable = currentStoreData !== null; // Check if data is available
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ p: 1 }}>
-      <Grid container spacing={8}>
-        {/* Sidebar - width: 4 columns */}
-        {/* <Grid xs={12} sm={4} md={2}> */}
-        <Box
+    <Box display="flex" sx={{ p: 2 }}>
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <IconButton
+          onClick={() => setIsSidebarOpen(true)}
           sx={{
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            p: 1,
-            gap: 5,
+            position: 'fixed',
+            top: 16,
+            right: 16,
+            zIndex: 1200,
+            bgcolor: '#119994',
+            color: 'white',
+            '&:hover': {
+              bgcolor: '#0d7b76',
+            },
           }}
         >
-          <SideBar />
-        </Box>
-        {/* </Grid> */}
+          <MenuOpenIcon />
+        </IconButton>
+      )}
 
-        {/* Mall Content - width: 8 columns */}
-        <Grid xs={12} sm={8} md={10}>
+      {/* Sidebar */}
+      {isMobile ? (
+        isSidebarOpen && (
+          <SideBar 
+            isMobile={true} 
+            onClose={() => setIsSidebarOpen(false)} 
+          />
+        )
+      ) : (
+        <Box
+          sx={{
+            width: "250px",
+            display: { xs: "none", md: "block" }
+          }}
+        >
+          <SideBar isMobile={false} />
+        </Box>
+      )}
+
+      {/* Main Content */}
           <Box
             sx={{
-              width: { lg: "100%", md: "100%", xs: "100%" },
-              margin: "0 auto",
-            }}
-          >
-            {/* <Paper sx={{ p: 3}}> */}
+          flex: 1,
+          p: { xs: 2, md: 3 },
+          top:2,
+          width: { xs: "100%", md: "75%" },
+          ml: { xs: 0, md: 1 },
+          maxWidth: "1200px",
+          overflow: { xs: "auto", md: "hidden" }
+        }}
+      >
+        <Paper elevation={3} sx={{ p: 5, borderRadius: 2 }}>
+          <Grid container spacing={3}>
             {/* Mall Information Section */}
+            <Grid xs={12}>
             <Typography variant="h5" gutterBottom sx={{ mt: { xs: 2, sm: 0 } }}>
               Add Mall Information
             </Typography>
@@ -381,7 +421,7 @@ const MallInfo = () => {
                   value={floorNo}
                   onChange={(e) => setFloorNo(e.target.value)}
                   label="Floor Number"
-                  disabled={!mallName || availableFloors.length === 0}
+                    disabled={!mallName || availableFloors.length === 0}
                   sx={{
                     height: "56px",
                     "& .MuiSelect-select": {
@@ -486,23 +526,23 @@ const MallInfo = () => {
                   alignItems: "center",
                   justifyContent: "center",
                   overflow: "hidden",
-                  position: "relative"
-                }}
-              >
-                {image && typeof image === 'string' && (
-                  <img
-                    src={image}
-                    alt="Store"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0
-                    }}
-                  />
-                )}
+                    position: "relative"
+                  }}
+                >
+                  {image && typeof image === 'string' && (
+                    <img
+                      src={image}
+                      alt="Store"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0
+                      }}
+                    />
+                  )}
                 <input
                   type="file"
                   accept="image/*"
@@ -517,11 +557,11 @@ const MallInfo = () => {
                     sx={{
                       backgroundColor: "#119994",
                       "&:hover": { backgroundColor: "#0d7b76" },
-                      position: "relative",
-                      zIndex: 1
+                        position: "relative",
+                        zIndex: 1
                     }}
                   >
-                    {image ? (typeof image === 'string' ? 'Change Image' : image.name) : "Upload Image"}
+                      {image ? (typeof image === 'string' ? 'Change Image' : image.name) : "Upload Image"}
                   </Button>
                 </label>
               </Box>
@@ -544,11 +584,10 @@ const MallInfo = () => {
                 {loading ? <CircularProgress size={24} /> : "Submit"}
               </Button>
             )}
-            {/* </Paper> */}
-          </Box>
         </Grid>
       </Grid>
-
+        </Paper>
+      </Box>
 
       {/* Modal for editing */}
       <Modal open={modalOpen} onClose={handleModalClose}>
