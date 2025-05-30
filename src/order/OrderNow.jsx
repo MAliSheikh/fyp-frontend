@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Box,
@@ -40,6 +40,34 @@ const OrderNow = () => {
     message: "",
     severity: "success",
   });
+  const [address, setAddress] = useState(null);
+  const [addressLoading, setAddressLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAddress = async () => {
+      setAddressLoading(true);
+      try {
+        const token = localStorage.getItem("access_token");
+        const userId = parseInt(localStorage.getItem("userId"));
+        const response = await axiosInstance.get(`/address/user/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (response.data && response.data.addresses && response.data.addresses.length > 0) {
+          setAddress(response.data.addresses[0]);
+        } else {
+          setAddress(null);
+        }
+      } catch (error) {
+        setAddress(null);
+      } finally {
+        setAddressLoading(false);
+      }
+    };
+    fetchAddress();
+  }, []);
 
   // Redirect if no items
   if (!orderItems.length) {
@@ -160,7 +188,7 @@ const OrderNow = () => {
       <Grid container spacing={4}>
         {/* Order Items Section */}
         <Grid item xs={12} md={8}>
-          <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+          <Paper elevation={3} sx={{ p: 3, mb: 3, height: '47%' }}>
             <Typography variant="h6" gutterBottom>
               Selected Items
             </Typography>
@@ -201,7 +229,7 @@ const OrderNow = () => {
 
         {/* Order Summary Section */}
         <Grid item xs={12} md={4}>
-          <Paper elevation={3} sx={{ p: 3, position: "sticky", top: 20 }}>
+          <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
             <Typography variant="h6" gutterBottom>
               Order Summary
             </Typography>
@@ -231,7 +259,7 @@ const OrderNow = () => {
               variant="contained"
               size="large"
               onClick={handlePlaceOrder}
-              disabled={loading}
+              disabled={loading || !address}
               sx={{
                 bgcolor: "#009688",
                 "&:hover": { bgcolor: "#00796b" },
@@ -244,6 +272,53 @@ const OrderNow = () => {
                 "Place Order"
               )}
             </Button>
+          </Paper>
+
+          {/* Address Details Section */}
+          <Paper elevation={3} sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Address Details
+            </Typography>
+            {addressLoading ? (
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <CircularProgress />
+              </Box>
+            ) : address ? (
+              <>
+                <Typography variant="body1" gutterBottom>
+                  <strong>State:</strong> {address.state}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>City:</strong> {address.city}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Full Address:</strong> {address.full_address}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Zip Code:</strong> {address.zip_code}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Phone:</strong> {address.phone_no}
+                </Typography>
+              </>
+            ) : (
+              <Box sx={{ textAlign: "center" }}>
+                <Typography variant="body1" color="error" gutterBottom>
+                  No address found. Please add an address.
+                </Typography>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate("/address")}
+                  sx={{
+                    mt: 2,
+                    bgcolor: "#26A69A",
+                    "&:hover": { bgcolor: "#219688" },
+                  }}
+                >
+                  Add Address
+                </Button>
+              </Box>
+            )}
           </Paper>
         </Grid>
       </Grid>
