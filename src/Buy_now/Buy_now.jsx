@@ -232,7 +232,7 @@ const BuyNowPage = () => {
                 fullWidth
                 variant="contained"
                 onClick={handlePlaceOrder}
-                disabled={loading}
+                disabled={loading || !address} // Add !address condition
                 sx={{
                   bgcolor: "#26A69A",
                   "&:hover": { bgcolor: "#219688" },

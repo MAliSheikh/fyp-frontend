@@ -29,7 +29,8 @@ const AddressInputPage = () => {
     const fetchAddress = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get(`http://localhost:8000/address/user/2`);
+        const userId = parseInt(localStorage.getItem("userId"))
+        const response = await axios.get(`http://localhost:8000/address/user/${userId}`);
         if (response.data && response.data.addresses && response.data.addresses.length > 0) {
           setAddress(response.data.addresses[0]);
           setIsEditing(false);
