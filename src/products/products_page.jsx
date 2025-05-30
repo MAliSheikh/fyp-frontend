@@ -189,8 +189,17 @@ const Products = () => {
       // Store the recommendations data
       setRecommendedProducts(response);
 
+      // Store only essential data in localStorage
+      const essentialData = response.map(product => ({
+        product_id: product.product_id,
+        name: product.name,
+        price: product.price,
+        average_rating: product.average_rating,
+        image_url: product.image_url
+      }));
+
       // Store in localStorage for the recommendations page
-      localStorage.setItem("recommendedProducts", JSON.stringify(response));
+      localStorage.setItem("recommendedProducts", JSON.stringify(essentialData));
       localStorage.setItem("recommendationsPage", "0"); // Track current page
       localStorage.setItem("recommendationsTotal", response.length.toString()); // Store total count
     } catch (error) {
