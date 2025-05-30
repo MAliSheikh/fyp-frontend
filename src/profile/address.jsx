@@ -82,8 +82,10 @@ const AddressInputPage = () => {
       });
 
       console.log("Address submitted successfully:", response.data);
-      navigate("/profile", { state: address });
       setIsSubmitted(true); // Set submission status to true
+      setTimeout(() => {
+        navigate(-1); // Navigate back to previous page
+      }, 500); // Wait 1.5 seconds to show success message before navigating
     } catch (error) {
       console.error("Error submitting address:", error);
       alert("Failed to submit address. Please try again.");
