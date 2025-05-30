@@ -37,6 +37,10 @@ const Reviews = ({ productId, storeId, reviews }) => {
       return;
     }
 
+    console.log('Current review data:', reviewData);
+    console.log('Has reviewed:', hasReviewed);
+    console.log('Is submitting:', isSubmitting);
+
     setIsSubmitting(true);
     try {
       const reviewPayload = {
@@ -61,6 +65,7 @@ const Reviews = ({ productId, storeId, reviews }) => {
       setData(prevData => [...prevData, response.data]);
       setSnackbar({ open: true, message: 'Review submitted successfully!', severity: 'success' });
       setReviewData({ rating: 0, comment: '' });
+      setHasReviewed(true);
 
     } catch (error) {
       console.error('Error submitting review:', error);
@@ -78,8 +83,10 @@ const Reviews = ({ productId, storeId, reviews }) => {
         const response = await axios.get(`http://localhost:8000/reviews/product/${productId}`);
         if (Array.isArray(response.data)) {
           setData(response.data);
-          const reviewedProduct = response.data.find(review => review.store_id === storeId);
-          setHasReviewed(!!reviewedProduct);
+          // Check if the current user has already reviewed this product
+          const userReview = response.data.find(review => review.user_id === parseInt(userId));
+          setHasReviewed(!!userReview);
+          console.log('User has reviewed:', !!userReview);
         }
       } catch (error) {
         console.error('Error fetching reviews:', error);
@@ -89,7 +96,7 @@ const Reviews = ({ productId, storeId, reviews }) => {
     };
 
     fetchReviews();
-  }, [productId, storeId]);
+  }, [productId, storeId, userId]);
 
   if (isLoading) {
     return (
@@ -126,14 +133,14 @@ const Reviews = ({ productId, storeId, reviews }) => {
           <Button 
             variant="contained" 
             onClick={handleSubmitReview}
-            disabled={!reviewData.rating || !reviewData.comment || isSubmitting || hasReviewed}
+            disabled={isSubmitting || hasReviewed}
             sx={{
               alignSelf: 'flex-end',
               bgcolor: "#009688",
               "&:hover": { bgcolor: "#00796b" },
             }}
           >
-            {isSubmitting ? <CircularProgress size={24} /> : 'Submit Review'}
+            {isSubmitting ? <CircularProgress size={24} /> : hasReviewed ? 'Already Reviewed' : 'Submit Review'}
           </Button>
         </Stack>
       </Paper>

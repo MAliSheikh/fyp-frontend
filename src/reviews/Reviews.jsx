@@ -181,10 +181,10 @@ const Reviews = ({ productId }) => {
               <Button
                 variant="contained"
                 onClick={handleSubmitReview}
-                disabled={rating === 0 || !comment}
+                disabled={loading}
                 sx={{ alignSelf: "flex-end" }}
               >
-                Submit Review
+                {loading ? <CircularProgress size={24} /> : "Submit Review"}
               </Button>
             </Stack>
           </Paper>
