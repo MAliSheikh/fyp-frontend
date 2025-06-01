@@ -52,7 +52,7 @@ const Footer = () => {
   return (
     <FooterContainer>
       <Container maxWidth="lg">
-        <Grid container spacing={4}>
+        <Grid container spacing={25}>
           {/* Help & Information */}
           <Grid item xs={12} sm={4}>
             <SectionTitle variant="h6">
