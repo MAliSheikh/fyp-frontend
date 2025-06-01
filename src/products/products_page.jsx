@@ -223,7 +223,7 @@ const Products = () => {
   }, []); // Empty dependency array ensures this runs only once
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" >
       {/* Banner Slider */}
       <Box sx={{ mt: 1, mb: 4 }}>
         <BannerSlider />
@@ -282,6 +282,7 @@ const Products = () => {
                 onClick={handleLoadMore}
                 disabled={loadingMore}
                 sx={{
+                  mb:13,
                   height: 45,
                   textTransform: "none",
                   bgcolor: "#26A69A",

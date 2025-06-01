@@ -227,7 +227,7 @@ const UploadProduct = () => {
   };
 
   return (
-    <Box display="flex" sx={{ p: 2 }}>
+    <Box display="flex" sx={{ p: 2, mb:10 }}>
       {/* Mobile Menu Button */}
       {isMobile && (
         <IconButton

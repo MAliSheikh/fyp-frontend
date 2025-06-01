@@ -101,7 +101,7 @@ const OrdersPage = () => {
   };
 
   return (
-    <Box display="flex" sx={{ height: "100vh", p: 2 }}>
+    <Box display="flex" sx={{ height: "100vh", p: 2, mb:15 }}>
       {/* Mobile Menu Button */}
       {isMobile && (
         <IconButton

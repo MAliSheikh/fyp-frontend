@@ -289,7 +289,7 @@ const MallInfo = () => {
   const isDataAvailable = currentStoreData !== null; // Check if data is available
 
   return (
-    <Box display="flex" sx={{ p: 2 }}>
+    <Box display="flex" sx={{ p: 2, mb:10 }}>
       {/* Mobile Menu Button */}
       {isMobile && (
         <IconButton

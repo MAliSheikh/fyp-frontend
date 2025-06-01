@@ -81,7 +81,7 @@ const ManageProducts = () => {
   );
 
   return (
-    <Box display="flex" sx={{ p: 2 }}>
+    <Box display="flex" sx={{ p: 2, mb:14 }}>
       {/* Mobile Menu Button */}
       {isMobile && (
         <IconButton
