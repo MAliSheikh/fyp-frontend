@@ -62,15 +62,16 @@ const AddToCartPage = () => {
   }
 
   const handleCheckboxChange = (item) => {
+    console.log("Checkbox clicked for item:", item);
     setSelectedItems((prev) => {
       const isSelected = prev.some(
         (selected) => selected.item_id === item.item_id
       );
-      if (isSelected) {
-        return prev.filter((selected) => selected.item_id !== item.item_id);
-      } else {
-        return [...prev, item];
-      }
+      const newSelectedItems = isSelected
+        ? prev.filter((selected) => selected.item_id !== item.item_id)
+        : [...prev, item];
+      console.log("New selected items:", newSelectedItems);
+      return newSelectedItems;
     });
   };
 
@@ -157,17 +158,32 @@ const AddToCartPage = () => {
   };
 
   const handleCheckout = () => {
+    console.log("Checkout clicked. Selected items:", selectedItems);
     if (selectedItems.length === 0) {
-      alert("Please select at least one item to proceed.");
+      setSnackbar({
+        open: true,
+        message: "Please select at least one item to proceed.",
+        severity: "warning"
+      });
       return;
     }
-    const totalAmount = calculateSelectedSubtotal();
-    navigate("/order-now", {
-      state: {
-        orderItems: selectedItems,
-        totalAmount: totalAmount,
-      },
-    });
+    try {
+      const totalAmount = calculateSelectedSubtotal();
+      console.log("Navigating to order-now with:", { orderItems: selectedItems, totalAmount });
+      navigate("/order-now", {
+        state: {
+          orderItems: selectedItems,
+          totalAmount: totalAmount,
+        },
+      });
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      setSnackbar({
+        open: true,
+        message: "Error during checkout. Please try again.",
+        severity: "error"
+      });
+    }
   };
 
   const handleCloseSnackbar = () => {
@@ -184,7 +200,7 @@ const AddToCartPage = () => {
 
   return (
     <Box sx={{ px: { xs: 2, md: 10 }, py: 5 }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom sx={{ fontSize: { xs: '1.5rem', md: '2rem' } }}>
         Add to Cart
       </Typography>
 
@@ -206,36 +222,41 @@ const AddToCartPage = () => {
               sx={{
                 border: "1px solid #ddd",
                 borderRadius: "8px",
-                p: 2,
+                p: { xs: 1, md: 2 },
                 mb: 2,
                 display: "flex",
-                alignItems: "center",
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: { xs: "flex-start", sm: "center" },
+                gap: { xs: 2, sm: 0 },
               }}
             >
-              {/* Checkbox */}
-              <Checkbox
-                checked={selectedItems.some(
-                  (selected) => selected.item_id === item.item_id
-                )}
-                onChange={() => handleCheckboxChange(item)}
-              />
-
-              {/* Product image */}
-              <img
-                src={item.image}
-                alt={item.name}
-                style={{
-                  width: "100px",
-                  height: "100px",
-                  objectFit: "cover",
-                  borderRadius: "8px",
-                  marginRight: "16px",
-                  marginLeft: "10px",
-                }}
-              />
+              {/* Checkbox and Image Container */}
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Checkbox
+                  checked={selectedItems.some(
+                    (selected) => selected.item_id === item.item_id
+                  )}
+                  onChange={() => handleCheckboxChange(item)}
+                />
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
+                />
+              </Box>
 
               {/* Product details */}
-              <Box sx={{ flexGrow: 1, marginLeft: 3 }}>
+              <Box sx={{ 
+                flexGrow: 1, 
+                ml: { xs: 0, sm: 3 },
+                width: { xs: "100%", sm: "auto" },
+                mt: { xs: 2, sm: 0 }
+              }}>
                 <Typography variant="subtitle1" fontWeight="500">
                   {item.name}
                 </Typography>
@@ -243,12 +264,11 @@ const AddToCartPage = () => {
 
                 {/* Display brand if available */}
                 {item.brand && (
-                  <Box sx={{ mt: 1 }}>
+                  <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
                     <Button
                       variant="outlined"
                       size="small"
                       sx={{
-                        mr: 1,
                         fontSize: "0.75rem",
                         pointerEvents: "none",
                         textTransform: "uppercase",
@@ -264,12 +284,11 @@ const AddToCartPage = () => {
 
                 {/* Display colors if available */}
                 {item.colors && item.colors.length > 0 && (
-                  <Box sx={{ mt: 1 }}>
+                  <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
                     <Button
                       variant="outlined"
                       size="small"
                       sx={{
-                        mr: 1,
                         fontSize: "0.75rem",
                         pointerEvents: "none",
                         textTransform: "uppercase",
@@ -285,12 +304,11 @@ const AddToCartPage = () => {
 
                 {/* Display sizes if available */}
                 {item.sizes && item.sizes.length > 0 && (
-                  <Box sx={{ mt: 1 }}>
+                  <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
                     <Button
                       variant="outlined"
                       size="small"
                       sx={{
-                        mr: 1,
                         fontSize: "0.75rem",
                         pointerEvents: "none",
                         textTransform: "uppercase",
@@ -323,7 +341,14 @@ const AddToCartPage = () => {
               </Box>
 
               {/* Delete button */}
-              <IconButton onClick={() => handleDeleteItem(item)} color="error">
+              <IconButton 
+                onClick={() => handleDeleteItem(item)} 
+                color="error"
+                sx={{ 
+                  alignSelf: { xs: "flex-end", sm: "center" },
+                  mt: { xs: -6, sm: 0 }
+                }}
+              >
                 <DeleteIcon />
               </IconButton>
             </Box>
@@ -335,9 +360,12 @@ const AddToCartPage = () => {
               borderTop: "1px solid #ddd",
               mt: 3,
               pt: 2,
+              mb: 12,
               display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
               justifyContent: "space-between",
-              alignItems: "center",
+              alignItems: { xs: "stretch", sm: "center" },
+              gap: { xs: 2, sm: 0 }
             }}
           >
             <Box>
@@ -351,10 +379,19 @@ const AddToCartPage = () => {
                 textTransform: "none",
                 bgcolor: "#26A69A",
                 "&:hover": { bgcolor: "#219688" },
+                opacity: selectedItems.length === 0 ? 0.7 : 1,
+                pointerEvents: selectedItems.length === 0 ? "none" : "auto",
+                cursor: selectedItems.length === 0 ? "not-allowed" : "pointer",
+                width: { xs: "100%", sm: "auto" }
               }}
-              onClick={handleCheckout}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleCheckout();
+              }}
+              disabled={selectedItems.length === 0}
             >
-              Checkout
+              {selectedItems.length === 0 ? "Select Items to Checkout" : "Checkout"}
             </Button>
           </Box>
         </>
