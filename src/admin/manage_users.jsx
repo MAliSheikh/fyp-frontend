@@ -93,7 +93,7 @@ const ManageUsers = () => {
   };
 
   return (
-    <Box display="flex" sx={{ height: "100vh", p: 2 }}>
+    <Box display="flex" sx={{ height: "100vh", p: 2, mb:10 }}>
       <Box
         sx={{
           flex: 1,
