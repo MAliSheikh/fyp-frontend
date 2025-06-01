@@ -55,6 +55,27 @@ const AdminDashboard = () => {
 
   // Convert object data to array format for charts
   const formatChartData = (data) => {
+    if (data === dashboardData.weekly_sales) {
+      // Define the order of days
+      const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      return dayOrder.map(day => {
+        const value = data[day];
+        if (typeof value === 'object' && value !== null) {
+          return { name: day, value: value.total_sales };
+        }
+        return { name: day, value: value };
+      });
+    }
+    
+    if (data === dashboardData.weekly_orders) {
+      // Define the order of days
+      const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      return dayOrder.map(day => ({
+        name: day,
+        value: data[day] || 0
+      }));
+    }
+    
     return Object.entries(data).map(([name, value]) => {
       if (typeof value === 'object' && value !== null) {
         if (value.total_sales !== undefined) {
@@ -121,20 +142,32 @@ const AdminDashboard = () => {
                 </Typography>
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={formatChartData(dashboardData.weekly_sales)}>
-                    <XAxis dataKey="name" axisLine={false} tick={false} />
+                    <XAxis 
+                      dataKey="name" 
+                      axisLine={false} 
+                      tickLine={false}
+                      stroke="black"
+                      interval={0}
+                      angle={-55}
+                      textAnchor="end"
+                      height={60}
+                      tick={{ fontSize: 11 }}
+                    />
                     <YAxis hide={true} />
-                    <Tooltip />
-                    <Bar dataKey="value" fill="#4CAF50" radius={[5, 5, 0, 0]} barSize="4%">
-                      <LabelList
-                        dataKey="name"
-                        position="bottom"
-                        offset={5}
-                        style={{ fill: "#333", fontSize: 12 }}
-                        formatter={(value) => value.substring(0, 3)}
-                    minPointSize={3}
-
-                      />
-                    </Bar>
+                    <Tooltip 
+                      formatter={(value) => [`PKR ${value}`, 'Sales']}
+                      contentStyle={{
+                        backgroundColor: "rgba(255, 255, 255, 0.9)",
+                        borderRadius: "4px",
+                        padding: "8px",
+                      }}
+                    />
+                    <Bar 
+                      dataKey="value" 
+                      fill="#4CAF50" 
+                      radius={[5, 5, 0, 0]} 
+                      barSize="4%"
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </Paper>
@@ -148,15 +181,37 @@ const AdminDashboard = () => {
                 </Typography>
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={formatChartData(dashboardData.weekly_orders)}>
-                    <XAxis dataKey="name" axisLine={false} tick={false} />
+                    <XAxis 
+                      dataKey="name" 
+                      axisLine={false} 
+                      tickLine={false}
+                      stroke="black"
+                      interval={0}
+                      angle={-55}
+                      textAnchor="end"
+                      height={60}
+                      tick={{ fontSize: 11 }}
+                    />
                     <YAxis hide={true} />
-                    <Tooltip />
-                    <Bar dataKey="value" fill="#FFD166" radius={[5, 5, 0, 0]} barSize="4%">
+                    <Tooltip 
+                      formatter={(value) => [`${value} orders`, 'Orders']}
+                      contentStyle={{
+                        backgroundColor: "rgba(255, 255, 255, 0.9)",
+                        borderRadius: "4px",
+                        padding: "8px",
+                      }}
+                    />
+                    <Bar 
+                      dataKey="value" 
+                      fill="#FFD166" 
+                      radius={[5, 5, 0, 0]} 
+                      barSize="4%"
+                    >
                       <LabelList
                         dataKey="value"
-                        position="bottom"
+                        position="top"
                         offset={5}
-                        style={{ fill: "#333", fontSize: 12 }}
+                        style={{ fill: "#333", fontSize: 11 }}
                       />
                     </Bar>
                   </BarChart>
@@ -172,10 +227,35 @@ const AdminDashboard = () => {
                 </Typography>
                 <ResponsiveContainer width="100%" height={180}>
                   <LineChart data={formatChartData(dashboardData.monthly_sales)}>
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} stroke="black" fontSize={12} />
+                    <XAxis 
+                      dataKey="name" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      stroke="black" 
+                      fontSize={12}
+                      interval={0}
+                      angle={-45}
+                      textAnchor="end"
+                      height={60}
+                      tick={{ fontSize: 11 }}
+                    />
                     <YAxis hide={true} />
-                    <Tooltip formatter={(value) => [`PKR ${value}`, 'Sales']} />
-                    <Line type="monotone" dataKey="value" stroke="#9C27B0" strokeWidth={2} />
+                    <Tooltip 
+                      formatter={(value) => [`PKR ${value}`, 'Sales']}
+                      contentStyle={{
+                        backgroundColor: "rgba(255, 255, 255, 0.9)",
+                        borderRadius: "4px",
+                        padding: "8px",
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#9C27B0" 
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </Paper>
