@@ -624,6 +624,7 @@ const UploadProduct = () => {
                   disabled={isLoading}
                   sx={{
                     mt: 4,
+                    mb: 13,
                     backgroundColor: "#00897b",
                     "&:hover": { backgroundColor: "#00796b" },
                     textTransform: "none",
