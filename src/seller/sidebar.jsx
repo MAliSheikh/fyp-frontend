@@ -177,7 +177,7 @@ export const SideBar = ({ isMobile, onClose }) => {
           width: "100%",
           backgroundColor: "#ffffff",
           color: "grey",
-          "&:hover": { backgroundColor: "red", color: "#ffffff" },
+          "&:hover": { backgroundColor: "#0d7b76", color: "#ffffff" },
         }}
         onClick={() => {
           authService.logout();

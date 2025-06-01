@@ -188,7 +188,7 @@ const OrderNow = () => {
       <Grid container spacing={4}>
         {/* Order Items Section */}
         <Grid item xs={12} md={8}>
-          <Paper elevation={3} sx={{ p: 3, mb: 3, height: '47%' }}>
+          <Paper elevation={3} sx={{ p: 3, mb: 3, height: 'auto' }}>
             <Typography variant="h6" gutterBottom>
               Selected Items
             </Typography>
