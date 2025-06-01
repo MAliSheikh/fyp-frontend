@@ -231,9 +231,21 @@ const SalesChart = () => {
                     axisLine={false}
                     tickLine={false}
                     stroke="black"
+                    tick={{ fontSize: 12 }}
+                    interval={0}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
                   />
                   <YAxis hide={true} />
-                  <Tooltip />
+                  <Tooltip 
+                    formatter={(value) => [`${value} sales`, 'Sales']}
+                    contentStyle={{
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      borderRadius: "4px",
+                      padding: "8px",
+                    }}
+                  />
                   <Bar
                     dataKey="sales"
                     fill="#FFA726"
