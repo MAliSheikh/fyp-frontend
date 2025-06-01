@@ -282,6 +282,7 @@ const Products = () => {
                 onClick={handleLoadMore}
                 disabled={loadingMore}
                 sx={{
+                  mb:13,
                   height: 45,
                   textTransform: "none",
                   bgcolor: "#26A69A",
