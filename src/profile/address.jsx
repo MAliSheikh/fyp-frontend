@@ -114,6 +114,7 @@ const AddressInputPage = () => {
         display: "flex",
         flexDirection: "column",
         gap: 3, 
+        marginBottom: 15,
       }}
     >
       {isLoading ? (
