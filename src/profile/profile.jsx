@@ -80,6 +80,7 @@ const CustomerProfile = () => {
         display: "flex",
         flexDirection: "column",
         gap: 3,
+        marginBottom: 15,
       }}
     >
       {/* Profile Header */}
