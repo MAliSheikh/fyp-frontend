@@ -263,7 +263,7 @@ const ChattingPanel = () => {
   }, [activeChat?.user_id, activeChat?.store_id]);
 
   return (
-    <Container maxWidth="lg" sx={{ height: "100vh", py: 2 }}>
+    <Container maxWidth="lg" sx={{ height: "100vh", py: 2,mb:13 }}>
       <Paper
         elevation={3}
         sx={{ height: "90vh", display: "flex", overflow: "hidden" }}

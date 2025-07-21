@@ -10,24 +10,32 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { Paper, Typography, Box, IconButton, useTheme, useMediaQuery, Grid } from "@mui/material";
+import {
+  Paper,
+  Typography,
+  Box,
+  IconButton,
+  useTheme,
+  useMediaQuery,
+  Grid,
+} from "@mui/material";
 import { SideBar } from "./sidebar";
-import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import axios from "axios";
 
 const COLORS = [
-  "#FF6B6B",  // Coral Red
-  "#FFD166",  // Soft Yellow
-  "#06D6A0",  // Mint Green
-  "#118AB2",  // Deep Sky Blue
-  "#EF476F",  // Vivid Pink
-  "#073B4C",  // Navy Blue
-  "#F4A261",  // Sandy Orange
-  "#2A9D8F",  // Teal
-  "#E76F51",  // Terracotta
-  "#A8DADC",  // Powder Blue
-  "#1D3557",  // Prussian Blue
-  "#B5838D"   // Dusty Mauve
+  "#FF6B6B", // Coral Red
+  "#FFD166", // Soft Yellow
+  "#06D6A0", // Mint Green
+  "#118AB2", // Deep Sky Blue
+  "#EF476F", // Vivid Pink
+  "#073B4C", // Navy Blue
+  "#F4A261", // Sandy Orange
+  "#2A9D8F", // Teal
+  "#E76F51", // Terracotta
+  "#A8DADC", // Powder Blue
+  "#1D3557", // Prussian Blue
+  "#B5838D", // Dusty Mauve
 ];
 
 const SalesChart = () => {
@@ -36,7 +44,7 @@ const SalesChart = () => {
   const [monthlySalesData, setMonthlySalesData] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   useEffect(() => {
     const fetchSalesData = async () => {
@@ -70,14 +78,14 @@ const SalesChart = () => {
         <IconButton
           onClick={() => setIsSidebarOpen(true)}
           sx={{
-            position: 'fixed',
+            position: "fixed",
             top: 16,
             right: 16,
             zIndex: 1200,
-            bgcolor: '#119994',
-            color: 'white',
-            '&:hover': {
-              bgcolor: '#0d7b76',
+            bgcolor: "#119994",
+            color: "white",
+            "&:hover": {
+              bgcolor: "#0d7b76",
             },
           }}
         >
@@ -88,16 +96,13 @@ const SalesChart = () => {
       {/* Sidebar */}
       {isMobile ? (
         isSidebarOpen && (
-          <SideBar 
-            isMobile={true} 
-            onClose={() => setIsSidebarOpen(false)} 
-          />
+          <SideBar isMobile={true} onClose={() => setIsSidebarOpen(false)} />
         )
       ) : (
         <Box
           sx={{
             width: "250px",
-            display: { xs: "none", md: "block" }
+            display: { xs: "none", md: "block" },
           }}
         >
           <SideBar isMobile={false} />
@@ -112,13 +117,66 @@ const SalesChart = () => {
           width: { xs: "100%", md: "75%" },
           ml: { xs: 0, md: 1 },
           maxWidth: "1200px",
-          overflow: { xs: "auto", md: "hidden" }
+          overflow: { xs: "auto", md: "hidden" },
         }}
       >
         <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}>
+              <Paper
+                elevation={3}
+                sx={{
+                  p: "12px 16px 8px 16px",
+                  borderRadius: 2,
+                  textAlign: "center",
+                  flex: 1,
+                  minWidth: 180,
+                  maxWidth: 220,
+                  mb: { xs: 1, md: 0 },
+                }}
+              >
+                <Typography variant="subtitle2" sx={{ fontSize: "0.9rem" }}>
+                  Total Amount
+                </Typography>
+                <Typography variant="h6" sx={{ fontSize: "1.2rem" }}>
+                  {monthlySalesData.reduce(
+                    (sum, item) => sum + (item.sales_amount || 0),
+                    0
+                  )}
+                </Typography>
+              </Paper>
+              <Paper
+                elevation={3}
+                sx={{
+                  p: "12px 16px 8px 16px",
+                  borderRadius: 2,
+                  textAlign: "center",
+                  flex: 1,
+                  minWidth: 180,
+                  maxWidth: 220,
+                }}
+              >
+                <Typography variant="subtitle2" sx={{ fontSize: "0.9rem" }}>
+                  Total Sales (All Months)
+                </Typography>
+                <Typography variant="h6" sx={{ fontSize: "1.2rem" }}>
+                  {monthlySalesData
+                    .reduce(
+                      (sum, item) => sum + (parseFloat(item.sales) || 0),
+                      0
+                    )
+                    .toLocaleString("en-PK", {
+                      style: "currency",
+                      currency: "PKR",
+                      maximumFractionDigits: 0,
+                    })}
+                </Typography>
+              </Paper>
+            </Box>
+          </Grid>
           {/* Weekly Sales Chart */}
           <Grid item xs={12} md={6} sx={{ mb: 4 }}>
-            <Paper elevation={3} sx={{ p: 2, borderRadius: 5, height: '100%' }}>
+            <Paper elevation={3} sx={{ p: 2, borderRadius: 5, height: "100%" }}>
               <Typography variant="h5" sx={{ textAlign: "center", mt: 2 }}>
                 Weekly Sales
               </Typography>
@@ -149,7 +207,7 @@ const SalesChart = () => {
 
           {/* Purchase Orders Chart */}
           <Grid item xs={12} md={6} sx={{ mb: 4 }}>
-            <Paper elevation={3} sx={{ p: 2, borderRadius: 5, height: '100%' }}>
+            <Paper elevation={3} sx={{ p: 2, borderRadius: 5, height: "100%" }}>
               <Typography variant="h5" sx={{ textAlign: "center", mt: 2 }}>
                 Purchase Orders
               </Typography>
@@ -179,9 +237,12 @@ const SalesChart = () => {
 
           {/* Total Sales Pie Chart */}
           <Grid item xs={12} md={6} sx={{ mb: 4 }}>
-            <Paper elevation={3} sx={{ p: 2, borderRadius: 5, height: '100%' }}>
-              <Typography variant="h5" sx={{ textAlign: "center", mb: 1, mt: 0.5 }}>
-                Total Sales
+            <Paper elevation={3} sx={{ p: 2, borderRadius: 5, height: "100%" }}>
+              <Typography
+                variant="h5"
+                sx={{ textAlign: "center", mb: 1, mt: 0.5 }}
+              >
+                Monthly Amount
               </Typography>
               <ResponsiveContainer width="100%" height={270}>
                 <PieChart>
@@ -196,12 +257,15 @@ const SalesChart = () => {
                   <Pie
                     data={monthlySalesData.map((item) => ({
                       name: item.month,
-                      value: item.sales,
+                      value: item.sales_amount,
                     }))}
                     cx="50%"
                     cy="50%"
                     labelLine={true}
-                    label={({ value }) => value}
+                    // label={({ value }) => value}
+                    label={({ value }) =>
+                      `Rs. ${value.toLocaleString("en-PK")}`
+                    }
                     outerRadius={100}
                     dataKey="value"
                     isAnimationActive={false}
@@ -220,7 +284,7 @@ const SalesChart = () => {
 
           {/* Monthly Sales Chart */}
           <Grid item xs={12} md={6} sx={{ mb: 4 }}>
-            <Paper elevation={3} sx={{ p: 2, borderRadius: 5, height: '100%' }}>
+            <Paper elevation={3} sx={{ p: 2, borderRadius: 5, height: "100%" }}>
               <Typography variant="h5" sx={{ textAlign: "center", mb: 1 }}>
                 Monthly Sales
               </Typography>
@@ -238,8 +302,8 @@ const SalesChart = () => {
                     height={60}
                   />
                   <YAxis hide={true} />
-                  <Tooltip 
-                    formatter={(value) => [`${value} sales`, 'Sales']}
+                  <Tooltip
+                    formatter={(value) => [`${value} sales`, "Sales"]}
                     contentStyle={{
                       backgroundColor: "rgba(255, 255, 255, 0.9)",
                       borderRadius: "4px",
