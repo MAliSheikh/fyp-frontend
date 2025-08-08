@@ -47,7 +47,7 @@ const ProductSlider = ({ products, title = "Featured Products" }) => {
   };
 
   const handleProductClick = (productId) => {
-    navigate(`/product/${productId}`);
+    navigate(`/products/${productId}`);
   };
 
   return (

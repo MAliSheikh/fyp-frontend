@@ -26,8 +26,8 @@ const Login = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleLogin = async (event) => {
-    event.preventDefault();
-    setError("");
+    event.preventDefault();// prevent from refresihing the page
+    setError(""); // Clear any previous error
     setLoading(true); // Set loading to true on login attempt
 
     if (!email || !password) {
